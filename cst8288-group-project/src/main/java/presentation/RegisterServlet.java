@@ -1,7 +1,7 @@
 package presentation;
 
 import data.UserDAO;
-import model.User;
+import model.User.User;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

@@ -26,6 +26,7 @@
         <url-pattern>/LoginServlet</url-pattern>
     </servlet-mapping>
     
+    <!-- Servlet Configuration for Logout -->
     <servlet>
         <servlet-name>LogoutServlet</servlet-name>
         <servlet-class>presentation.LogoutServlet</servlet-class>
@@ -36,6 +37,16 @@
         <url-pattern>/LogoutServlet</url-pattern>
     </servlet-mapping>
 
+    <!-- Servlet Configuration for Vehicle Management -->
+    <servlet>
+        <servlet-name>VehicleManagementServlet</servlet-name>
+        <servlet-class>presentation.VehicleManagementServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>VehicleManagementServlet</servlet-name>
+        <url-pattern>/VehicleManagementServlet</url-pattern>
+    </servlet-mapping>
 
     <!-- Welcome File (default page on startup) -->
     <welcome-file-list>

@@ -1,7 +1,7 @@
 package presentation;
 
 import data.UserDAO;
-import model.User;
+import model.User.User;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -34,7 +34,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("loggedInUser", user);
 
             // Redirect to dashboard.jsp
-            response.sendRedirect("DashboardPage.jsp");
+            response.sendRedirect("VehicleManagementServlet?action=dashboard");
         } else {
             // Invalid login → Send error message to login.jsp
             request.setAttribute("error", "Invalid email or password. Please try again.");
