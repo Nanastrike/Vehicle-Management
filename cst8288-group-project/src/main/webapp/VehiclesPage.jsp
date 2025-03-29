@@ -1,7 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.List, model.VehicleManagement.Vehicle" %>
+<%@ page import="java.util.List, model.VehicleManagement.Vehicle, model.User.User" %>
 
 <%
+    // Retrieve the logged-in user from the session
+    User user = (User) session.getAttribute("loggedInUser");
+    if (user == null) {
+        response.sendRedirect("LoginPage.jsp");
+        return;
+    }
     List<Vehicle> vehicleList = (List<Vehicle>) request.getAttribute("vehicleList");
 %>
 
@@ -19,28 +25,8 @@
             margin: 0;
             padding: 0;
         }
-        /* Navbar Styles */
-        .navbar {
-            background-color: #fff;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            border-bottom: 1px solid #ddd;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .navbar a {
-            color: #555;
-            padding: 14px 20px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease-in-out;
-        }
-        .navbar a:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-            border-radius: 5px;
-            color: #333;
-        }
+
+        /* Main Container and Content */
         .container {
             max-width: 1200px;
             margin: 20px auto;
@@ -49,10 +35,15 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
+
         h2 {
             color: #555;
             text-align: left;
+            font-size: 24px;
+            margin-bottom: 20px;
         }
+
+        /* Add Button */
         .add-btn {
             background-color: #4682B4;
             color: white;
@@ -62,26 +53,34 @@
             font-weight: 600;
             transition: background-color 0.3s ease-in-out;
         }
+
         .add-btn:hover {
             background-color: #4169E1;
         }
+
+        /* Table Styles */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
+
         th, td {
             padding: 12px 15px;
             border-bottom: 1px solid #ddd;
             text-align: left;
         }
+
         th {
             background-color: #4682B4;
             color: white;
         }
+
         tr:hover {
             background-color: #f1f1f1;
         }
+
+        /* Edit and Delete Buttons */
         .edit-btn, .delete-btn {
             padding: 6px 12px;
             border: none;
@@ -90,40 +89,42 @@
             cursor: pointer;
             text-decoration: none;
         }
+
         .edit-btn {
-            background-color: #20c997;
+            background-color: #198754;
             color: white;
         }
+
         .edit-btn:hover {
-            background-color: #17a589;
+            background-color: #157347;
         }
+
         .delete-btn {
             background-color: #dc3545;
             color: white;
         }
+
         .delete-btn:hover {
             background-color: #c82333;
         }
+
         .no-data {
             text-align: center;
             padding: 20px;
             color: #777;
         }
+
+        /* Centering Action Buttons */
+        th.action-col, td.action-col {
+            text-align: center;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Navbar -->
-    <div class="navbar">
-        <div>
-            <a href="DashboardPage.jsp">Home</a>
-            <a href="VehiclesPage.jsp">Vehicle Management</a>
-            <a href="gps_tracking.jsp">GPS Tracking</a>
-            <a href="fuel_monitor.jsp">Fuel/Energy Monitor</a>
-            <a href="maintenance.jsp">Maintenance Alerts</a>
-            <a href="reports.jsp">Reports</a>
-        </div>
-    </div>
+    <!-- Include Navbar -->
+    <jsp:include page="navbar.jsp" />
 
     <!-- Main Container -->
     <div class="container">
@@ -144,8 +145,8 @@
                     <th>Max Passengers</th>
                     <th>Consumption Rate (km/l)</th>
                     <th>Last Maintenance</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
+                    <th class="action-col">Edit</th>
+                    <th class="action-col">Delete</th>
                 </tr>
             </thead>
             <tbody>
@@ -158,11 +159,11 @@
                             <td><%= vehicle.getMaxPassengers() %></td>
                             <td><%= vehicle.getConsumptionRate() %></td>
                             <td><%= vehicle.getLastMaintenanceDate() != null ? vehicle.getLastMaintenanceDate() : "N/A" %></td>
-                            <td>
+                            <td class="action-col">
                                 <!-- Edit Button -->
-                                <a href="EditVehiclePage.jsp?vehicleID=<%= vehicle.getVehicleID() %>" class="edit-btn">Edit</a>
+                                <a href="VehicleManagementServlet?action=update&vehicleID=<%= vehicle.getVehicleID() %>" class="edit-btn">Edit</a>
                             </td>
-                            <td>
+                            <td class="action-col">
                                 <!-- Delete Button with Confirmation -->
                                 <a href="VehicleManagementServlet?action=delete&vehicleID=<%= vehicle.getVehicleID() %>" 
                                    class="delete-btn"

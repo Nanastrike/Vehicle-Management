@@ -1,9 +1,18 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.List, model.VehicleManagement.Vehicle" %>
+<%@ page import="model.VehicleManagement.Vehicle, model.VehicleManagement.VehicleType, model.VehicleManagement.FuelType" %>
+
+<%
+    Vehicle vehicle = (Vehicle) request.getAttribute("vehicle");
+    if (vehicle == null) {
+        response.sendRedirect("VehicleManagementServlet?action=list");
+        return;
+    }
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add Vehicle</title>
+    <title>Edit Vehicle</title>
     <!-- Google Font - Quicksand for consistency -->
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
 
@@ -14,18 +23,14 @@
             margin: 0;
             padding: 0;
         }
-        /* Navbar Styles */
         .navbar {
             background-color: #fff;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 20px; /* Consistent padding */
-            height: 60px; /* Fixed height */
+            padding: 10px 20px;
             border-bottom: 1px solid #ddd;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin: 0 auto;
-            box-sizing: border-box;
         }
         .navbar a {
             color: #555;
@@ -40,6 +45,7 @@
             color: #333;
         }
         .container {
+            max-width: 600px; /* Consistent width with AddVehiclePage */
             margin: 20px auto;
             padding: 20px;
             background-color: #fff;
@@ -65,11 +71,11 @@
             border: 1px solid #ccc;
             border-radius: 8px;
             font-size: 14px;
-            box-sizing: border-box; /* Prevent width overflow */
+            box-sizing: border-box; /* Ensures padding and border are included */
         }
-        /* Limit select width to 80% */
+        /* Limit select width to 80% to make them shorter */
         select {
-            width: 20%;
+            width: 80%;
         }
         input:focus, select:focus {
             border-color: #4682B4;
@@ -105,81 +111,51 @@
         .back-btn:hover {
             background-color: #5a6268;
         }
-        /* Error and Success Messages */
-        .error {
-            color: #dc3545;
-            background-color: #f8d7da;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .success {
-            color: #28a745;
-            background-color: #d4edda;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
 
     <!-- Main Container -->
     <div class="container">
-        <h2>Add New Vehicle</h2>
-
-        <!-- Display Error or Success Messages -->
-        <% 
-            String error = (String) request.getAttribute("error");
-            String success = (String) request.getAttribute("success");
-        %>
-        
-        <% if (error != null) { %>
-            <div class="error"><%= error %></div>
-        <% } %>
-
-        <% if (success != null) { %>
-            <div class="success"><%= success %></div>
-        <% } %>
+        <h2>Edit Vehicle</h2>
 
         <!-- Vehicle Form -->
         <form action="VehicleManagementServlet" method="post">
-            <input type="hidden" name="action" value="insert">
+            <input type="hidden" name="action" value="update">
+            <input type="hidden" name="vehicleID" value="<%= vehicle.getVehicleID() %>">
 
             <label for="vehicleNumber">Vehicle Number:</label>
-            <input type="text" name="vehicleNumber" id="vehicleNumber" required>
+            <input type="text" name="vehicleNumber" id="vehicleNumber" value="<%= vehicle.getVehicleNumber() %>" required>
 
             <label for="vehicleTypeID">Vehicle Type:</label>
             <select name="vehicleTypeID" id="vehicleTypeID" required>
-                <option value="1">Diesel Bus</option>
-                <option value="2">Electric Light Rail</option>
-                <option value="3">Diesel-Electric Train</option>
+                <option value="1" <%= vehicle.getVehicleType().getVehicleTypeID() == 1 ? "selected" : "" %>>Diesel Bus</option>
+                <option value="2" <%= vehicle.getVehicleType().getVehicleTypeID() == 2 ? "selected" : "" %>>Electric Light Rail</option>
+                <option value="3" <%= vehicle.getVehicleType().getVehicleTypeID() == 3 ? "selected" : "" %>>Diesel-Electric Train</option>
             </select>
 
             <label for="fuelTypeID">Fuel Type:</label>
             <select name="fuelTypeID" id="fuelTypeID" required>
-                <option value="1">Diesel</option>
-                <option value="2">CNG</option>
-                <option value="3">Electric</option>
+                <option value="1" <%= vehicle.getFuelType().getFuelTypeID() == 1 ? "selected" : "" %>>Diesel</option>
+                <option value="2" <%= vehicle.getFuelType().getFuelTypeID() == 2 ? "selected" : "" %>>CNG</option>
+                <option value="3" <%= vehicle.getFuelType().getFuelTypeID() == 3 ? "selected" : "" %>>Electric</option>
             </select>
 
             <label for="consumptionRate">Consumption Rate (km/l):</label>
-            <input type="number" step="0.01" name="consumptionRate" id="consumptionRate" required>
+            <input type="number" step="0.01" name="consumptionRate" id="consumptionRate" value="<%= vehicle.getConsumptionRate() %>" required>
 
             <label for="maxPassengers">Max Passengers:</label>
-            <input type="number" name="maxPassengers" id="maxPassengers" required>
+            <input type="number" name="maxPassengers" id="maxPassengers" value="<%= vehicle.getMaxPassengers() %>" required>
 
             <label for="routeID">Route ID (Optional):</label>
-            <input type="number" name="routeID" id="routeID" min="0" value="0">
+            <input type="number" name="routeID" id="routeID" value="<%= vehicle.getRouteID() %>">
 
             <label for="lastMaintenanceDate">Last Maintenance Date:</label>
-            <input type="date" name="lastMaintenanceDate" id="lastMaintenanceDate" required>
+            <input type="date" name="lastMaintenanceDate" id="lastMaintenanceDate" value="<%= vehicle.getLastMaintenanceDate() %>" required>
 
             <!-- Submit and Back Buttons -->
             <div class="btn-container">
-                <button type="submit" class="btn">Add Vehicle</button>
+                <button type="submit" class="btn">Update Vehicle</button>
                 <a href="VehicleManagementServlet?action=list" class="back-btn">Cancel</a>
             </div>
         </form>

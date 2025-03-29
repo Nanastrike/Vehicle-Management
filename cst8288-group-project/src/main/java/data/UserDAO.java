@@ -1,6 +1,6 @@
 package data;
 
-import model.User;
+import model.User.User;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

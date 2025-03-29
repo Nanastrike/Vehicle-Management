@@ -15,23 +15,25 @@ public class VehicleDAO {
 
     // Add Vehicle
     public boolean addVehicle(Vehicle vehicle) {
-        String sql = "INSERT INTO Vehicles (VehicleNumber, VehicleTypeID, FuelTypeID, ConsumptionRate, MaxPassengers, RouteID, LastMaintenanceDate) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, vehicle.getVehicleNumber());
-            stmt.setInt(2, vehicle.getVehicleType().getVehicleTypeID());
-            stmt.setInt(3, vehicle.getFuelType().getFuelTypeID());
-            stmt.setFloat(4, vehicle.getConsumptionRate());
-            stmt.setObject(5, vehicle.getRouteID() != 0 ? vehicle.getRouteID() : null);
-            stmt.setDate(6, vehicle.getLastMaintenanceDate());
+    String sql = "INSERT INTO Vehicles (VehicleNumber, VehicleTypeID, FuelTypeID, ConsumptionRate, MaxPassengers, RouteID, LastMaintenanceDate) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, vehicle.getVehicleNumber());
+        stmt.setInt(2, vehicle.getVehicleType().getVehicleTypeID());
+        stmt.setInt(3, vehicle.getFuelType().getFuelTypeID());
+        stmt.setFloat(4, vehicle.getConsumptionRate());
+        stmt.setInt(5, vehicle.getMaxPassengers());
+        stmt.setInt(6, vehicle.getRouteID());
+        stmt.setDate(7, vehicle.getLastMaintenanceDate());
 
-            int rowsInserted = stmt.executeUpdate();
-            System.out.println("Rows inserted: " + rowsInserted);
-            return rowsInserted > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        int rowsInserted = stmt.executeUpdate();
+        System.out.println("Rows inserted: " + rowsInserted);
+        return rowsInserted > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
     }
+}
+
 
     // Get All Vehicles
     public List<Vehicle> getAllVehicles() {
@@ -128,4 +130,20 @@ public class VehicleDAO {
         System.out.println("Vehicle Retrieved: " + vehicleNumber);
         return vehicle;
     }
+    // Check if Vehicle Number Already Exists
+public boolean isVehicleNumberExists(String vehicleNumber) {
+    String sql = "SELECT COUNT(*) FROM Vehicles WHERE VehicleNumber = ?";
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        
+        stmt.setString(1, vehicleNumber);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
 }
