@@ -1,52 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
-   version="6.0">
-
-    <!-- Servlet Configuration for Register -->
-    <servlet>
-        <servlet-name>RegisterServlet</servlet-name>
-        <servlet-class>presentation.RegisterServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>RegisterServlet</servlet-name>
-        <url-pattern>/RegisterServlet</url-pattern>
-    </servlet-mapping>
-
-    <!-- Servlet Configuration for Login -->
-    <servlet>
-        <servlet-name>LoginServlet</servlet-name>
-        <servlet-class>presentation.LoginServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>LoginServlet</servlet-name>
-        <url-pattern>/LoginServlet</url-pattern>
-    </servlet-mapping>
-    
-    <!-- Servlet Configuration for Logout -->
-    <servlet>
-        <servlet-name>LogoutServlet</servlet-name>
-        <servlet-class>presentation.LogoutServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>LogoutServlet</servlet-name>
-        <url-pattern>/LogoutServlet</url-pattern>
-    </servlet-mapping>
-
-    <!-- Servlet Configuration for Vehicle Management -->
-    <servlet>
-        <servlet-name>VehicleManagementServlet</servlet-name>
-        <servlet-class>presentation.VehicleManagementServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>VehicleManagementServlet</servlet-name>
-        <url-pattern>/VehicleManagementServlet</url-pattern>
-    </servlet-mapping>
+   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+   version="5.0">
 
     <!-- Welcome File (default page on startup) -->
     <welcome-file-list>
@@ -57,4 +13,44 @@
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
+
+    <!-- LoginServlet Configuration -->
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>presentation.LoginServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/LoginServlet</url-pattern>
+    </servlet-mapping>
+
+    <!-- RegisterServlet Configuration -->
+    <servlet>
+        <servlet-name>RegisterServlet</servlet-name>
+        <servlet-class>presentation.RegisterServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RegisterServlet</servlet-name>
+        <url-pattern>/RegisterServlet</url-pattern>
+    </servlet-mapping>
+
+    <!-- LogoutServlet Configuration -->
+    <servlet>
+        <servlet-name>LogoutServlet</servlet-name>
+        <servlet-class>presentation.LogoutServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LogoutServlet</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+
+    <!-- VehicleManagementServlet Configuration -->
+    <servlet>
+        <servlet-name>VehicleManagementServlet</servlet-name>
+        <servlet-class>presentation.VehicleManagementServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VehicleManagementServlet</servlet-name>
+        <url-pattern>/VehicleManagementServlet</url-pattern>
+    </servlet-mapping>
 </web-app>

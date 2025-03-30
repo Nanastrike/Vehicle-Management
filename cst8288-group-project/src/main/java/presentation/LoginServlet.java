@@ -4,7 +4,6 @@ import data.UserDAO;
 import model.User.User;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
