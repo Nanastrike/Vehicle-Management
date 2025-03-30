@@ -1,7 +1,8 @@
 package businesslayer;
 
-import databaselayer.MaintenanceTaskDAO;
-import model.MaintenanceTask;
+import data.MaintenanceTaskDAO;
+import data.DatabaseConnection;
+import model.MaintenanceTask.MaintenanceTask;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,8 +10,8 @@ import java.util.List;
 public class MaintenanceTaskController {
     private final MaintenanceTaskDAO taskDAO;
     
-    public MaintenanceTaskController() {
-        this.taskDAO = new MaintenanceTaskDAO();
+    public MaintenanceTaskController() throws SQLException {
+        this.taskDAO = new MaintenanceTaskDAO(DatabaseConnection.getInstance().getConnection());
     }
     
     public void createMaintenanceTask(String vehicleId, String componentType, 

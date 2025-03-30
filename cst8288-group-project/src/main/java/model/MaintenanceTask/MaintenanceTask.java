@@ -1,4 +1,4 @@
-package model;
+package model.MaintenanceTask;
 
 import java.time.LocalDateTime;
 

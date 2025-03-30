@@ -11,15 +11,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-@WebServlet("/RegisterServlet")
 public class RegisterServlet extends HttpServlet {
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        // Forward to the registration page
-        request.getRequestDispatcher("RegisterPage.jsp").forward(request, response);
-    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -82,4 +74,3 @@ public class RegisterServlet extends HttpServlet {
         }
     }
 }
-

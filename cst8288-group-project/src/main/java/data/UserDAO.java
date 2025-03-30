@@ -123,4 +123,3 @@ public boolean isEmailRegistered(String email) {
     return exists;
 }
 }
-

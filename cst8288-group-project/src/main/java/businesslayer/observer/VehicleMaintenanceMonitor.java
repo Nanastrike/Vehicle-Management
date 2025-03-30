@@ -1,9 +1,12 @@
 package businesslayer.observer;
 
+import model.MaintenanceTask.ComponentStatus;
+import model.MaintenanceTask.ComponentObserver;
+import model.MaintenanceTask.ComponentMonitor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VehicleMaintenanceMonitor implements MaintenanceSubject {
+public class VehicleMaintenanceMonitor implements ComponentMonitor {
     private static final double CRITICAL_WEAR_LEVEL = 80.0;
     private static final double WARNING_WEAR_LEVEL = 60.0;
     private static final double MAX_HOURS = 1000.0;
@@ -16,38 +19,43 @@ public class VehicleMaintenanceMonitor implements MaintenanceSubject {
     private static final double CRITICAL_PRESSURE = 200.0;
     private static final double WARNING_PRESSURE = 150.0;
     
-    private List<MaintenanceObserver> observers;
+    private List<ComponentObserver> observers;
+    private List<ComponentStatus> componentStatuses;
     private String vehicleId;
-    private String componentType;
-    private double wearLevel;
-    private String alertMessage;
     
     public VehicleMaintenanceMonitor(String vehicleId) {
         this.observers = new ArrayList<>();
+        this.componentStatuses = new ArrayList<>();
         this.vehicleId = vehicleId;
     }
     
     @Override
-    public void registerObserver(MaintenanceObserver observer) {
+    public void addObserver(ComponentObserver observer) {
         observers.add(observer);
     }
     
     @Override
-    public void removeObserver(MaintenanceObserver observer) {
+    public void removeObserver(ComponentObserver observer) {
         observers.remove(observer);
     }
     
     @Override
     public void notifyObservers() {
-        for (MaintenanceObserver observer : observers) {
-            observer.update(vehicleId, componentType, wearLevel, alertMessage);
+        for (ComponentObserver observer : observers) {
+            observer.update(componentStatuses);
         }
     }
     
-    public void setMaintenanceData(String componentType, double wearLevel, String alertMessage) {
-        this.componentType = componentType;
-        this.wearLevel = wearLevel;
-        this.alertMessage = alertMessage;
+    @Override
+    public List<ComponentStatus> getComponentStatuses() {
+        return componentStatuses;
+    }
+    
+    private void updateComponentStatus(String componentType, double wearLevel, String alertMessage) {
+        String status = wearLevel >= CRITICAL_WEAR_LEVEL ? "CRITICAL" : 
+                       (wearLevel >= WARNING_WEAR_LEVEL ? "WARNING" : "NORMAL");
+        ComponentStatus componentStatus = new ComponentStatus(vehicleId, componentType, wearLevel, status, alertMessage);
+        componentStatuses.add(componentStatus);
         notifyObservers();
     }
     
@@ -64,7 +72,7 @@ public class VehicleMaintenanceMonitor implements MaintenanceSubject {
             alertMessage = "Operating normally";
         }
         
-        setMaintenanceData(componentType, wearLevel, alertMessage);
+        updateComponentStatus(componentType, wearLevel, alertMessage);
     }
     
     public void monitorElectricalComponents(String componentType, double voltage, double current) {
@@ -82,7 +90,7 @@ public class VehicleMaintenanceMonitor implements MaintenanceSubject {
             alertMessage = "Electrical component operating normally";
         }
         
-        setMaintenanceData(componentType, wearLevel, alertMessage);
+        updateComponentStatus(componentType, wearLevel, alertMessage);
     }
     
     public void monitorEngineDiagnostics(String componentType, double temperature, double pressure) {
@@ -100,6 +108,6 @@ public class VehicleMaintenanceMonitor implements MaintenanceSubject {
             alertMessage = "Engine operating normally";
         }
         
-        setMaintenanceData(componentType, wearLevel, alertMessage);
+        updateComponentStatus(componentType, wearLevel, alertMessage);
     }
 } 

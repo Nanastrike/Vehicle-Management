@@ -1,37 +1,43 @@
 package presentation;
 
-import businesslayer.observer.MaintenanceAlertObserver;
-import businesslayer.observer.VehicleMaintenanceMonitor;
-import model.MaintenanceAlert;
+import businesslayer.MaintenanceTaskController;
+import model.MaintenanceTask.MaintenanceTask;
+import model.MaintenanceTask.ComponentStatus;
+import model.MaintenanceTask.VehicleComponentMonitor;
+import model.MaintenanceTask.MaintenanceAlert;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class MaintenancePresenter {
-    private VehicleMaintenanceMonitor monitor;
-    private MaintenanceAlertObserver observer;
+    private final MaintenanceTaskController taskController;
+    private final VehicleComponentMonitor componentMonitor;
     
-    public MaintenancePresenter(String vehicleId) {
-        this.monitor = new VehicleMaintenanceMonitor(vehicleId);
-        this.observer = new MaintenanceAlertObserver("系統監控器");
-        this.monitor.registerObserver(observer);
+    public MaintenancePresenter() throws SQLException {
+        this.taskController = new MaintenanceTaskController();
+        this.componentMonitor = new VehicleComponentMonitor();
     }
     
-    public void checkMechanicalComponents(String componentType, double hoursOfUse) {
-        monitor.monitorMechanicalComponents(componentType, hoursOfUse);
+    public void displayMaintenanceTasks() throws SQLException {
+        List<MaintenanceTask> tasks = taskController.getAllMaintenanceTasks();
+        for (MaintenanceTask task : tasks) {
+            System.out.println("Task ID: " + task.getTaskId());
+            System.out.println("Vehicle ID: " + task.getVehicleId());
+            System.out.println("Component Type: " + task.getComponentType());
+            System.out.println("Description: " + task.getTaskDescription());
+            System.out.println("Scheduled Date: " + task.getScheduledDate());
+            System.out.println("Status: " + task.getStatus());
+            System.out.println("Created By: " + task.getCreatedBy());
+            System.out.println("Created At: " + task.getCreatedAt());
+            System.out.println("----------------------------------------");
+        }
     }
     
-    public void checkElectricalComponents(String componentType, double voltage, double current) {
-        monitor.monitorElectricalComponents(componentType, voltage, current);
-    }
-    
-    public void checkEngineDiagnostics(String componentType, double temperature, double pressure) {
-        monitor.monitorEngineDiagnostics(componentType, temperature, pressure);
-    }
-    
-    public List<MaintenanceAlert> getAlerts() {
-        return observer.getAlerts();
-    }
-    
-    public void clearAlerts() {
-        observer.clearAlerts();
+    public void displayComponentAlerts() {
+        List<ComponentStatus> statuses = componentMonitor.getComponentStatuses();
+        for (ComponentStatus status : statuses) {
+            MaintenanceAlert alert = new MaintenanceAlert(status);
+            System.out.println(alert.toString());
+        }
     }
 } 

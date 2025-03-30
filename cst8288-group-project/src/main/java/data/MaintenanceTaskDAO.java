@@ -1,23 +1,23 @@
-package databaselayer;
+package data;
 
-import model.MaintenanceTask;
+import model.MaintenanceTask.MaintenanceTask;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MaintenanceTaskDAO {
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/ptfms";
-    private static final String USER = "root";
-    private static final String PASS = "password";
+    private Connection conn;
+    
+    public MaintenanceTaskDAO(Connection conn) {
+        this.conn = conn;
+    }
     
     public void createTask(MaintenanceTask task) throws SQLException {
         String sql = "INSERT INTO maintenance_tasks (vehicle_id, component_type, task_description, " +
                     "scheduled_date, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
         
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, task.getVehicleId());
             pstmt.setString(2, task.getComponentType());
             pstmt.setString(3, task.getTaskDescription());
@@ -35,8 +35,7 @@ public class MaintenanceTaskDAO {
         List<MaintenanceTask> tasks = new ArrayList<>();
         String sql = "SELECT * FROM maintenance_tasks ORDER BY scheduled_date";
         
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             Statement stmt = conn.createStatement();
+        try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             
             while (rs.next()) {
@@ -59,9 +58,7 @@ public class MaintenanceTaskDAO {
     public void updateTaskStatus(int taskId, String status) throws SQLException {
         String sql = "UPDATE maintenance_tasks SET status = ? WHERE task_id = ?";
         
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, status);
             pstmt.setInt(2, taskId);
             
@@ -73,9 +70,7 @@ public class MaintenanceTaskDAO {
     public void deleteTask(int taskId) throws SQLException {
         String sql = "DELETE FROM maintenance_tasks WHERE task_id = ?";
         
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, taskId);
             
             pstmt.executeUpdate();
