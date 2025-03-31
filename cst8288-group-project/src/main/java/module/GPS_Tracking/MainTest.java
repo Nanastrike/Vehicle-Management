@@ -4,6 +4,9 @@
  */
 package module.GPS_Tracking;
 
+import module.GPS_Tracking.operators.OperatorAction;
+import module.GPS_Tracking.operators.OperatorActionImpl;
+import module.GPS_Tracking.vehicles.VehicleActionImpl;
 import model.VehicleManagement.Vehicle;
 
 public class MainTest {
