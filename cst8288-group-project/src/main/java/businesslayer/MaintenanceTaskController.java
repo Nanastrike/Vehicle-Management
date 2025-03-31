@@ -1,48 +1,37 @@
 package businesslayer;
 
-import data.MaintenanceTaskDAO;
-import data.DatabaseConnection;
 import model.MaintenanceTask.MaintenanceTask;
+import model.MaintenanceTask.MaintenanceTaskManager;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class MaintenanceTaskController {
-    private final MaintenanceTaskDAO taskDAO;
+    private final MaintenanceTaskManager taskManager;
     
     public MaintenanceTaskController() throws SQLException {
-        this.taskDAO = new MaintenanceTaskDAO(DatabaseConnection.getInstance().getConnection());
-    }
-    
-    public void createMaintenanceTask(String vehicleId, String componentType, 
-                                    String description, LocalDateTime scheduledDate, 
-                                    String createdBy) throws SQLException {
-        MaintenanceTask task = new MaintenanceTask(vehicleId, componentType, 
-                                                 description, scheduledDate, createdBy);
-        taskDAO.createTask(task);
+        this.taskManager = new MaintenanceTaskManager();
     }
     
     public List<MaintenanceTask> getAllMaintenanceTasks() throws SQLException {
-        return taskDAO.getAllTasks();
+        return taskManager.getAllMaintenanceTasks();
+    }
+    
+    public void createMaintenanceTask(String vehicleId, String componentType, 
+            String description, LocalDateTime scheduledDate, String createdBy) throws SQLException {
+        taskManager.createMaintenanceTask(vehicleId, componentType, description, scheduledDate, createdBy);
     }
     
     public void updateTaskStatus(int taskId, String status) throws SQLException {
-        taskDAO.updateTaskStatus(taskId, status);
+        taskManager.updateTaskStatus(taskId, status);
     }
     
     public void deleteMaintenanceTask(int taskId) throws SQLException {
-        taskDAO.deleteTask(taskId);
+        taskManager.deleteMaintenanceTask(taskId);
     }
     
-    public List<MaintenanceTask> getTasksByVehicleId(String vehicleId) throws SQLException {
-        return taskDAO.getAllTasks().stream()
-                     .filter(task -> task.getVehicleId().equals(vehicleId))
-                     .toList();
-    }
-    
-    public List<MaintenanceTask> getPendingTasks() throws SQLException {
-        return taskDAO.getAllTasks().stream()
-                     .filter(task -> task.getStatus().equals("PENDING"))
-                     .toList();
+    public void monitorComponents(String vehicleId, String componentType, 
+            double wearLevel, String alertMessage) {
+        taskManager.monitorComponents(vehicleId, componentType, wearLevel, alertMessage);
     }
 } 
