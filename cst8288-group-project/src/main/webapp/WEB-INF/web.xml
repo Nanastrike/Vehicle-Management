@@ -41,7 +41,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>LogoutServlet</servlet-name>
-        <url-pattern>/logout</url-pattern>
+        <url-pattern>/LogoutServlet</url-pattern>
     </servlet-mapping>
 
     <!-- VehicleManagementServlet Configuration -->
