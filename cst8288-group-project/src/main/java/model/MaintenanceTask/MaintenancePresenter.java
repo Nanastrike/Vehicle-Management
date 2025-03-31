@@ -1,24 +1,23 @@
 package model.MaintenanceTask;
 
 import view.MaintenanceView;
-import businesslayer.MaintenanceTaskController;
 import java.sql.SQLException;
 import java.util.List;
 
 public class MaintenancePresenter {
     private final MaintenanceView view;
     private final VehicleComponentMonitor monitor;
-    private final MaintenanceTaskController taskController;
+    private final MaintenanceTaskManager taskManager;
     
     public MaintenancePresenter(MaintenanceView view) throws SQLException {
         this.view = view;
         this.monitor = new VehicleComponentMonitor();
-        this.taskController = new MaintenanceTaskController();
+        this.taskManager = new MaintenanceTaskManager();
         this.monitor.addObserver(view);
     }
     
     public void displayMaintenanceTasks() throws SQLException {
-        List<MaintenanceTask> tasks = taskController.getAllMaintenanceTasks();
+        List<MaintenanceTask> tasks = taskManager.getAllMaintenanceTasks();
         view.displayMaintenanceTasks(tasks);
     }
     

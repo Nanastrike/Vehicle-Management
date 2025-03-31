@@ -1,13 +1,13 @@
 package model.MaintenanceTask;
 
-import businesslayer.MaintenanceTaskController;
+import model.MaintenanceTask.MaintenanceTaskManager;
 import java.util.List;
 
 public class MaintenanceAlertObserver implements ComponentObserver {
-    private final MaintenanceTaskController taskController;
+    private final MaintenanceTaskManager taskManager;
     
-    public MaintenanceAlertObserver(MaintenanceTaskController taskController) {
-        this.taskController = taskController;
+    public MaintenanceAlertObserver(MaintenanceTaskManager taskManager) {
+        this.taskManager = taskManager;
     }
     
     @Override
@@ -16,7 +16,7 @@ public class MaintenanceAlertObserver implements ComponentObserver {
             if (status.getStatus().equals("CRITICAL")) {
                 // Create emergency maintenance task
                 try {
-                    taskController.createMaintenanceTask(
+                    taskManager.createMaintenanceTask(
                         status.getVehicleId(),
                         status.getComponentType(),
                         status.getAlertMessage(),
