@@ -64,8 +64,8 @@ public class MaintenanceView implements ComponentObserver {
         for (MaintenanceTask task : tasks) {
             System.out.println("Task ID: " + task.getTaskId());
             System.out.println("Vehicle ID: " + task.getVehicleId());
-            System.out.println("Component Type: " + task.getComponentType());
-            System.out.println("Description: " + task.getTaskDescription());
+            System.out.println("Task Type: " + task.getTaskType());
+            System.out.println("Description: " + task.getDescription());
             System.out.println("Scheduled Date: " + task.getScheduledDate());
             System.out.println("Status: " + task.getStatus());
             System.out.println("----------------------------------------");

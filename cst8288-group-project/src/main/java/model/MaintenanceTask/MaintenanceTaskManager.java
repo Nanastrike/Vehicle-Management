@@ -19,9 +19,15 @@ public class MaintenanceTaskManager {
         return taskDAO.getAllTasks();
     }
     
-    public void createMaintenanceTask(String vehicleId, String componentType, 
-            String description, LocalDateTime scheduledDate, String createdBy) throws SQLException {
-        MaintenanceTask task = new MaintenanceTask(vehicleId, componentType, description, scheduledDate, createdBy);
+    public void createMaintenanceTask(int vehicleId, String taskType, String description, LocalDateTime scheduledDate, String createdBy) throws SQLException {
+        MaintenanceTask task = new MaintenanceTask();
+        task.setVehicleId(String.valueOf(vehicleId));
+        task.setTaskType(taskType);
+        task.setDescription(description);
+        task.setScheduledDate(scheduledDate);
+        task.setCreatedBy(createdBy);
+        task.setStatus("PENDING");
+        
         taskDAO.createTask(task);
     }
     

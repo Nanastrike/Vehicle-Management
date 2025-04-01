@@ -1,5 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="model.User.User" %>
+<%@ page import="model.VehicleManagement.Vehicle" %>
+<%@ page import="java.util.List" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%
     // Retrieve the logged-in user from the session
@@ -8,6 +11,22 @@
         response.sendRedirect("LoginPage.jsp");
         return;
     }
+    
+    // Debug information
+    List<Vehicle> debugVehicleList = (List<Vehicle>) request.getAttribute("vehicleList");
+    System.out.println("=== JSP Debug Information ===");
+    if (debugVehicleList != null) {
+        System.out.println("Vehicle list is available in JSP");
+        System.out.println("Vehicle list size: " + debugVehicleList.size());
+        for (Vehicle v : debugVehicleList) {
+            System.out.println("Vehicle in JSP: ID=" + v.getVehicleID() + 
+                             ", Number=" + v.getVehicleNumber() + 
+                             ", Type=" + v.getVehicleType().getTypeName());
+        }
+    } else {
+        System.out.println("Vehicle list is NULL in JSP");
+    }
+    System.out.println("=== End JSP Debug Information ===");
 %>
 
 <!DOCTYPE html>
@@ -176,15 +195,39 @@
         <jsp:include page="navbar.jsp" />
 
         <div class="container">
+            <!-- Debug Information Section -->
+            <div class="section">
+                <h3>Debug Information</h3>
+                <p>Vehicle List Status: ${vehicleList != null ? 'Available' : 'Not Available'}</p>
+                <p>Vehicle List Size: ${vehicleList != null ? vehicleList.size() : '0'}</p>
+                <c:if test="${not empty vehicleList}">
+                    <p>Available Vehicles:</p>
+                    <ul>
+                        <c:forEach var="vehicle" items="${vehicleList}">
+                            <li>
+                                ID: ${vehicle.vehicleID}, 
+                                Number: ${vehicle.vehicleNumber}, 
+                                Type: ${vehicle.vehicleType.typeName}
+                            </li>
+                        </c:forEach>
+                    </ul>
+                </c:if>
+            </div>
+            
             <div class="section">
                 <h2>Schedule Maintenance Task</h2>
-                <form id="maintenanceForm" onsubmit="return scheduleMaintenanceTask(event)">
+                <form action="MaintenanceServlet" method="post">
+                    <input type="hidden" name="action" value="scheduleTask">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="vehicleId">Vehicle ID</label>
-                            <select id="vehicleId" name="vehicleId" required>
-                                <option value="">Select Vehicle</option>
-                                <!-- Will be populated dynamically -->
+                            <label for="vehicleNumber">Vehicle Number</label>
+                            <select id="vehicleNumber" name="vehicleNumber" required>
+                                <option value="">Select Vehicle Number</option>
+                                <c:forEach var="vehicle" items="${vehicleList}">
+                                    <option value="${vehicle.vehicleID}">
+                                        ${vehicle.vehicleNumber} - ${vehicle.vehicleType.typeName}
+                                    </option>
+                                </c:forEach>
                             </select>
                         </div>
                         <div class="form-group">
@@ -199,7 +242,7 @@
                         </div>
                         <div class="form-group">
                             <label for="scheduledDate">Scheduled Date</label>
-                            <input type="text" id="scheduledDate" name="scheduledDate" required>
+                            <input type="date" id="scheduledDate" name="scheduledDate" required>
                         </div>
                         <div class="form-group">
                             <label for="priority">Priority</label>
@@ -209,10 +252,6 @@
                                 <option value="MEDIUM">Medium</option>
                                 <option value="LOW">Low</option>
                             </select>
-                        </div>
-                        <div class="form-group" style="grid-column: span 2;">
-                            <label for="description">Description</label>
-                            <textarea id="description" name="description" required></textarea>
                         </div>
                     </div>
                     <button type="submit" class="btn">Schedule Task</button>
@@ -249,8 +288,23 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="scheduledTasksList">
-                        <!-- Tasks will be displayed here dynamically -->
+                    <tbody>
+                        <c:forEach var="task" items="${scheduledTasks}">
+                            <tr>
+                                <td>${task.vehicleId}</td>
+                                <td>${task.taskType}</td>
+                                <td>${task.scheduledDate}</td>
+                                <td>${task.priority}</td>
+                                <td>${task.status}</td>
+                                <td>
+                                    <form action="MaintenanceServlet" method="post" style="display: inline;">
+                                        <input type="hidden" name="action" value="deleteTask">
+                                        <input type="hidden" name="taskId" value="${task.taskId}">
+                                        <button type="submit" class="btn">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </c:forEach>
                     </tbody>
                 </table>
             </div>
@@ -263,45 +317,36 @@
                     dateFormat: 'yy-mm-dd',
                     minDate: 0
                 });
-
-                // Load vehicles for dropdown
-                loadVehicles();
                 
                 // Load scheduled tasks
                 loadScheduledTasks();
             });
-
-            function loadVehicles() {
-                fetch('api/vehicles')
-                    .then(response => response.json())
-                    .then(vehicles => {
-                        const select = document.getElementById('vehicleId');
-                        vehicles.forEach(vehicle => {
-                            const option = document.createElement('option');
-                            option.value = vehicle.id;
-                            option.textContent = `Vehicle ${vehicle.id} - ${vehicle.type}`;
-                            select.appendChild(option);
-                        });
-                    });
-            }
 
             function scheduleMaintenanceTask(event) {
                 event.preventDefault();
                 const formData = new FormData(event.target);
                 const task = Object.fromEntries(formData.entries());
 
-                fetch('api/maintenance/schedule', {
+                fetch('MaintenanceServlet', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    body: JSON.stringify(task)
+                    body: new URLSearchParams({
+                        'action': 'scheduleTask',
+                        'vehicleId': task.vehicleId,
+                        'taskType': task.taskType,
+                        'scheduledDate': task.scheduledDate,
+                        'priority': task.priority,
+                        'description': task.description
+                    })
                 })
-                .then(response => response.json())
-                .then(result => {
-                    alert('Task scheduled successfully!');
-                    loadScheduledTasks();
-                    event.target.reset();
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        throw new Error('Failed to schedule task');
+                    }
                 })
                 .catch(error => {
                     alert('Error scheduling task: ' + error.message);

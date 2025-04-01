@@ -1,15 +1,18 @@
 package presentation;
 
-import model.MaintenanceTask.MaintenanceTask;
-import model.MaintenanceTask.ComponentStatus;
-import model.MaintenanceTask.VehicleComponentMonitor;
-import model.MaintenanceTask.MaintenanceAlert;
 import model.MaintenanceTask.MaintenanceTaskManager;
+import data.VehicleDAO;
+import data.DatabaseConnection;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.MaintenanceTask.MaintenanceTask;
+import model.MaintenanceTask.ComponentStatus;
+import model.MaintenanceTask.VehicleComponentMonitor;
+import model.MaintenanceTask.MaintenanceAlert;
+import model.VehicleManagement.Vehicle;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -17,16 +20,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@WebServlet("/api/maintenance/*")
+@WebServlet(name = "MaintenanceServlet", urlPatterns = {"/MaintenanceServlet"})
 public class MaintenanceServlet extends HttpServlet {
-    private final MaintenanceTaskManager taskManager;
-    private final VehicleComponentMonitor componentMonitor;
+    private MaintenanceTaskManager taskManager;
+    private VehicleComponentMonitor componentMonitor;
+    private VehicleDAO vehicleDAO;
     
-    public MaintenanceServlet() throws ServletException {
+    @Override
+    public void init() throws ServletException {
         try {
             this.taskManager = new MaintenanceTaskManager();
             this.componentMonitor = new VehicleComponentMonitor();
+            this.vehicleDAO = new VehicleDAO(DatabaseConnection.getInstance().getConnection());
+            System.out.println("MaintenanceServlet initialized successfully");
         } catch (Exception e) {
+            System.err.println("Error initializing MaintenanceServlet: " + e.getMessage());
             throw new ServletException("Failed to initialize MaintenanceServlet", e);
         }
     }
@@ -34,25 +42,32 @@ public class MaintenanceServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        String pathInfo = request.getPathInfo();
-        
         try {
-            if (pathInfo == null || pathInfo.equals("/")) {
-                // 獲取所有維護任務
-                List<MaintenanceTask> tasks = taskManager.getAllMaintenanceTasks();
-                response.setContentType("application/json");
-                response.getWriter().write(tasks.toString());
-            } else if (pathInfo.equals("/alerts")) {
-                // 獲取所有警報
-                List<MaintenanceAlert> alerts = componentMonitor.getComponentStatuses().stream()
-                    .map(MaintenanceAlert::new)
-                    .collect(Collectors.toList());
-                response.setContentType("application/json");
-                response.getWriter().write(alerts.toString());
-            } else {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            System.out.println("MaintenanceServlet doGet called");
+            
+            // Get vehicle list
+            List<Vehicle> vehicleList = vehicleDAO.getAllVehicles();
+            System.out.println("Retrieved vehicle list size: " + (vehicleList != null ? vehicleList.size() : "null"));
+            
+            if (vehicleList != null) {
+                for (Vehicle v : vehicleList) {
+                    System.out.println("Vehicle: ID=" + v.getVehicleID() + 
+                                     ", Number=" + v.getVehicleNumber() + 
+                                     ", Type=" + (v.getVehicleType() != null ? v.getVehicleType().getTypeName() : "null"));
+                }
             }
-        } catch (SQLException e) {
+            
+            request.setAttribute("vehicleList", vehicleList);
+            
+            // Get maintenance tasks
+            List<MaintenanceTask> tasks = taskManager.getAllMaintenanceTasks();
+            request.setAttribute("scheduledTasks", tasks);
+            
+            // Forward to maintenance.jsp
+            request.getRequestDispatcher("/maintenance.jsp").forward(request, response);
+        } catch (Exception e) {
+            System.err.println("Error in MaintenanceServlet doGet: " + e.getMessage());
+            e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
@@ -60,61 +75,35 @@ public class MaintenanceServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        String pathInfo = request.getPathInfo();
+        String action = request.getParameter("action");
         
         try {
-            if (pathInfo == null || pathInfo.equals("/")) {
-                // 創建新的維護任務
-                String vehicleId = request.getParameter("vehicleId");
-                String componentType = request.getParameter("componentType");
-                String description = request.getParameter("description");
-                String scheduledDateStr = request.getParameter("scheduledDate");
-                String createdBy = request.getParameter("createdBy");
+            if ("scheduleTask".equals(action)) {
+                String vehicleNumber = request.getParameter("vehicleNumber");
+                String taskType = request.getParameter("taskType");
+                String scheduledDate = request.getParameter("scheduledDate");
+                String priority = request.getParameter("priority");
                 
-                LocalDateTime scheduledDate = LocalDateTime.parse(scheduledDateStr, 
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+                System.out.println("Scheduling task for vehicle: " + vehicleNumber);
                 
-                taskManager.createMaintenanceTask(vehicleId, componentType, description, 
-                    scheduledDate, createdBy);
+                // Create maintenance task
+                taskManager.createMaintenanceTask(
+                    Integer.parseInt(vehicleNumber),
+                    taskType,
+                    "Maintenance task for vehicle " + vehicleNumber,
+                    LocalDateTime.parse(scheduledDate + "T00:00:00"),
+                    "System"
+                );
                 
-                response.setStatus(HttpServletResponse.SC_CREATED);
-            } else if (pathInfo.equals("/mechanical")) {
-                // 監控機械組件
-                String vehicleId = request.getParameter("vehicleId");
-                double brakeWear = Double.parseDouble(request.getParameter("brakeWear"));
-                double wheelWear = Double.parseDouble(request.getParameter("wheelWear"));
-                double bearingWear = Double.parseDouble(request.getParameter("bearingWear"));
-                
-                componentMonitor.monitorMechanicalComponents(vehicleId, brakeWear, wheelWear, bearingWear);
-                response.setStatus(HttpServletResponse.SC_OK);
-            } else if (pathInfo.equals("/electrical")) {
-                // 監控電氣組件
-                String vehicleId = request.getParameter("vehicleId");
-                double catenaryWear = Double.parseDouble(request.getParameter("catenaryWear"));
-                double pantographWear = Double.parseDouble(request.getParameter("pantographWear"));
-                double breakerWear = Double.parseDouble(request.getParameter("breakerWear"));
-                
-                componentMonitor.monitorElectricalComponents(vehicleId, catenaryWear, 
-                    pantographWear, breakerWear);
-                response.setStatus(HttpServletResponse.SC_OK);
-            } else if (pathInfo.equals("/engine")) {
-                // 監控引擎診斷
-                String vehicleId = request.getParameter("vehicleId");
-                double engineTemp = Double.parseDouble(request.getParameter("engineTemp"));
-                double oilPressure = Double.parseDouble(request.getParameter("oilPressure"));
-                double fuelEfficiency = Double.parseDouble(request.getParameter("fuelEfficiency"));
-                
-                componentMonitor.monitorEngineDiagnostics(vehicleId, engineTemp, 
-                    oilPressure, fuelEfficiency);
-                response.setStatus(HttpServletResponse.SC_OK);
-            } else if (pathInfo.equals("/clear")) {
-                // 清除所有警報
-                componentMonitor.clearAlerts();
-                response.setStatus(HttpServletResponse.SC_OK);
-            } else {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                response.sendRedirect("MaintenanceServlet");
+            } else if ("deleteTask".equals(action)) {
+                int taskId = Integer.parseInt(request.getParameter("taskId"));
+                taskManager.deleteMaintenanceTask(taskId);
+                response.sendRedirect("MaintenanceServlet");
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
+            System.err.println("Error in MaintenanceServlet doPost: " + e.getMessage());
+            e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
