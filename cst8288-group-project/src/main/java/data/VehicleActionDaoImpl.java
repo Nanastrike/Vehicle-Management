@@ -99,8 +99,7 @@ public class VehicleActionDaoImpl implements VehicleActionDao {
 
     @Override
     public void insertDistanceLog(VehicleActionDTO vehicle) throws SQLException {
-        String sql = "INSERT INTO gps_tracking (VehicleID,Position, LeavingTime"
-                +"ArriveTime) VALUES (?,?,?,?)";
+        String sql = "INSERT INTO gps_tracking (VehicleID, CarDistance, LeavingTime, ArriveTime) VALUES (?,?,?,?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, vehicle.getVehicleID());
             stmt.setDouble(2, vehicle.getCarDistance());
