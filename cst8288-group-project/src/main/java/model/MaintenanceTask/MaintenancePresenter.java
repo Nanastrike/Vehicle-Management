@@ -1,10 +1,5 @@
-package presentation;
+package model.MaintenanceTask;
 
-import model.MaintenanceTask.MaintenanceTask;
-import model.MaintenanceTask.ComponentStatus;
-import model.MaintenanceTask.VehicleComponentMonitor;
-import model.MaintenanceTask.MaintenanceAlert;
-import model.MaintenanceTask.MaintenanceTaskManager;
 import view.MaintenanceView;
 import java.sql.SQLException;
 import java.util.List;

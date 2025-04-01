@@ -8,7 +8,13 @@ package module.GPS_Tracking;
  *
  * @author silve
  */
-public interface PositionChangeListener {
-    //监听坐标变化
-    void onPositionChanged(int vehicleId, double newPosition);
+
+//以操作员的行为为主体的interface
+public interface OperatorAction {
+    
+    //驾驶一辆车
+    void runVehicle(VehicleAction vehicle);
+    
+    //暂停一辆车
+    void stopVehicle(VehicleAction vehicle);
 }
