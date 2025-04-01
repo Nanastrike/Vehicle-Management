@@ -14,13 +14,13 @@ public class MaintenanceTaskDAO {
     }
     
     public void createTask(MaintenanceTask task) throws SQLException {
-        String sql = "INSERT INTO maintenance_tasks (vehicle_id, component_type, task_description, " +
+        String sql = "INSERT INTO maintenance_tasks (vehicle_id, task_type, description, " +
                     "scheduled_date, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
         
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, task.getVehicleId());
-            pstmt.setString(2, task.getComponentType());
-            pstmt.setString(3, task.getTaskDescription());
+            pstmt.setString(2, task.getTaskType());
+            pstmt.setString(3, task.getDescription());
             pstmt.setTimestamp(4, Timestamp.valueOf(task.getScheduledDate()));
             pstmt.setString(5, task.getStatus());
             pstmt.setString(6, task.getCreatedBy());
@@ -41,8 +41,8 @@ public class MaintenanceTaskDAO {
             while (rs.next()) {
                 MaintenanceTask task = new MaintenanceTask(
                     rs.getString("vehicle_id"),
-                    rs.getString("component_type"),
-                    rs.getString("task_description"),
+                    rs.getString("task_type"),
+                    rs.getString("description"),
                     rs.getTimestamp("scheduled_date").toLocalDateTime(),
                     rs.getString("created_by")
                 );

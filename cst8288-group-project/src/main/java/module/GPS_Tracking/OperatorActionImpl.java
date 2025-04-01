@@ -8,11 +8,16 @@ package module.GPS_Tracking;
  *
  * @author silve
  */
-public class RunningStateImpl implements RunningStateListener {
+public class OperatorActionImpl implements OperatorAction {
 
     @Override
-    public void onRunningStateChanged(int vehicleId, boolean isRunning) {
-        System.out.println("car id: " + vehicleId + " has become:" + (isRunning ? "running" : "stopped"));
+    public void runVehicle(VehicleAction vehicle) {
+        vehicle.setRunning(true);
+    }
+
+    @Override
+    public void stopVehicle(VehicleAction vehicle) {
+        vehicle.setRunning(false);
     }
 
 }

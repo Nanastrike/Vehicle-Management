@@ -39,6 +39,11 @@ public class VehicleComponentMonitor implements ComponentMonitor {
         notifyObservers();
     }
     
+    public void clearAlerts() {
+        componentStatuses.clear();
+        notifyObservers();
+    }
+    
     public void monitorMechanicalComponents(String vehicleId, double brakeWear, double wheelWear, double bearingWear) {
         // 監控機械組件
         if (brakeWear > 80) {

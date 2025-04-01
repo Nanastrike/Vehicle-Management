@@ -39,8 +39,8 @@ public class VehicleDAO {
     public List<Vehicle> getAllVehicles() {
         List<Vehicle> vehicleList = new ArrayList<>();
         String sql = "SELECT v.*, vt.TypeName AS VehicleTypeName, ft.TypeName AS FuelTypeName FROM Vehicles v " +
-                     "JOIN VehicleTypes vt ON v.VehicleTypeID = vt.VehicleTypeID " +
-                     "JOIN FuelTypes ft ON v.FuelTypeID = ft.FuelTypeID";
+                     "LEFT JOIN VehicleTypes vt ON v.VehicleTypeID = vt.VehicleTypeID " +
+                     "LEFT JOIN FuelTypes ft ON v.FuelTypeID = ft.FuelTypeID";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -48,6 +48,7 @@ public class VehicleDAO {
             while (rs.next()) {
                 Vehicle vehicle = mapResultSetToVehicle(rs);
                 vehicleList.add(vehicle);
+                System.out.println("Vehicle Retrieved: " + vehicle.getVehicleNumber());
             }
 
             // Debug: Print the size of the list

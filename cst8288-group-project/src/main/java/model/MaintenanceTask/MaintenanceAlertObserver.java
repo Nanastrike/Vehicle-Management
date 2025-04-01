@@ -1,13 +1,14 @@
 package model.MaintenanceTask;
 
-import businesslayer.MaintenanceTaskController;
+import model.MaintenanceTask.MaintenanceTaskManager;
 import java.util.List;
+import java.time.LocalDateTime;
 
 public class MaintenanceAlertObserver implements ComponentObserver {
-    private final MaintenanceTaskController taskController;
+    private final MaintenanceTaskManager taskManager;
     
-    public MaintenanceAlertObserver(MaintenanceTaskController taskController) {
-        this.taskController = taskController;
+    public MaintenanceAlertObserver(MaintenanceTaskManager taskManager) {
+        this.taskManager = taskManager;
     }
     
     @Override
@@ -16,13 +17,18 @@ public class MaintenanceAlertObserver implements ComponentObserver {
             if (status.getStatus().equals("CRITICAL")) {
                 // Create emergency maintenance task
                 try {
-                    taskController.createMaintenanceTask(
-                        status.getVehicleId(),
+                    // Convert vehicleId from String to int
+                    int vehicleId = Integer.parseInt(status.getVehicleId());
+                    
+                    taskManager.createMaintenanceTask(
+                        vehicleId,
                         status.getComponentType(),
-                        status.getAlertMessage(),
-                        java.time.LocalDateTime.now(),
+                        "EMERGENCY: " + status.getAlertMessage(),
+                        LocalDateTime.now(),
                         "System"
                     );
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid vehicle ID format: " + status.getVehicleId());
                 } catch (Exception e) {
                     System.err.println("Failed to create maintenance task: " + e.getMessage());
                 }
