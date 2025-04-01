@@ -37,6 +37,7 @@ public class VehicleActionImpl implements VehicleAction {
     public VehicleActionImpl(Vehicle vehicle) {
         super();
         this.vehicle = vehicle;
+        this.vehicleID = vehicle.getVehicleID();
     }
 
     public VehicleActionImpl() {
