@@ -26,7 +26,7 @@ public class VehicleActionDTO {
         this.carDistance = carDistance;
         this.leavingTime = leavingTime;
         this.arriveTime = arriveTime;
-        this.currentTime = currentTime;
+        this.currentTime = LocalTime.now();
     }
 
     public int getVehicleID() {
@@ -62,13 +62,7 @@ public class VehicleActionDTO {
     }
 
     public LocalTime getCurrentTime() {
-        return currentTime;
+        return LocalTime.now();
     }
-
-    public void setCurrentTime(LocalTime currentTime) {
-        this.currentTime = currentTime;
-    }
-    
-    
     
 }
