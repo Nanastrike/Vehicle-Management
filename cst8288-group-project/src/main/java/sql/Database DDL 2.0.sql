@@ -81,8 +81,7 @@ CREATE TABLE Vehicles (
     FOREIGN KEY (RouteID) REFERENCES Routes(RouteID) ON DELETE CASCADE
 );
 
-
--- GPS Tracking Table (For Real-Time Tracking)
+-- GPS Tracking Table (Updated)
 CREATE TABLE GPS_Tracking (
     TrackingID INT AUTO_INCREMENT PRIMARY KEY,
     VehicleID INT NOT NULL,
@@ -136,3 +135,9 @@ INSERT INTO VehicleTypes (TypeName) VALUES ('Diesel Bus'), ('Electric Light Rail
 INSERT INTO FuelTypes (TypeName) VALUES ('Diesel'), ('CNG'), ('Electric');
 INSERT INTO AlertSeverity (SeverityName) VALUES ('Low'), ('Medium'), ('High');
 INSERT INTO OperatorStatusTypes (StatusName) VALUES ('Active'), ('On Break'), ('Out of Service');
+
+-- Insert initial data into Routes table
+INSERT INTO Routes (RouteName, StartLocation, EndLocation, Distance) VALUES
+('Downtown Loop', 'Union Station', 'Main Street Terminal', 12.5),
+('Airport Express', 'City Center', 'International Airport', 25.8),
+('East-West Connector', 'East Side Depot', 'West Hills Terminal', 18.2);
