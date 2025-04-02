@@ -124,7 +124,7 @@
 <body>
 
     <!-- Include Navbar -->
-    <jsp:include page="navbar.jsp" />
+    <jsp:include page="/WEB-INF/includes/navbarDispatcher.jsp" />
 
     <!-- Main Container -->
     <div class="container">
