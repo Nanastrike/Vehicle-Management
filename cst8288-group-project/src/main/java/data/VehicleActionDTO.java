@@ -4,6 +4,7 @@
  */
 package data;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 /**
@@ -14,19 +15,19 @@ public class VehicleActionDTO {
     
     private int vehicleID;
     private double carDistance;
-    private LocalTime leavingTime;
-    private LocalTime arriveTime;
-    private LocalTime currentTime;
+    private LocalDateTime  leavingTime;
+    private LocalDateTime  arriveTime;
+    private LocalDateTime  currentTime;
 
     public VehicleActionDTO() {
     }
 
-    public VehicleActionDTO(int vehicleID, double carDistance, LocalTime leavingTime, LocalTime arriveTime, LocalTime currentTime) {
+    public VehicleActionDTO(int vehicleID, double carDistance, LocalDateTime  leavingTime, LocalDateTime  arriveTime, LocalDateTime  currentTime) {
         this.vehicleID = vehicleID;
         this.carDistance = carDistance;
         this.leavingTime = leavingTime;
         this.arriveTime = arriveTime;
-        this.currentTime = LocalTime.now();
+        this.currentTime = LocalDateTime .now();
     }
 
     public int getVehicleID() {
@@ -45,24 +46,24 @@ public class VehicleActionDTO {
         this.carDistance = carDistance;
     }
 
-    public LocalTime getLeavingTime() {
+    public LocalDateTime  getLeavingTime() {
         return leavingTime;
     }
 
-    public void setLeavingTime(LocalTime leavingTime) {
+    public void setLeavingTime(LocalDateTime  leavingTime) {
         this.leavingTime = leavingTime;
     }
 
-    public LocalTime getArriveTime() {
+    public LocalDateTime  getArriveTime() {
         return arriveTime;
     }
 
-    public void setArriveTime(LocalTime arriveTime) {
+    public void setArriveTime(LocalDateTime  arriveTime) {
         this.arriveTime = arriveTime;
     }
 
-    public LocalTime getCurrentTime() {
-        return LocalTime.now();
+    public LocalDateTime  getCurrentTime() {
+        return LocalDateTime.now();
     }
     
 }

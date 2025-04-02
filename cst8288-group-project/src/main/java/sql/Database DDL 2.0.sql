@@ -1,4 +1,5 @@
 -- Database: PTFMS (Public Transit Fleet Management System)
+SET FOREIGN_KEY_CHECKS = 0;
 CREATE DATABASE IF NOT EXISTS PTFMS;
 USE PTFMS;
 
@@ -141,3 +142,12 @@ INSERT INTO Routes (RouteName, StartLocation, EndLocation, Distance) VALUES
 ('Downtown Loop', 'Union Station', 'Main Street Terminal', 12.5),
 ('Airport Express', 'City Center', 'International Airport', 25.8),
 ('East-West Connector', 'East Side Depot', 'West Hills Terminal', 18.2);
+
+INSERT INTO vehicles (
+    VehicleID, VehicleNumber, VehicleTypeID, FuelTypeID, 
+    ConsumptionRate, MaxPassengers, RouteID, LastMaintenanceDate
+) VALUES (
+    1, 'BUS-001', 1, 1, 5.0, 40, 1, '2024-01-01'
+);
+
+SET FOREIGN_KEY_CHECKS = 1;
