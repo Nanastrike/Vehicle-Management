@@ -86,7 +86,7 @@ CREATE TABLE GPS_Tracking (
     TrackingID INT AUTO_INCREMENT PRIMARY KEY,
     VehicleID INT NOT NULL,
     Position DECIMAL(10,6) NOT NULL,
-    CurrentTime DATETIME,
+    CurrentTime DATETIME DEFAULT CURRENT_TIMESTAMP,
     LeavingTime DATETIME,
     ArriveTime DATETIME,
     FOREIGN KEY (VehicleID) REFERENCES Vehicles(VehicleID) ON DELETE CASCADE
