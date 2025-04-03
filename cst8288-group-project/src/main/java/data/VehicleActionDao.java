@@ -20,7 +20,12 @@ public interface VehicleActionDao {
      */
     List<VehicleActionDTO> getAllVehicleLogs();
     
-    List<VehicleActionDTO> getVehicleLogs(int vehicleID);
+    /**
+     * 
+     * @param vehicleID
+     * @return 
+     */
+    VehicleActionDTO getVehicleLogs(int vehicleID);
     
     /**
      * 
@@ -29,7 +34,6 @@ public interface VehicleActionDao {
      */
     void insertDistanceLog(VehicleActionDTO vehicle) throws SQLException;
 
-    
     /**
      * delete the chosen vehicle records
      * @param vehicleID
@@ -38,7 +42,7 @@ public interface VehicleActionDao {
     
     /**
      * change the info of chosen vehicle record
-     * @param vehicleID
+     * @param vehicle
      */
-    void updateVehicleLogs(int vehicleID);
+    void updateVehicleLogs(VehicleActionDTO vehicle);
 }

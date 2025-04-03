@@ -5,6 +5,7 @@
 package module.GPS_Tracking.operators;
 
 import module.GPS_Tracking.vehicles.VehicleAction;
+import module.GPS_Tracking.vehicles.VehicleActionImpl;
 
 /**
  *
@@ -15,6 +16,10 @@ public class OperatorActionImpl implements OperatorAction {
     @Override
     public void runVehicle(VehicleAction vehicle) {
         vehicle.setRunning(true);
+        
+        if (vehicle instanceof VehicleActionImpl impl) {
+        impl.setLeavingTimeIfAbsent(); // 设置 leavingTime（只一次）
+    }
     }
 
     @Override
