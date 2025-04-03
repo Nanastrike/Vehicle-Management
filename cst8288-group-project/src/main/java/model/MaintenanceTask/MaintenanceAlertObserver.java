@@ -1,6 +1,5 @@
 package model.MaintenanceTask;
 
-import model.MaintenanceTask.MaintenanceTaskManager;
 import java.util.List;
 import java.time.LocalDateTime;
 
@@ -22,10 +21,10 @@ public class MaintenanceAlertObserver implements ComponentObserver {
                     
                     taskManager.createMaintenanceTask(
                         vehicleId,
-                        status.getComponentType(),
-                        "EMERGENCY: " + status.getAlertMessage(),
+                        "EMERGENCY: " + status.getComponentName(),
                         LocalDateTime.now(),
-                        "System"
+                        "System",
+                        "HIGH"  // 緊急任務設置為高優先級
                     );
                 } catch (NumberFormatException e) {
                     System.err.println("Invalid vehicle ID format: " + status.getVehicleId());
