@@ -3,6 +3,7 @@ package presentation;
 import data.VehicleDAO;
 import model.VehicleManagement.*;
 import data.DatabaseConnection;
+import data.DashboardDAO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -40,8 +41,9 @@ public class VehicleManagementServlet extends HttpServlet {
             listVehicles(request, response);
         } else if (action.equals("dashboard")) {
             // Get vehicle type counts and last added vehicle
-            Map<String, Integer> vehicleTypeCounts = getVehicleTypeCounts();
-            Vehicle lastVehicle = getLastAddedVehicle();
+            DashboardDAO dashboardDAO = new DashboardDAO(vehicleDAO);
+            Map<String, Integer> vehicleTypeCounts = dashboardDAO.getVehicleTypeCounts();
+            Vehicle lastVehicle = dashboardDAO.getLastAddedVehicle();
 
             // Pass data to the dashboard
             request.setAttribute("vehicleTypeCounts", vehicleTypeCounts);
@@ -219,28 +221,4 @@ public class VehicleManagementServlet extends HttpServlet {
             default: return "Unknown";
         }
     }
-    
-    // Get Vehicle Counts by Type
-    private Map<String, Integer> getVehicleTypeCounts() {
-        Map<String, Integer> vehicleTypeCounts = new HashMap<>();
-        List<Vehicle> vehicleList = vehicleDAO.getAllVehicles();
-
-        for (Vehicle vehicle : vehicleList) {
-            String typeName = vehicle.getVehicleType().getTypeName();
-            vehicleTypeCounts.put(typeName, vehicleTypeCounts.getOrDefault(typeName, 0) + 1);
-        }
-
-        return vehicleTypeCounts;
-    }
-    
-    // Get the Most Recently Added Vehicle
-    private Vehicle getLastAddedVehicle() {
-        List<Vehicle> vehicleList = vehicleDAO.getAllVehicles();
-        if (!vehicleList.isEmpty()) {
-            return vehicleList.get(vehicleList.size() - 1); // Return the last added vehicle
-        }
-        return null; // Return null if no vehicles exist
-    }
-
-
 }
