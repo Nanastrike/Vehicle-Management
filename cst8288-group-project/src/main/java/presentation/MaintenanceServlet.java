@@ -59,9 +59,9 @@ public class MaintenanceServlet extends HttpServlet {
             
             request.setAttribute("vehicleList", vehicleList);
             
-            // Get maintenance tasks
-            List<MaintenanceTask> tasks = taskManager.getAllMaintenanceTasks();
-            request.setAttribute("scheduledTasks", tasks);
+            // TODO: Get maintenance tasks
+            //List<MaintenanceTask> tasks = taskManager.getAllMaintenanceTasks();
+            //request.setAttribute("scheduledTasks", tasks);
             
             // Forward to maintenance.jsp
             request.getRequestDispatcher("/maintenance.jsp").forward(request, response);

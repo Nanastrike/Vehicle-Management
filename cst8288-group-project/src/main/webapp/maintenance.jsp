@@ -13,12 +13,12 @@
     }
     
     // Debug information
-    List<Vehicle> debugVehicleList = (List<Vehicle>) request.getAttribute("vehicleList");
+    List<Vehicle> vehicleList = (List<Vehicle>) request.getAttribute("vehicleList");
     System.out.println("=== JSP Debug Information ===");
-    if (debugVehicleList != null) {
+    if (vehicleList != null) {
         System.out.println("Vehicle list is available in JSP");
-        System.out.println("Vehicle list size: " + debugVehicleList.size());
-        for (Vehicle v : debugVehicleList) {
+        System.out.println("Vehicle list size: " + vehicleList.size());
+        for (Vehicle v : vehicleList) {
             System.out.println("Vehicle in JSP: ID=" + v.getVehicleID() + 
                              ", Number=" + v.getVehicleNumber() + 
                              ", Type=" + v.getVehicleType().getTypeName());
