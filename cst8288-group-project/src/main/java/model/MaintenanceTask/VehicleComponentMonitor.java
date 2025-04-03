@@ -48,22 +48,19 @@ public class VehicleComponentMonitor implements ComponentMonitor {
         // 監控機械組件
         if (brakeWear > 80) {
             updateComponentStatus(new ComponentStatus(
-                vehicleId, "Brakes", brakeWear, "CRITICAL",
-                "Brake wear level critical - immediate maintenance required"
+                vehicleId, "Brakes", 0, brakeWear
             ));
         }
         
         if (wheelWear > 75) {
             updateComponentStatus(new ComponentStatus(
-                vehicleId, "Wheels", wheelWear, "WARNING",
-                "Wheel wear level high - maintenance needed soon"
+                vehicleId, "Wheels", 0, wheelWear
             ));
         }
         
         if (bearingWear > 70) {
             updateComponentStatus(new ComponentStatus(
-                vehicleId, "Bearings", bearingWear, "WARNING",
-                "Bearing wear level high - maintenance needed soon"
+                vehicleId, "Bearings", 0, bearingWear
             ));
         }
     }
@@ -72,22 +69,19 @@ public class VehicleComponentMonitor implements ComponentMonitor {
         // 監控電氣組件
         if (catenaryWear > 85) {
             updateComponentStatus(new ComponentStatus(
-                vehicleId, "Catenary", catenaryWear, "CRITICAL",
-                "Catenary wear level critical - immediate maintenance required"
+                vehicleId, "Catenary", 0, catenaryWear
             ));
         }
         
         if (pantographWear > 80) {
             updateComponentStatus(new ComponentStatus(
-                vehicleId, "Pantograph", pantographWear, "WARNING",
-                "Pantograph wear level high - maintenance needed soon"
+                vehicleId, "Pantograph", 0, pantographWear
             ));
         }
         
         if (breakerWear > 75) {
             updateComponentStatus(new ComponentStatus(
-                vehicleId, "Circuit Breaker", breakerWear, "WARNING",
-                "Circuit breaker wear level high - maintenance needed soon"
+                vehicleId, "Circuit Breaker", 0, breakerWear
             ));
         }
     }
@@ -96,23 +90,53 @@ public class VehicleComponentMonitor implements ComponentMonitor {
         // 監控引擎診斷
         if (engineTemp > 90) {
             updateComponentStatus(new ComponentStatus(
-                vehicleId, "Engine Temperature", engineTemp, "CRITICAL",
-                "Engine temperature critical - immediate maintenance required"
+                vehicleId, "Engine Temperature", 0, engineTemp
             ));
         }
         
         if (oilPressure < 20) {
             updateComponentStatus(new ComponentStatus(
-                vehicleId, "Oil Pressure", oilPressure, "WARNING",
-                "Oil pressure low - maintenance needed soon"
+                vehicleId, "Oil Pressure", 0, oilPressure
             ));
         }
         
         if (fuelEfficiency < 70) {
             updateComponentStatus(new ComponentStatus(
-                vehicleId, "Fuel Efficiency", fuelEfficiency, "WARNING",
-                "Fuel efficiency low - maintenance needed soon"
+                vehicleId, "Fuel Efficiency", 0, fuelEfficiency
             ));
+        }
+    }
+    
+    public void checkMechanicalComponents(int vehicleId, double brakeWear, double wheelWear, double bearingWear) {
+        List<ComponentStatus> statuses = new ArrayList<>();
+        statuses.add(new ComponentStatus("Brakes", brakeWear, "Hours", vehicleId));
+        statuses.add(new ComponentStatus("Wheels/Tires", wheelWear, "Hours", vehicleId));
+        statuses.add(new ComponentStatus("Axle Bearings", bearingWear, "Hours", vehicleId));
+        
+        for (ComponentObserver observer : observers) {
+            observer.update(statuses);
+        }
+    }
+    
+    public void checkElectricalComponents(int vehicleId, double catenaryWear, double pantographWear, double breakerWear) {
+        List<ComponentStatus> statuses = new ArrayList<>();
+        statuses.add(new ComponentStatus("Catenary", catenaryWear, "Hours", vehicleId));
+        statuses.add(new ComponentStatus("Pantograph", pantographWear, "Hours", vehicleId));
+        statuses.add(new ComponentStatus("Circuit Breaker", breakerWear, "Hours", vehicleId));
+        
+        for (ComponentObserver observer : observers) {
+            observer.update(statuses);
+        }
+    }
+    
+    public void checkEngineDiagnostics(int vehicleId, double engineTemp, double oilPressure, double fuelEfficiency) {
+        List<ComponentStatus> statuses = new ArrayList<>();
+        statuses.add(new ComponentStatus("Engine Temperature", engineTemp, "°C", vehicleId));
+        statuses.add(new ComponentStatus("Oil Pressure", oilPressure, "PSI", vehicleId));
+        statuses.add(new ComponentStatus("Fuel Efficiency", fuelEfficiency, "km/L", vehicleId));
+        
+        for (ComponentObserver observer : observers) {
+            observer.update(statuses);
         }
     }
 } 

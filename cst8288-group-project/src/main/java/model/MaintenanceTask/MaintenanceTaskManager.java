@@ -1,32 +1,32 @@
 package model.MaintenanceTask;
 
-import data.MaintenanceTaskDAO;
+import data.MaintenanceTasksDAO;
 import data.DatabaseConnection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class MaintenanceTaskManager {
-    private final MaintenanceTaskDAO taskDAO;
+    private final MaintenanceTasksDAO taskDAO;
     private final VehicleComponentMonitor componentMonitor;
     
     public MaintenanceTaskManager() throws SQLException {
-        this.taskDAO = new MaintenanceTaskDAO(DatabaseConnection.getInstance().getConnection());
+        this.taskDAO = new MaintenanceTasksDAO(DatabaseConnection.getInstance().getConnection());
         this.componentMonitor = new VehicleComponentMonitor();
     }
     
     public List<MaintenanceTask> getAllMaintenanceTasks() throws SQLException {
-        return taskDAO.getAllTasks();
+        return taskDAO.getPendingTasks();
     }
     
-    public void createMaintenanceTask(int vehicleId, String taskType, String description, LocalDateTime scheduledDate, String createdBy) throws SQLException {
+    public void createMaintenanceTask(int vehicleId, String taskType, LocalDateTime scheduledDate, String createdBy, String priority) throws SQLException {
         MaintenanceTask task = new MaintenanceTask();
         task.setVehicleId(String.valueOf(vehicleId));
         task.setTaskType(taskType);
-        task.setDescription(description);
         task.setScheduledDate(scheduledDate);
         task.setCreatedBy(createdBy);
-        task.setStatus("PENDING");
+        task.setStatus("Scheduled");
+        task.setPriority(priority);
         
         taskDAO.createTask(task);
     }
@@ -39,13 +39,8 @@ public class MaintenanceTaskManager {
         taskDAO.deleteTask(taskId);
     }
     
-    public void monitorComponents(String vehicleId, String componentType, 
-            double wearLevel, String alertMessage) {
-        ComponentStatus status = new ComponentStatus(
-            vehicleId, componentType, wearLevel, 
-            wearLevel > 80 ? "CRITICAL" : (wearLevel > 60 ? "WARNING" : "NORMAL"),
-            alertMessage
-        );
+    public void monitorComponents(String vehicleId, String componentName, int hoursUsed, double wearLevel) {
+        ComponentStatus status = new ComponentStatus(vehicleId, componentName, hoursUsed, wearLevel);
         componentMonitor.updateComponentStatus(status);
     }
 } 

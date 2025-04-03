@@ -9,16 +9,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.MaintenanceTask.MaintenanceTask;
-import model.MaintenanceTask.ComponentStatus;
 import model.MaintenanceTask.VehicleComponentMonitor;
-import model.MaintenanceTask.MaintenanceAlert;
 import model.VehicleManagement.Vehicle;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 @WebServlet(name = "MaintenanceServlet", urlPatterns = {"/MaintenanceServlet"})
 public class MaintenanceServlet extends HttpServlet {
@@ -57,11 +53,25 @@ public class MaintenanceServlet extends HttpServlet {
                 }
             }
             
-            request.setAttribute("vehicleList", vehicleList);
+            // 檢查需要維修的車輛
+            List<Vehicle> vehiclesNeedingMaintenance = new ArrayList<>();
+            LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
             
-            // TODO: Get maintenance tasks
-            //List<MaintenanceTask> tasks = taskManager.getAllMaintenanceTasks();
-            //request.setAttribute("scheduledTasks", tasks);
+            for (Vehicle vehicle : vehicleList) {
+                if (vehicle.getLastMaintenanceDate() != null) {
+                    LocalDateTime lastMaintenance = vehicle.getLastMaintenanceDate().toLocalDate().atStartOfDay();
+                    if (lastMaintenance.isBefore(threeMonthsAgo)) {
+                        vehiclesNeedingMaintenance.add(vehicle);
+                    }
+                }
+            }
+            
+            request.setAttribute("vehicleList", vehicleList);
+            request.setAttribute("vehiclesNeedingMaintenance", vehiclesNeedingMaintenance);
+            
+            // Get maintenance tasks
+            List<MaintenanceTask> tasks = taskManager.getAllMaintenanceTasks();
+            request.setAttribute("scheduledTasks", tasks);
             
             // Forward to maintenance.jsp
             request.getRequestDispatcher("/maintenance.jsp").forward(request, response);
@@ -90,9 +100,9 @@ public class MaintenanceServlet extends HttpServlet {
                 taskManager.createMaintenanceTask(
                     Integer.parseInt(vehicleNumber),
                     taskType,
-                    "Maintenance task for vehicle " + vehicleNumber,
                     LocalDateTime.parse(scheduledDate + "T00:00:00"),
-                    "System"
+                    "System",
+                    priority
                 );
                 
                 response.sendRedirect("MaintenanceServlet");
