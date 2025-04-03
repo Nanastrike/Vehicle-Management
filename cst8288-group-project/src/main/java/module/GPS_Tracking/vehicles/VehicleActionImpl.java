@@ -4,6 +4,8 @@
  */
 package module.GPS_Tracking.vehicles;
 
+import data.RouteDao;
+import data.RouteDaoImpl;
 import data.VehicleActionDTO;
 import data.VehicleActionDao;
 import data.VehicleActionDaoImpl;
@@ -16,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import model.VehicleManagement.Vehicle;
 import module.GPS_Tracking.PositionChangeListener;
-import module.GPS_Tracking.Route;
 import module.GPS_Tracking.RunningStateListener;
 
 /**
@@ -35,6 +36,7 @@ public class VehicleActionImpl implements VehicleAction {
     private LocalDateTime leavingTime;
     private LocalDateTime arriveTime;
     private VehicleActionDao vehicleDao = new VehicleActionDaoImpl(); // 用于操作数据库
+    private final RouteDao routeDao = new RouteDaoImpl(); //用于连接route表
 
     public VehicleActionImpl(Vehicle vehicle) {
         super();
@@ -48,7 +50,8 @@ public class VehicleActionImpl implements VehicleAction {
 
     /**
      * 设置负责数据库连接的class
-     * @param dao 
+     *
+     * @param dao
      */
     public void setDao(VehicleActionDao dao) {
         this.vehicleDao = dao;
@@ -64,11 +67,8 @@ public class VehicleActionImpl implements VehicleAction {
      */
     @Override
     public boolean isArrived(double carDistance, int roadNumber) {
-        boolean arrived = carDistance >= Route.getRoadDistance(roadNumber);
-        if (arrived && this.arriveTime == null) {
-            this.arriveTime = LocalDateTime.now();
-        }
-        return arrived;
+        double distanceLimit = routeDao.getRoadDistanceByRouteID(roadNumber);
+        return carDistance >= distanceLimit;
     }
 
     /**
@@ -81,7 +81,9 @@ public class VehicleActionImpl implements VehicleAction {
     }
 
     /**
-     * calculate the vehicle's moved distance
+     * calculate the vehicle's moved distance leavingTime will only be created
+     * and written to db once arriveTime will only be written when the car is
+     * arrived
      *
      * @param roadNumber
      * @return the vehicle's moved distance the default distance is between 0.5
@@ -89,20 +91,29 @@ public class VehicleActionImpl implements VehicleAction {
      */
     @Override
     public double vehicleMovedDistance(int roadNumber) {
-        if (carDistance >= Route.getRoadDistance(roadNumber)) {
+        //计算每次行径距离
+        double i = 0.5 + Math.random() * (5.0 - 0.5); //每次行径距离在0-5之间
+        BigDecimal rounded = new BigDecimal(i).setScale(2, RoundingMode.HALF_UP);
+        carDistance += rounded.doubleValue(); //只保留两位小数
+
+        //计算已有距离是否超过总长度
+        if (isArrived(carDistance,roadNumber)) {
             setRunning(false); // 如果超过道路长度，判断车辆已停下
             if (arriveTime == null) {
                 this.arriveTime = LocalDateTime.now(); // 只设置一次
             }
         }
 
-        double i = 0.5 + Math.random() * (5.0 - 0.5);
-        BigDecimal rounded = new BigDecimal(i).setScale(2, RoundingMode.HALF_UP);
-        carDistance += rounded.doubleValue(); //只保留两位小数
+        LocalDateTime leavingTimeFromDB = null;
 
-        // 设置 leavingTime（如果还没设置）
-        if (leavingTime == null) {
-            this.leavingTime = LocalDateTime.now();
+        // 通过 vehicleDao 查询数据库中是否有已有的 leavingTime
+        if (vehicleDao != null) {
+            leavingTimeFromDB = vehicleDao.getLeavingTimeFromDB(this.vehicleID);
+        }
+        // 如果数据库没有记录，就创建一个新的（并写入 DTO）
+        if (leavingTimeFromDB == null) {
+            leavingTimeFromDB = LocalDateTime.now();
+            System.out.println("first LeavingTime:" + leavingTimeFromDB);
         }
 
         // 数据库插入记录
@@ -110,7 +121,7 @@ public class VehicleActionImpl implements VehicleAction {
             VehicleActionDTO dto = new VehicleActionDTO();
             dto.setVehicleID(this.vehicleID);
             dto.setCarDistance(this.carDistance);
-            dto.setLeavingTime(leavingTime);  // 不再是 now()
+            dto.setLeavingTime(leavingTimeFromDB);
             dto.setArriveTime(arriveTime);    // 如果为 null 数据库也能接受
             try {
                 vehicleDao.insertDistanceLog(dto);

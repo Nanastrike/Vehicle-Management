@@ -54,11 +54,11 @@ public class VehicleActionDaoImpl implements VehicleActionDao {
                 vehicleAction.setCarDistance(rs.getDouble("Position"));
 
                 // 数据库里 "LeavingTime" 列是 TIME 或 DATETIME 类型
-                LocalDateTime  leavingTime = rs.getObject("LeavingTime", LocalDateTime .class);
+                LocalDateTime leavingTime = rs.getObject("LeavingTime", LocalDateTime.class);
                 vehicleAction.setLeavingTime(leavingTime);
 
                 // 数据库里 "ArriveTime" 列也存的是 TIME 或 DATETIME
-                LocalDateTime  arriveTime = rs.getObject("ArriveTime", LocalDateTime .class);
+                LocalDateTime arriveTime = rs.getObject("ArriveTime", LocalDateTime.class);
                 vehicleAction.setArriveTime(arriveTime);
 
                 vehicleLogs.add(vehicleAction);
@@ -81,7 +81,7 @@ public class VehicleActionDaoImpl implements VehicleActionDao {
     public VehicleActionDTO getVehicleLogs(int vehicleID) {
         VehicleActionDTO vehicleAction = null;
         String sql = "SELECT VehicleID, Position,LeavingTime,ArriveTime "
-                + "FROM ptfms.gps_tracking WHERE VehicleID=?";
+                + "FROM ptfms.gps_tracking WHERE VehicleID=? ORDER BY TrackingID DESC LIMIT 1";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             // 给 WHERE vehicleID=? 的占位符赋值
             pstmt.setInt(1, vehicleID);
@@ -94,10 +94,10 @@ public class VehicleActionDaoImpl implements VehicleActionDao {
                     vehicleAction.setCarDistance(rs.getDouble("Position"));
 
                     // 取 TIME/DATETIME 列为 LocalTime，如果数据库的列类型匹配
-                    LocalDateTime  leavingTime = rs.getObject("LeavingTime", LocalDateTime .class);
+                    LocalDateTime leavingTime = rs.getObject("LeavingTime", LocalDateTime.class);
                     vehicleAction.setLeavingTime(leavingTime);
 
-                    LocalDateTime  arriveTime = rs.getObject("ArriveTime", LocalDateTime .class);
+                    LocalDateTime arriveTime = rs.getObject("ArriveTime", LocalDateTime.class);
                     vehicleAction.setArriveTime(arriveTime);
                 }
             }
@@ -117,13 +117,13 @@ public class VehicleActionDaoImpl implements VehicleActionDao {
             if (vehicle.getLeavingTime() != null) {
                 stmt.setTimestamp(3, Timestamp.valueOf(vehicle.getLeavingTime()));
             } else {
-                stmt.setNull(3, java.sql.Types.TIME);
+                stmt.setNull(3, java.sql.Types.TIMESTAMP);
             }
 
             if (vehicle.getArriveTime() != null) {
                 stmt.setTimestamp(4, Timestamp.valueOf(vehicle.getArriveTime()));
             } else {
-                stmt.setNull(4, java.sql.Types.TIME);
+                stmt.setNull(4, java.sql.Types.TIMESTAMP);
             }
             stmt.executeUpdate();
         }
@@ -155,6 +155,27 @@ public class VehicleActionDaoImpl implements VehicleActionDao {
             Logger.getLogger(VehicleActionDaoImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    /*
+     * 查询数据库中是否已经有该车辆的 LeavingTime，如果有就用数据库里的，
+     * 不再生成新的；如果没有，就生成一次并存进去。
+     * @param vehicleID
+     * @return 
+     */
+    @Override
+    public LocalDateTime getLeavingTimeFromDB(int vehicleID) {
+        String sql = "SELECT LeavingTime FROM ptfms.gps_tracking WHERE VehicleID = ? AND LeavingTime IS NOT NULL LIMIT 1";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, vehicleID); //todo要改
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getObject("LeavingTime", LocalDateTime.class);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // 数据库里没有记录
     }
 
 }
