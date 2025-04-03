@@ -4,16 +4,14 @@
  */
 package data;
 
-import jakarta.activation.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Time;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -80,8 +78,9 @@ public class VehicleActionDaoImpl implements VehicleActionDao {
     @Override
     public VehicleActionDTO getVehicleLogs(int vehicleID) {
         VehicleActionDTO vehicleAction = null;
-        String sql = "SELECT VehicleID, Position,LeavingTime,ArriveTime "
-                + "FROM ptfms.gps_tracking WHERE VehicleID=? ORDER BY TrackingID DESC LIMIT 1";
+        String sql = "SELECT VehicleID, Position, LeavingTime, ArriveTime "
+           + "FROM ptfms.gps_tracking WHERE VehicleID = ? AND ArriveTime IS NULL "
+           + "ORDER BY TrackingID DESC LIMIT 1";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             // 给 WHERE vehicleID=? 的占位符赋值
             pstmt.setInt(1, vehicleID);
@@ -144,12 +143,26 @@ public class VehicleActionDaoImpl implements VehicleActionDao {
 
     @Override
     public void updateVehicleLogs(VehicleActionDTO vehicle) {
-        String sql = "UPDATE ptfms.gps_tracking SET VehicleID = ?, LeavingTime = ?, ArriveTime = ? WHERE VehicleID = ?";
+        String sql = "UPDATE ptfms.gps_tracking " +
+                 "SET Position = ?, LeavingTime = ?, ArriveTime = ? " +
+                 "WHERE VehicleID = ? AND ArriveTime IS NULL";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, vehicle.getVehicleID());
-            stmt.setDouble(2, vehicle.getCarDistance());
-            stmt.setTimestamp(3, Timestamp.valueOf(vehicle.getLeavingTime()));
-            stmt.setTimestamp(4, Timestamp.valueOf(vehicle.getArriveTime()));
+            stmt.setDouble(1, vehicle.getCarDistance());
+
+            if (vehicle.getLeavingTime() != null) {
+                stmt.setTimestamp(2, Timestamp.valueOf(vehicle.getLeavingTime()));
+            } else {
+                stmt.setNull(2, Types.TIMESTAMP);
+            }
+
+            if (vehicle.getArriveTime() != null) {
+                stmt.setTimestamp(3, Timestamp.valueOf(vehicle.getArriveTime()));
+            } else {
+                stmt.setNull(3, Types.TIMESTAMP);
+            }
+
+            stmt.setInt(4, vehicle.getVehicleID());
+
             stmt.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(VehicleActionDaoImpl.class.getName()).log(Level.SEVERE, null, ex);
@@ -167,7 +180,7 @@ public class VehicleActionDaoImpl implements VehicleActionDao {
     public LocalDateTime getLeavingTimeFromDB(int vehicleID) {
         String sql = "SELECT LeavingTime FROM ptfms.gps_tracking WHERE VehicleID = ? AND LeavingTime IS NOT NULL LIMIT 1";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, vehicleID); //todo要改
+            stmt.setInt(1, vehicleID); 
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return rs.getObject("LeavingTime", LocalDateTime.class);

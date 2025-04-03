@@ -12,16 +12,19 @@ import data.VehicleActionDaoImpl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.VehicleManagement.Vehicle;
 import module.GPS_Tracking.PositionChangeListener;
 import module.GPS_Tracking.RunningStateListener;
 
 /**
- * 核心文件
+ * 记录车辆的出发、行径距离、状态、监听器
  *
  * @author silve
  */
@@ -97,37 +100,45 @@ public class VehicleActionImpl implements VehicleAction {
         carDistance += rounded.doubleValue(); //只保留两位小数
 
         //计算已有距离是否超过总长度
-        if (isArrived(carDistance,roadNumber)) {
+        if (isArrived(carDistance, roadNumber)) {
             setRunning(false); // 如果超过道路长度，判断车辆已停下
             if (arriveTime == null) {
                 this.arriveTime = LocalDateTime.now(); // 只设置一次
             }
         }
 
-        LocalDateTime leavingTimeFromDB = null;
+//        LocalDateTime leavingTimeFromDB = null;
+        VehicleActionDao dao = new VehicleActionDaoImpl();
+        VehicleActionDTO log = dao.getVehicleLogs(vehicleID); // 查有没有旧记录
 
-        // 通过 vehicleDao 查询数据库中是否有已有的 leavingTime
-        if (vehicleDao != null) {
-            leavingTimeFromDB = vehicleDao.getLeavingTimeFromDB(this.vehicleID);
-        }
-        // 如果数据库没有记录，就创建一个新的（并写入 DTO）
-        if (leavingTimeFromDB == null) {
-            leavingTimeFromDB = LocalDateTime.now();
-            System.out.println("first LeavingTime:" + leavingTimeFromDB);
-        }
+        if (log == null) {
+            // 没有记录，说明是第一次 => 插入
+            VehicleActionDTO newLog = new VehicleActionDTO();
+            newLog.setVehicleID(this.vehicleID);
+            newLog.setCarDistance(this.carDistance);
 
-        // 数据库插入记录
-        if (vehicleDao != null) {
-            VehicleActionDTO dto = new VehicleActionDTO();
-            dto.setVehicleID(this.vehicleID);
-            dto.setCarDistance(this.carDistance);
-            dto.setLeavingTime(leavingTimeFromDB);
-            dto.setArriveTime(arriveTime);    // 如果为 null 数据库也能接受
-            try {
-                vehicleDao.insertDistanceLog(dto);
-            } catch (SQLException e) {
-                e.printStackTrace();
+            // leavingTime 只设一次（如果你还没有从数据库查它）
+            if (this.leavingTime == null) {
+                this.leavingTime = LocalDateTime.now();
             }
+            newLog.setLeavingTime(this.leavingTime);
+            newLog.setArriveTime(this.arriveTime);
+
+            try {
+                dao.insertDistanceLog(newLog);
+            } catch (SQLException ex) {
+                Logger.getLogger(VehicleActionImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } else {
+            // 有记录 => 更新
+            log.setCarDistance(this.carDistance);
+
+            if (this.arriveTime != null && log.getArriveTime() == null) {
+                log.setArriveTime(this.arriveTime);
+            }
+
+            dao.updateVehicleLogs(log);
         }
 
         return carDistance;

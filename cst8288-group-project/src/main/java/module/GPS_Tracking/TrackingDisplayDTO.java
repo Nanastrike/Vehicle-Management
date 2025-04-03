@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * @author silve
  */
 public class TrackingDisplayDTO {
-    private int vehicleNumber;
+    private String vehicleNumber;
     private int routeID;
     private double position;
     private String destination;
@@ -20,11 +20,11 @@ public class TrackingDisplayDTO {
     private LocalDateTime leavingTime;
     private LocalDateTime arriveTime;
 
-    public int getVehicleNumber() {
+    public String getVehicleNumber() {
         return vehicleNumber;
     }
 
-    public void setVehicleNubmer(int vehicleNumber) {
+    public void setVehicleNumber(String vehicleNumber) {
         this.vehicleNumber = vehicleNumber;
     }
 
