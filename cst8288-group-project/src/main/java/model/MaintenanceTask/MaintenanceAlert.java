@@ -24,7 +24,7 @@ public class MaintenanceAlert {
         return String.format("Alert at %s: %s - %s (Wear: %.1f%%)",
             timestamp,
             componentStatus.getVehicleId(),
-            componentStatus.getComponentType(),
+            componentStatus.getComponentName(),
             componentStatus.getWearLevel()
         );
     }

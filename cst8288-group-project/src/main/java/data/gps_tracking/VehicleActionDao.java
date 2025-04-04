@@ -2,9 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package data;
+package data.gps_tracking;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -19,6 +20,13 @@ public interface VehicleActionDao {
      * @return 
      */
     List<VehicleActionDTO> getAllVehicleLogs();
+    
+    /**
+     * 
+     * @param vehicleID
+     * @return 
+     */
+    List<VehicleActionDTO> getAllLogsByVehicleID(int vehicleID);
     
     /**
      * 
@@ -45,4 +53,12 @@ public interface VehicleActionDao {
      * @param vehicle
      */
     void updateVehicleLogs(VehicleActionDTO vehicle);
+    
+    /**
+     * 查询数据库中是否已经有该车辆的 LeavingTime，如果有就用数据库里的，
+     * 不再生成新的；如果没有，就生成一次并存进去。
+     * @param vehicleID
+     * @return 
+     */
+    LocalDateTime getLeavingTimeFromDB(int vehicleID);
 }

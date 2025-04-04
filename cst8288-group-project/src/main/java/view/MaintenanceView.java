@@ -1,21 +1,27 @@
 package view;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import model.MaintenanceTask.MaintenanceTask;
 import model.MaintenanceTask.ComponentStatus;
 import model.MaintenanceTask.ComponentObserver;
 import model.MaintenanceTask.MaintenanceAlert;
-import model.MaintenanceTask.MaintenancePresenter;
+import model.MaintenanceTask.MaintenanceTaskManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 
 public class MaintenanceView implements ComponentObserver {
     private final Scanner scanner;
-    private final MaintenancePresenter presenter;
+    private final MaintenanceTaskManager taskManager;
+    private final HttpServletRequest request;
+    private final HttpServletResponse response;
     
-    public MaintenanceView() throws SQLException {
+    public MaintenanceView(HttpServletRequest request, HttpServletResponse response) throws SQLException {
         this.scanner = new Scanner(System.in);
-        this.presenter = new MaintenancePresenter(this);
+        this.taskManager = new MaintenanceTaskManager();
+        this.request = request;
+        this.response = response;
     }
     
     public void start() {
@@ -26,10 +32,11 @@ public class MaintenanceView implements ComponentObserver {
             try {
                 switch (choice) {
                     case "1":
-                        presenter.displayMaintenanceTasks();
+                        displayMaintenanceTasks(taskManager.getAllMaintenanceTasks());
                         break;
                     case "2":
-                        presenter.displayComponentAlerts();
+                        // TODO: Implement component alerts display
+                        System.out.println("Component alerts feature not implemented yet");
                         break;
                     case "3":
                         System.exit(0);
@@ -60,22 +67,22 @@ public class MaintenanceView implements ComponentObserver {
     }
     
     public void displayMaintenanceTasks(List<MaintenanceTask> tasks) {
-        System.out.println("\nMaintenance Tasks:");
-        for (MaintenanceTask task : tasks) {
-            System.out.println("Task ID: " + task.getTaskId());
-            System.out.println("Vehicle ID: " + task.getVehicleId());
-            System.out.println("Task Type: " + task.getTaskType());
-            System.out.println("Description: " + task.getDescription());
-            System.out.println("Scheduled Date: " + task.getScheduledDate());
-            System.out.println("Status: " + task.getStatus());
-            System.out.println("----------------------------------------");
-        }
+        request.setAttribute("maintenanceTasks", tasks);
     }
     
     public void displayComponentAlerts(List<MaintenanceAlert> alerts) {
-        System.out.println("\nComponent Alerts:");
-        for (MaintenanceAlert alert : alerts) {
-            System.out.println(alert.toString());
-        }
+        request.setAttribute("maintenanceAlerts", alerts);
+    }
+    
+    public void setMechanicalStatuses(List<ComponentStatus> statuses) {
+        request.setAttribute("mechanicalStatuses", statuses);
+    }
+    
+    public void setElectricalStatuses(List<ComponentStatus> statuses) {
+        request.setAttribute("electricalStatuses", statuses);
+    }
+    
+    public void setEngineStatuses(List<ComponentStatus> statuses) {
+        request.setAttribute("engineStatuses", statuses);
     }
 } 

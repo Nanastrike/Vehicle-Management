@@ -3,6 +3,7 @@ package presentation;
 import data.VehicleDAO;
 import model.VehicleManagement.*;
 import data.DatabaseConnection;
+import data.DashboardDAO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,12 +15,38 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * VehicleManagementServlet handles all vehicle-related actions such as listing,
+ * inserting, updating, and dashboard data preparation within the Public Transit Fleet Management System.
+ * <p>
+ * It interacts with {@link data.VehicleDAO} for database operations and uses
+ * {@link data.DashboardDAO} for dashboard-specific statistics.
+ * </p>
+ *
+ * <h3>Supported Actions:</h3>
+ * <ul>
+ *     <li><code>?action=list</code> – List all vehicles</li>
+ *     <li><code>?action=insert</code> – Insert a new vehicle</li>
+ *     <li><code>?action=update</code> – Update existing vehicle data</li>
+ *     <li><code>?action=dashboard</code> – Load dashboard data (vehicle stats)</li>
+ * </ul>
+ *
+ * @author Zhennan Deng
+ * @version 1.0
+ * @since Java 1.21
+ * @see jakarta.servlet.http.HttpServlet
+ * @see data.VehicleDAO
+ * @see data.DashboardDAO
+ * @see model.VehicleManagement.Vehicle
+ */
 public class VehicleManagementServlet extends HttpServlet {
 
     private Connection conn;
     private VehicleDAO vehicleDAO;
 
+    /**
+     * Initializes the servlet and sets up database connection and DAO instance.
+     */
     @Override
     public void init() throws ServletException {
         try {
@@ -30,8 +57,15 @@ public class VehicleManagementServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Handles GET requests to list vehicles or display the dashboard view.
+     *
+     * @param request  the HttpServletRequest
+     * @param response the HttpServletResponse
+     * @throws ServletException if a servlet error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
-    // Update doGet method in VehicleManagementServlet.java
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
         String action = request.getParameter("action");
@@ -39,23 +73,27 @@ public class VehicleManagementServlet extends HttpServlet {
         if (action == null || action.equals("list")) {
             listVehicles(request, response);
         } else if (action.equals("dashboard")) {
-            // Get vehicle type counts and last added vehicle
-            Map<String, Integer> vehicleTypeCounts = getVehicleTypeCounts();
-            Vehicle lastVehicle = getLastAddedVehicle();
+            DashboardDAO dashboardDAO = new DashboardDAO(vehicleDAO);
+            Map<String, Integer> vehicleTypeCounts = dashboardDAO.getVehicleTypeCounts();
+            Vehicle lastVehicle = dashboardDAO.getLastAddedVehicle();
 
-            // Pass data to the dashboard
             request.setAttribute("vehicleTypeCounts", vehicleTypeCounts);
             request.setAttribute("lastVehicle", lastVehicle);
 
-            // Forward to the dashboard
             request.getRequestDispatcher("DashboardPage.jsp").forward(request, response);
         } else {
-            response.sendRedirect("DashboardPage.jsp"); // Fallback to dashboard
+            response.sendRedirect("DashboardPage.jsp"); // Fallback
         }
     }
 
-
-
+    /**
+     * Handles POST requests for inserting or updating vehicles.
+     *
+     * @param request  the HttpServletRequest
+     * @param response the HttpServletResponse
+     * @throws ServletException if a servlet error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -68,88 +106,91 @@ public class VehicleManagementServlet extends HttpServlet {
         }
     }
 
-    // List All Vehicles
+    /**
+     * Lists all vehicles and forwards the data to VehiclesPage.jsp.
+     *
+     * @param request  the HttpServletRequest
+     * @param response the HttpServletResponse
+     * @throws ServletException if a servlet error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     private void listVehicles(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         List<Vehicle> vehicleList = vehicleDAO.getAllVehicles();
-        System.out.println("Number of vehicles retrieved: " + vehicleList.size());
         request.setAttribute("vehicleList", vehicleList);
         request.getRequestDispatcher("VehiclesPage.jsp").forward(request, response);
     }
 
-    // Show Add Vehicle Form
+    /**
+     * Forwards request to the vehicle addition page.
+     *
+     * @param request  the HttpServletRequest
+     * @param response the HttpServletResponse
+     * @throws ServletException if a servlet error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     private void showAddForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.getRequestDispatcher("AddVehiclePage.jsp").forward(request, response);
     }
 
-    // Insert New Vehicle
+    /**
+     * Handles insertion of a new vehicle into the database.
+     *
+     * @param request  the HttpServletRequest
+     * @param response the HttpServletResponse
+     * @throws IOException      if an I/O error occurs
+     * @throws ServletException if input is invalid or error occurs
+     */
     private void insertVehicle(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException {
-    try {
-        System.out.println("Received request to insert vehicle.");
+        try {
+            String vehicleNumber = request.getParameter("vehicleNumber");
+            if (vehicleNumber == null || vehicleNumber.isEmpty()) {
+                request.setAttribute("error", "Vehicle Number is required.");
+                request.getRequestDispatcher("AddVehiclePage.jsp").forward(request, response);
+                return;
+            }
 
-        String vehicleNumber = request.getParameter("vehicleNumber");
-        String vehicleTypeParam = request.getParameter("vehicleTypeID");
-        String fuelTypeParam = request.getParameter("fuelTypeID");
-        String consumptionRateParam = request.getParameter("consumptionRate");
-        String maxPassengersParam = request.getParameter("maxPassengers");
-        String routeIDParam = request.getParameter("routeID");
-        String lastMaintenanceDateParam = request.getParameter("lastMaintenanceDate");
+            int vehicleTypeID = Integer.parseInt(request.getParameter("vehicleTypeID"));
+            int fuelTypeID = Integer.parseInt(request.getParameter("fuelTypeID"));
+            float consumptionRate = Float.parseFloat(request.getParameter("consumptionRate"));
+            int maxPassengers = Integer.parseInt(request.getParameter("maxPassengers"));
+            int routeID = request.getParameter("routeID") != null && !request.getParameter("routeID").isEmpty()
+                    ? Integer.parseInt(request.getParameter("routeID")) : 0;
+            Date lastMaintenanceDate = Date.valueOf(request.getParameter("lastMaintenanceDate"));
 
-        System.out.println("Vehicle Number: " + vehicleNumber);
-        System.out.println("Vehicle Type ID: " + vehicleTypeParam);
-        System.out.println("Fuel Type ID: " + fuelTypeParam);
-        System.out.println("Consumption Rate: " + consumptionRateParam);
-        System.out.println("Max Passengers: " + maxPassengersParam);
-        System.out.println("Route ID: " + routeIDParam);
-        System.out.println("Last Maintenance Date: " + lastMaintenanceDateParam);
+            VehicleType vehicleType = new VehicleType(vehicleTypeID, getVehicleTypeName(vehicleTypeID));
+            FuelType fuelType = new FuelType(fuelTypeID, getFuelTypeName(fuelTypeID));
+            Vehicle newVehicle = new Vehicle(0, vehicleNumber, vehicleType, fuelType, consumptionRate, maxPassengers, routeID, lastMaintenanceDate);
 
-        if (vehicleNumber == null || vehicleNumber.isEmpty()) {
-            request.setAttribute("error", "Vehicle Number is required.");
-            request.getRequestDispatcher("AddVehiclePage.jsp").forward(request, response);
-            return;
-        }
+            if (vehicleDAO.isVehicleNumberExists(vehicleNumber)) {
+                request.setAttribute("error", "Vehicle number already exists.");
+                request.getRequestDispatcher("AddVehiclePage.jsp").forward(request, response);
+                return;
+            }
 
-        // Continue only if vehicleNumber is valid
-        int vehicleTypeID = Integer.parseInt(vehicleTypeParam);
-        int fuelTypeID = Integer.parseInt(fuelTypeParam);
-        float consumptionRate = Float.parseFloat(consumptionRateParam);
-        int maxPassengers = Integer.parseInt(maxPassengersParam);
-        int routeID = (routeIDParam != null && !routeIDParam.isEmpty()) ? Integer.parseInt(routeIDParam) : 0;
-        Date lastMaintenanceDate = Date.valueOf(lastMaintenanceDateParam);
-
-        VehicleType vehicleType = new VehicleType(vehicleTypeID, getVehicleTypeName(vehicleTypeID));
-        FuelType fuelType = new FuelType(fuelTypeID, getFuelTypeName(fuelTypeID));
-
-        Vehicle newVehicle = new Vehicle(0, vehicleNumber, vehicleType, fuelType, consumptionRate, maxPassengers, routeID, lastMaintenanceDate);
-
-        // Check if vehicle number already exists
-        if (vehicleDAO.isVehicleNumberExists(vehicleNumber)) {
-            System.out.println("Vehicle number already exists.");
-            request.setAttribute("error", "Vehicle number already exists. Please choose a different number.");
-            request.getRequestDispatcher("AddVehiclePage.jsp").forward(request, response);
-            return;
-        }
-
-        if (vehicleDAO.addVehicle(newVehicle)) {
-            System.out.println("Vehicle added successfully!");
-            response.sendRedirect("VehicleManagementServlet?action=list");
-        } else {
-            System.out.println("Failed to add vehicle.");
-            request.setAttribute("error", "Failed to add vehicle. Please try again.");
+            if (vehicleDAO.addVehicle(newVehicle)) {
+                response.sendRedirect("VehicleManagementServlet?action=list");
+            } else {
+                request.setAttribute("error", "Failed to add vehicle.");
+                request.getRequestDispatcher("AddVehiclePage.jsp").forward(request, response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Invalid input.");
             request.getRequestDispatcher("AddVehiclePage.jsp").forward(request, response);
         }
-    } catch (Exception e) {
-        e.printStackTrace();
-        request.setAttribute("error", "Invalid input. Please try again.");
-        request.getRequestDispatcher("AddVehiclePage.jsp").forward(request, response);
     }
-}
 
-
-
-    // Show Edit Form
+    /**
+     * Forwards to edit vehicle form with pre-filled data.
+     *
+     * @param request  the HttpServletRequest
+     * @param response the HttpServletResponse
+     * @throws ServletException if a servlet error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         int vehicleID = Integer.parseInt(request.getParameter("vehicleID"));
@@ -158,49 +199,61 @@ public class VehicleManagementServlet extends HttpServlet {
         request.getRequestDispatcher("EditVehiclePage.jsp").forward(request, response);
     }
 
+    /**
+     * Updates an existing vehicle’s information in the database.
+     *
+     * @param request  the HttpServletRequest
+     * @param response the HttpServletResponse
+     * @throws IOException if an I/O error occurs
+     */
     private void updateVehicle(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
-    try {
-        int vehicleID = Integer.parseInt(request.getParameter("vehicleID"));
-        String vehicleNumber = request.getParameter("vehicleNumber");
-        int vehicleTypeID = Integer.parseInt(request.getParameter("vehicleTypeID"));
-        int fuelTypeID = Integer.parseInt(request.getParameter("fuelTypeID"));
-        float consumptionRate = Float.parseFloat(request.getParameter("consumptionRate"));
-        int maxPassengers = Integer.parseInt(request.getParameter("maxPassengers"));
-        int routeID = Integer.parseInt(request.getParameter("routeID"));
-        Date lastMaintenanceDate = Date.valueOf(request.getParameter("lastMaintenanceDate"));
+        try {
+            int vehicleID = Integer.parseInt(request.getParameter("vehicleID"));
+            String vehicleNumber = request.getParameter("vehicleNumber");
+            int vehicleTypeID = Integer.parseInt(request.getParameter("vehicleTypeID"));
+            int fuelTypeID = Integer.parseInt(request.getParameter("fuelTypeID"));
+            float consumptionRate = Float.parseFloat(request.getParameter("consumptionRate"));
+            int maxPassengers = Integer.parseInt(request.getParameter("maxPassengers"));
+            int routeID = Integer.parseInt(request.getParameter("routeID"));
+            Date lastMaintenanceDate = Date.valueOf(request.getParameter("lastMaintenanceDate"));
 
-        VehicleType vehicleType = new VehicleType(vehicleTypeID, getVehicleTypeName(vehicleTypeID));
-        FuelType fuelType = new FuelType(fuelTypeID, getFuelTypeName(fuelTypeID));
+            VehicleType vehicleType = new VehicleType(vehicleTypeID, getVehicleTypeName(vehicleTypeID));
+            FuelType fuelType = new FuelType(fuelTypeID, getFuelTypeName(fuelTypeID));
 
-        Vehicle updatedVehicle = new Vehicle(vehicleID, vehicleNumber, vehicleType, fuelType, consumptionRate, maxPassengers, routeID, lastMaintenanceDate);
+            Vehicle updatedVehicle = new Vehicle(vehicleID, vehicleNumber, vehicleType, fuelType, consumptionRate, maxPassengers, routeID, lastMaintenanceDate);
 
-        if (vehicleDAO.updateVehicle(updatedVehicle)) {
-            System.out.println("Vehicle updated successfully!");
-            response.sendRedirect("VehicleManagementServlet?action=list");
-        } else {
-            System.out.println("Failed to update vehicle.");
-            response.sendRedirect("EditVehiclePage.jsp?vehicleID=" + vehicleID + "&error=Failed to update vehicle.");
+            if (vehicleDAO.updateVehicle(updatedVehicle)) {
+                response.sendRedirect("VehicleManagementServlet?action=list");
+            } else {
+                response.sendRedirect("EditVehiclePage.jsp?vehicleID=" + vehicleID + "&error=Failed to update vehicle.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("EditVehiclePage.jsp?error=Invalid+input");
         }
-    } catch (Exception e) {
-        e.printStackTrace();
-        response.sendRedirect("EditVehiclePage.jsp?error=Invalid+input.+Please+try+again.");
-    }
     }
 
-    // Delete Vehicle
+    /**
+     * Deletes a vehicle based on the provided vehicle ID.
+     *
+     * @param request  the HttpServletRequest
+     * @param response the HttpServletResponse
+     * @throws IOException if an I/O error occurs
+     */
     private void deleteVehicle(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         int vehicleID = Integer.parseInt(request.getParameter("vehicleID"));
-        if (vehicleDAO.deleteVehicle(vehicleID)) {
-            System.out.println("Vehicle deleted successfully.");
-        } else {
-            System.out.println("Failed to delete vehicle.");
-        }
+        vehicleDAO.deleteVehicle(vehicleID);
         response.sendRedirect("VehicleManagementServlet?action=list");
     }
 
-    // Helper: Get Vehicle Type Name by ID
+    /**
+     * Maps a vehicle type ID to its name.
+     *
+     * @param vehicleTypeID the vehicle type ID
+     * @return the corresponding vehicle type name
+     */
     private String getVehicleTypeName(int vehicleTypeID) {
         switch (vehicleTypeID) {
             case 1: return "Diesel Bus";
@@ -210,7 +263,12 @@ public class VehicleManagementServlet extends HttpServlet {
         }
     }
 
-    // Helper: Get Fuel Type Name by ID
+    /**
+     * Maps a fuel type ID to its name.
+     *
+     * @param fuelTypeID the fuel type ID
+     * @return the corresponding fuel type name
+     */
     private String getFuelTypeName(int fuelTypeID) {
         switch (fuelTypeID) {
             case 1: return "Diesel";
@@ -219,28 +277,4 @@ public class VehicleManagementServlet extends HttpServlet {
             default: return "Unknown";
         }
     }
-    
-    // Get Vehicle Counts by Type
-    private Map<String, Integer> getVehicleTypeCounts() {
-        Map<String, Integer> vehicleTypeCounts = new HashMap<>();
-        List<Vehicle> vehicleList = vehicleDAO.getAllVehicles();
-
-        for (Vehicle vehicle : vehicleList) {
-            String typeName = vehicle.getVehicleType().getTypeName();
-            vehicleTypeCounts.put(typeName, vehicleTypeCounts.getOrDefault(typeName, 0) + 1);
-        }
-
-        return vehicleTypeCounts;
-    }
-    
-    // Get the Most Recently Added Vehicle
-    private Vehicle getLastAddedVehicle() {
-        List<Vehicle> vehicleList = vehicleDAO.getAllVehicles();
-        if (!vehicleList.isEmpty()) {
-            return vehicleList.get(vehicleList.size() - 1); // Return the last added vehicle
-        }
-        return null; // Return null if no vehicles exist
-    }
-
-
 }
