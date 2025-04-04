@@ -26,6 +26,13 @@ public interface VehicleActionDao {
      * @param vehicleID
      * @return 
      */
+    List<VehicleActionDTO> getAllLogsByVehicleID(int vehicleID);
+    
+    /**
+     * 
+     * @param vehicleID
+     * @return 
+     */
     VehicleActionDTO getVehicleLogs(int vehicleID);
     
     /**

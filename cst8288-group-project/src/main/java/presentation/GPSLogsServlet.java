@@ -30,8 +30,8 @@ import jakarta.servlet.annotation.WebServlet;
 @WebServlet("/gpsLogs")
 public class GPSLogsServlet extends HttpServlet {
 
-@Override
-protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Connection conn = DatabaseConnection.getInstance().getConnection();
         VehicleDAO vehicleDao = new VehicleDAO(conn);
         VehicleActionDao vehicleActionDao = new VehicleActionDaoImpl();
@@ -42,8 +42,8 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response) t
 
         List<TrackingDisplayDTO> displayList = new ArrayList<>();
 
-        // ✅ 如果用户点击了 Refresh，或者没输入任何编号，就显示所有车辆
         if ((refreshParam != null && refreshParam.equals("true")) || vehicleNumberParam == null || vehicleNumberParam.trim().isEmpty()) {
+            // ✅ 全部车辆 => 显示每辆车最新的一条记录
             List<VehicleActionDTO> logs = vehicleActionDao.getAllVehicleLogs();
             for (VehicleActionDTO log : logs) {
                 Vehicle vehicle = vehicleDao.getVehicleByID(log.getVehicleID());
@@ -56,15 +56,18 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response) t
                     dto.setLeavingTime(log.getLeavingTime());
                     dto.setArriveTime(log.getArriveTime());
                     dto.setIs_arrived(log.getArriveTime() != null ? "Y" : "N");
+                    dto.setOperatorName(log.getOperatorName());
                     displayList.add(dto);
                 }
             }
+
         } else {
-            // ✅ 有输入编号，只查这辆车
+            // ✅ 查询某辆车的所有记录
             Vehicle vehicle = vehicleDao.getVehicleByNumber(vehicleNumberParam.trim());
             if (vehicle != null) {
-                VehicleActionDTO log = vehicleActionDao.getVehicleLogs(vehicle.getVehicleID());
-                if (log != null) {
+                List<VehicleActionDTO> logs = vehicleActionDao.getAllLogsByVehicleID(vehicle.getVehicleID());
+
+                for (VehicleActionDTO log : logs) {
                     TrackingDisplayDTO dto = new TrackingDisplayDTO();
                     dto.setVehicleNumber(vehicle.getVehicleNumber());
                     dto.setRouteID(vehicle.getRouteID());
@@ -73,6 +76,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response) t
                     dto.setLeavingTime(log.getLeavingTime());
                     dto.setArriveTime(log.getArriveTime());
                     dto.setIs_arrived(log.getArriveTime() != null ? "Y" : "N");
+                    dto.setOperatorName(log.getOperatorName());
                     displayList.add(dto);
                 }
             }

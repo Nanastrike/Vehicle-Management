@@ -100,7 +100,7 @@
                 <button type="submit">Search</button>
                 <button type="submit" name="refresh" value="true">Refresh</button>
             </form>
-            
+
             <table>
                 <thead>
                     <tr>
@@ -111,6 +111,7 @@
                         <th>Arrived</th>
                         <th>Leaving Time</th>
                         <th>Arrive Time</th>
+                        <th>Operator</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -133,6 +134,7 @@
                         <td><%= log.getIs_arrived()%></td>
                         <td><%= log.getLeavingTime() != null ? log.getLeavingTime().toLocalTime() : ""%></td>
                         <td><%= log.getArriveTime() != null ? log.getArriveTime().toLocalTime() : ""%></td>
+                        <td><%= log.getOperatorName() != null ? log.getOperatorName() : "N/A"%></td>
                     </tr>
                     <%
                             }

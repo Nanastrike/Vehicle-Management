@@ -90,6 +90,7 @@ CREATE TABLE GPS_Tracking (
     CurrentTime DATETIME DEFAULT CURRENT_TIMESTAMP,
     LeavingTime DATETIME,
     ArriveTime DATETIME,
+    OperatorID INT,
     FOREIGN KEY (VehicleID) REFERENCES Vehicles(VehicleID) ON DELETE CASCADE
 );
 
