@@ -1,19 +1,23 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Fuel_strategy;
 
-import Fuel_model.Vehicle;
+import model.VehicleManagement.Vehicle;
 
-
+/**
+ * Strategy for calculating energy consumption for Light Rail vehicles.
+ * Assumes electric-only consumption measured in kWh/km.
+ */
 public class LightRailConsumptionStrategy implements ConsumptionStrategy {
-    public double calculate(double rate, double distance) {
-        return rate * distance;  // kWh/mile * distance
-    }
 
+    /**
+     * Calculates electric energy consumption.
+     *
+     * @param vehicle the light rail vehicle object
+     * @param distance the distance traveled in kilometers
+     * @return total electricity consumption in kWh
+     */
     @Override
     public double calculateConsumption(Vehicle vehicle, double distance) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        double electricRate = vehicle.getElectricRate();  // in kWh/km
+        return electricRate * distance;
     }
 }

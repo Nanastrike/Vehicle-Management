@@ -4,7 +4,7 @@
  */
 package Fuel_strategy;
 
-import Fuel_model.Vehicle;
+import model.VehicleManagement.Vehicle;
 
 /**
  *

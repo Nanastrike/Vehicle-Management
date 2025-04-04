@@ -4,7 +4,7 @@
  */
 package Fuel_service;
 
-import Fuel_model.Vehicle;
+import model.VehicleManagement.Vehicle;
 import Fuel_observer.ConsumptionMonitor;
 import Fuel_strategy.BusConsumptionStrategy;
 import Fuel_strategy.ConsumptionStrategy;
@@ -40,11 +40,12 @@ public class FuelService {
     }
 
     private ConsumptionStrategy selectStrategy(Vehicle vehicle) {
-        String type = vehicle.getVehicleType();
+        String type = vehicle.getVehicleType().getTypeName(); 
+        
         switch (type) {
-            case "Bus":
+            case "Diesel Bus":
                 return new BusConsumptionStrategy();
-            case "Light Rail":
+            case "Electric Light Rail":
                 return new LightRailConsumptionStrategy();
             case "Diesel-Electric Train":
                 return new DieselElectricConsumptionStrategy();

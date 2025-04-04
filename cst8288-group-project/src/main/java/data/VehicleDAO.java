@@ -13,6 +13,10 @@ public class VehicleDAO {
         this.conn = conn;
     }
 
+    public VehicleDAO() {
+    this.conn = DatabaseConnection.getInstance().getConnection();
+    }
+
     // Add Vehicle
     public boolean addVehicle(Vehicle vehicle) {
     String sql = "INSERT INTO Vehicles (VehicleNumber, VehicleTypeID, FuelTypeID, ConsumptionRate, MaxPassengers, RouteID, LastMaintenanceDate) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -78,6 +82,27 @@ public class VehicleDAO {
         }
         return null;
     }
+
+    // Get Vehicle by VehicleNumber
+    public Vehicle getVehicleByVehicleNumber(String vehicleNumber) {
+    String sql = "SELECT v.*, vt.TypeName AS VehicleTypeName, ft.TypeName AS FuelTypeName FROM Vehicles v " +
+                 "JOIN VehicleTypes vt ON v.VehicleTypeID = vt.VehicleTypeID " +
+                 "JOIN FuelTypes ft ON v.FuelTypeID = ft.FuelTypeID " +
+                 "WHERE v.VehicleNumber = ?";
+
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, vehicleNumber);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return mapResultSetToVehicle(rs);  // 复用已有的映射函数
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return null;
+    }
+
 
     // Update Vehicle
     public boolean updateVehicle(Vehicle vehicle) {

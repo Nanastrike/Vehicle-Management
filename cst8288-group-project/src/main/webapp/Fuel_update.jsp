@@ -1,21 +1,40 @@
-<%@ page import="java.sql.Timestamp, model.FuelConsumption, dao.FuelConsumptionDAO" %>
+<%@ page import="java.sql.Timestamp, Fuel_model.FuelConsumption, Fuel_dao.FuelConsumptionDAO" %>
 <%
-    int id = Integer.parseInt(request.getParameter("consumptionId"));
-    int vehicleId = Integer.parseInt(request.getParameter("vehicleId"));
-    int fuelTypeId = Integer.parseInt(request.getParameter("fuelTypeId"));
-    float fuelUsed = Float.parseFloat(request.getParameter("fuelUsed"));
-    float distance = Float.parseFloat(request.getParameter("distanceTraveled"));
-    
-    FuelConsumption record = new FuelConsumption();
-    record.setConsumptionId(id);
-    record.setVehicleId(vehicleId);
-    record.setFuelTypeId(fuelTypeId);
-    record.setFuelUsed(fuelUsed);
-    record.setDistanceTraveled(distance);
-    record.setTimestamp(new Timestamp(System.currentTimeMillis()));  // ???????
+    request.setCharacterEncoding("UTF-8");
 
-    FuelConsumptionDAO dao = new FuelConsumptionDAO();
-    dao.updateFuelConsumption(record);
+    String idParam = request.getParameter("consumptionId");
+    String vehicleIdParam = request.getParameter("vehicleId");
+    String fuelTypeIdParam = request.getParameter("fuelTypeId");
+    String fuelUsedParam = request.getParameter("fuelUsed");
+    String distanceParam = request.getParameter("distanceTraveled");
 
-    response.sendRedirect("fuel-dashboard.jsp");
+    if (idParam != null && vehicleIdParam != null && fuelTypeIdParam != null &&
+        fuelUsedParam != null && distanceParam != null) {
+
+        int id = Integer.parseInt(idParam);
+        int vehicleId = Integer.parseInt(vehicleIdParam);
+        int fuelTypeId = Integer.parseInt(fuelTypeIdParam);
+        float fuelUsed = Float.parseFloat(fuelUsedParam);
+        float distance = Float.parseFloat(distanceParam);
+
+        FuelConsumption fuel = new FuelConsumption();
+        fuel.setConsumptionId(id);
+        fuel.setVehicleId(vehicleId);
+        fuel.setFuelTypeId(fuelTypeId);
+        fuel.setFuelUsed(fuelUsed);
+        fuel.setDistanceTraveled(distance);
+        fuel.setTimestamp(new Timestamp(System.currentTimeMillis()));
+
+        FuelConsumptionDAO dao = new FuelConsumptionDAO();
+        boolean updated = dao.updateFuelConsumption(fuel);
+
+        if (updated) {
+            response.sendRedirect("Fuel_dashboard.jsp");
+        } else {
+            out.println("<h3>Failed to update record.</h3>");
+        }
+
+    } else {
+        out.println("<h3>Missing parameters. Cannot update.</h3>");
+    }
 %>

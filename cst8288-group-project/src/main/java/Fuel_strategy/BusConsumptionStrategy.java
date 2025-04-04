@@ -1,14 +1,14 @@
 package Fuel_strategy;
 
-import Fuel_model.Vehicle;
+import model.VehicleManagement.Vehicle;
 
 public class BusConsumptionStrategy implements ConsumptionStrategy {
-    public double calculate(double rate, double distance) {
-        return (rate / 100.0) * distance;  // L/100km * distance
-    }
 
     @Override
     public double calculateConsumption(Vehicle vehicle, double distance) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        // 使用 consumptionRate 作为 L/100km 的油耗
+        double rate = vehicle.getConsumptionRate(); // 通常是 float，也可以强转 double
+        double consumption = rate * distance / 100.0;
+        return consumption;
     }
 }

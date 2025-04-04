@@ -1,11 +1,13 @@
 package Fuel_controller;
 
-import Fuel_dao.VehicleDAO;
-import Fuel_model.Vehicle;
+import Fuel_dao.FuelConsumptionDAO;
+import Fuel_model.FuelConsumption;
+import data.VehicleDAO;
+import model.VehicleManagement.Vehicle;
 import Fuel_service.FuelService;
 import Fuel_observer.ConsumptionMonitor;
 import Fuel_observer.AlertService;
-
+import data.DatabaseConnection;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -36,40 +38,47 @@ public class DashboardServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 1. Get vehicleId from form
-        String vehicleIdStr = request.getParameter("vehicleId");
-        int vehicleId = Integer.parseInt(vehicleIdStr);
-
-        // 2. Get distance from form
+        // 获取 vehicleNumber 而不是 vehicleId
+        String vehicleNumber = request.getParameter("vehicleNumber");
         double distance = parseDouble(request.getParameter("distance"), 100.0);
 
-        // 3. Get Vehicle object from DB
+        // 实例化 DAO
         VehicleDAO vehicleDAO = new VehicleDAO();
-        Vehicle vehicle = vehicleDAO.getVehicleById(vehicleId);
+
+        // 根据 vehicleNumber 查询车辆对象
+        Vehicle vehicle = vehicleDAO.getVehicleByVehicleNumber(vehicleNumber);
 
         if (vehicle == null) {
             request.setAttribute("error", "Vehicle not found in database.");
-            RequestDispatcher rd = request.getRequestDispatcher("/dashboard.jsp");
-            rd.forward(request, response);
+            request.getRequestDispatcher("/Fuel_dashboard.jsp").forward(request, response);
             return;
         }
 
-        // 4. Calculate fuel consumption
+        // ✅ 计算消耗
         double result = fuelService.calculateFuel(vehicle, distance);
+        
+        FuelConsumption record = new FuelConsumption();
+        record.setVehicleId(vehicle.getVehicleID());
+        record.setFuelTypeId(vehicle.getFuelType().getFuelTypeID());
+        record.setFuelUsed((float) result);
+        record.setDistanceTraveled((float) distance);
+        record.setTimestamp(new java.sql.Timestamp(System.currentTimeMillis()));
 
-        // 5. Store result for UI
+        FuelConsumptionDAO fuelDAO = new FuelConsumptionDAO();
+        fuelDAO.insertFuelConsumption(record);
+
+        // ✅ 设置用于 JSP 显示的参数
         request.setAttribute("calculatedConsumption", result);
-        request.setAttribute("vehicleId", vehicleId);
-        request.setAttribute("vehicleType", vehicle.getVehicleType());
-        request.setAttribute("fuelType", vehicle.getFuelType());
+        request.setAttribute("vehicleNumber", vehicleNumber);
+        request.setAttribute("vehicleType", vehicle.getVehicleType().getTypeName());
+        request.setAttribute("fuelType", vehicle.getFuelType().getTypeName());
 
         if (result > 50.0) {
             request.setAttribute("alertMessage", "ALERT: Consumption exceeded threshold!");
         }
 
-        // 6. Forward to dashboard.jsp
-        RequestDispatcher rd = request.getRequestDispatcher("/dashboard.jsp");
-        rd.forward(request, response);
+        // 返回 dashboard 页面
+        request.getRequestDispatcher("/Fuel_dashboard.jsp").forward(request, response);
     }
 
     private double parseDouble(String param, double defaultValue) {
