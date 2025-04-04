@@ -103,6 +103,7 @@ CREATE TABLE Fuel_Consumption (
     FuelTypeID INT NOT NULL,
     FuelUsed FLOAT NOT NULL,
     DistanceTraveled FLOAT NOT NULL,
+    Status VARCHAR(20) DEFAULT 'Normal';
     Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (VehicleID) REFERENCES Vehicles(VehicleID) ON DELETE CASCADE,
     FOREIGN KEY (FuelTypeID) REFERENCES FuelTypes(FuelTypeID) ON DELETE CASCADE
@@ -174,3 +175,11 @@ INSERT INTO vehicles (
 );
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+INSERT INTO Vehicles (
+    VehicleID, VehicleNumber, VehicleTypeID, FuelTypeID, 
+    ConsumptionRate, DieselRate, ElectricRate,
+    MaxPassengers, RouteID, LastMaintenanceDate, Status
+) VALUES (
+    1, 'BUS-001', 1, 1, 5.0, 25.0, 0.0, 40, 1, '2024-01-01','Nomal'
+);
