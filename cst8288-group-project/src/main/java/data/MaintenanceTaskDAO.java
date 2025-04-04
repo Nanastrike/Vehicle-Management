@@ -2,79 +2,97 @@ package data;
 
 import model.MaintenanceTask.MaintenanceTask;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MaintenanceTaskDAO {
-    private Connection conn;
+    private final Connection connection;
     
-    public MaintenanceTaskDAO(Connection conn) {
-        this.conn = conn;
+    public MaintenanceTaskDAO(Connection connection) {
+        this.connection = connection;
     }
     
     public void createTask(MaintenanceTask task) throws SQLException {
-        String sql = "INSERT INTO maintenance_tasks (vehicle_id, task_type, description, " +
-                    "scheduled_date, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, task.getVehicleId());
-            pstmt.setString(2, task.getTaskType());
-            pstmt.setString(3, task.getDescription());
-            pstmt.setTimestamp(4, Timestamp.valueOf(task.getScheduledDate()));
-            pstmt.setString(5, task.getStatus());
-            pstmt.setString(6, task.getCreatedBy());
-            pstmt.setTimestamp(7, Timestamp.valueOf(task.getCreatedAt()));
+        String sql = "INSERT INTO Maintenance_Tasks (VehicleID, MaintenanceDate, Status, CreatedBy, Priority, TaskType) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, task.getVehicleId());
+            stmt.setTimestamp(2, Timestamp.valueOf(task.getScheduledDate()));
+            stmt.setString(3, task.getStatus());
+            stmt.setString(4, task.getCreatedBy());
+            stmt.setString(5, task.getPriority());
+            stmt.setString(6, task.getTaskType());
+            stmt.executeUpdate();
             
-            pstmt.executeUpdate();
-            System.out.println("Maintenance task created successfully");
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    task.setTaskId(rs.getInt(1));
+                }
+            }
         }
     }
     
-    public List<MaintenanceTask> getAllTasks() throws SQLException {
+    public void updateTaskStatus(int taskId, String status) throws SQLException {
+        String sql = "UPDATE Maintenance_Tasks SET Status = ? WHERE TaskID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, status);
+            stmt.setInt(2, taskId);
+            stmt.executeUpdate();
+        }
+    }
+    
+    public void deleteTask(int taskId) throws SQLException {
+        String sql = "DELETE FROM Maintenance_Tasks WHERE TaskID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, taskId);
+            stmt.executeUpdate();
+        }
+    }
+    
+    public List<MaintenanceTask> getTasksByVehicle(String vehicleId) throws SQLException {
+        String sql = "SELECT * FROM Maintenance_Tasks WHERE VehicleID = ? ORDER BY MaintenanceDate";
         List<MaintenanceTask> tasks = new ArrayList<>();
-        String sql = "SELECT * FROM maintenance_tasks ORDER BY scheduled_date";
         
-        try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            
-            while (rs.next()) {
-                MaintenanceTask task = new MaintenanceTask(
-                    rs.getString("vehicle_id"),
-                    rs.getString("task_type"),
-                    rs.getString("description"),
-                    rs.getTimestamp("scheduled_date").toLocalDateTime(),
-                    rs.getString("created_by")
-                );
-                task.setTaskId(rs.getInt("task_id"));
-                task.setStatus(rs.getString("status"));
-                task.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                tasks.add(task);
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, vehicleId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    MaintenanceTask task = new MaintenanceTask();
+                    task.setTaskId(rs.getInt("TaskID"));
+                    task.setVehicleId(rs.getString("VehicleID"));
+                    task.setComponentId(rs.getInt("ComponentID"));
+                    task.setScheduledDate(rs.getTimestamp("MaintenanceDate").toLocalDateTime());
+                    task.setStatus(rs.getString("Status"));
+                    task.setCreatedBy(rs.getString("CreatedBy"));
+                    tasks.add(task);
+                }
             }
         }
         return tasks;
     }
     
-    public void updateTaskStatus(int taskId, String status) throws SQLException {
-        String sql = "UPDATE maintenance_tasks SET status = ? WHERE task_id = ?";
+    public List<MaintenanceTask> getPendingTasks() throws SQLException {
+        String sql = "SELECT mt.*, v.VehicleNumber FROM Maintenance_Tasks mt " +
+                    "JOIN Vehicles v ON mt.VehicleID = v.VehicleID " +
+                    "WHERE mt.Status = 'Scheduled' " +
+                    "ORDER BY mt.MaintenanceDate";
+        List<MaintenanceTask> tasks = new ArrayList<>();
         
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, status);
-            pstmt.setInt(2, taskId);
-            
-            pstmt.executeUpdate();
-            System.out.println("Task status updated successfully");
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                MaintenanceTask task = new MaintenanceTask();
+                task.setTaskId(rs.getInt("TaskID"));
+                task.setVehicleId(rs.getString("VehicleID"));
+                task.setVehicleNumber(rs.getString("VehicleNumber"));
+                task.setComponentId(rs.getInt("ComponentID"));
+                task.setTaskType(rs.getString("TaskType"));
+                task.setScheduledDate(rs.getTimestamp("MaintenanceDate").toLocalDateTime());
+                task.setStatus(rs.getString("Status"));
+                task.setCreatedBy(rs.getString("CreatedBy"));
+                task.setPriority(rs.getString("Priority"));
+                tasks.add(task);
+            }
         }
-    }
-    
-    public void deleteTask(int taskId) throws SQLException {
-        String sql = "DELETE FROM maintenance_tasks WHERE task_id = ?";
-        
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, taskId);
-            
-            pstmt.executeUpdate();
-            System.out.println("Task deleted successfully");
-        }
+        return tasks;
     }
 } 

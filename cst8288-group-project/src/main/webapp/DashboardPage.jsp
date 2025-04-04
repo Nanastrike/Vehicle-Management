@@ -7,6 +7,7 @@
         response.sendRedirect("LoginPage.jsp");
         return;
     }
+    int userTypeId = user.getUserTypeId();
 %>
 
 <!DOCTYPE html>
@@ -61,37 +62,14 @@
 </head>
 <body>
 
-    <!-- Include Navbar -->
-    <jsp:include page="navbar.jsp" />
-
-    <!-- Main Container -->
-    <div class="container">
-
-        <!-- Row 1: Whole Overview and Reports Overview -->
-        <div class="card-container row-1">
-            <jsp:include page="/WEB-INF/includes/wholeOverviewCard.jsp" />
-            <jsp:include page="/WEB-INF/includes/reportsOverviewCard.jsp" />
-        </div>
-
-        <!-- Row 2: Vehicle Management and GPS Tracking Overview -->
-        <div class="card-container row-2">
-            <div class="card">
-                <!-- Include Vehicle Overview (Counts + Last Vehicle) -->
-                <jsp:include page="/WEB-INF/includes/vehicleOverviewCard.jsp" />
-            </div>
-            
-            <!-- Include GPS Tracking Card -->
-            <jsp:include page="/WEB-INF/includes/gpsTrackingCard.jsp" />
-        </div>
-
-        <!-- Row 3: Maintenance and Fuel/Energy Overview -->
-        <div class="card-container row-3">
-            <!-- Include Maintenance Card -->
-            <jsp:include page="/WEB-INF/includes/maintenanceCard.jsp" />
-            <!-- Include Fuel/Energy Card -->
-            <jsp:include page="/WEB-INF/includes/fuelEnergyCard.jsp" />
-        </div>
-
-    </div>
+    <% if (userTypeId == 1) { %>
+        <jsp:include page="/WEB-INF/includes/navbarDispatcher.jsp" />
+        <jsp:include page="/WEB-INF/includes/managerDashboard.jsp" />
+    <% } else if (userTypeId == 2) { %>
+        <jsp:include page="/WEB-INF/includes/navbarDispatcher.jsp" />
+        <jsp:include page="/WEB-INF/includes/operatorDashboard.jsp" />
+    <% } else { %>
+        <p>Unknown role. Please contact admin.</p>
+    <% } %>
 </body>
 </html>

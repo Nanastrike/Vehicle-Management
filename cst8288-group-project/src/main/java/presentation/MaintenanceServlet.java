@@ -9,16 +9,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.MaintenanceTask.MaintenanceTask;
-import model.MaintenanceTask.ComponentStatus;
 import model.MaintenanceTask.VehicleComponentMonitor;
-import model.MaintenanceTask.MaintenanceAlert;
 import model.VehicleManagement.Vehicle;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 @WebServlet(name = "MaintenanceServlet", urlPatterns = {"/MaintenanceServlet"})
 public class MaintenanceServlet extends HttpServlet {
@@ -44,10 +40,24 @@ public class MaintenanceServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             System.out.println("MaintenanceServlet doGet called");
+            String action = request.getParameter("action");
             
             // Get vehicle list
             List<Vehicle> vehicleList = vehicleDAO.getAllVehicles();
             System.out.println("Retrieved vehicle list size: " + (vehicleList != null ? vehicleList.size() : "null"));
+            
+            // 如果是組件檢查請求，處理選中的車輛
+            String selectedVehicle = request.getParameter("vehicleNumber");
+            if ("checkComponents".equals(action) && selectedVehicle != null && !selectedVehicle.isEmpty()) {
+                Vehicle currentVehicle = null;
+                for (Vehicle v : vehicleList) {
+                    if (v.getVehicleNumber().equals(selectedVehicle)) {
+                        currentVehicle = v;
+                        break;
+                    }
+                }
+                request.setAttribute("currentVehicle", currentVehicle);
+            }
             
             if (vehicleList != null) {
                 for (Vehicle v : vehicleList) {
@@ -57,7 +67,21 @@ public class MaintenanceServlet extends HttpServlet {
                 }
             }
             
+            // 檢查需要維修的車輛
+            List<Vehicle> vehiclesNeedingMaintenance = new ArrayList<>();
+            LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
+            
+            for (Vehicle vehicle : vehicleList) {
+                if (vehicle.getLastMaintenanceDate() != null) {
+                    LocalDateTime lastMaintenance = vehicle.getLastMaintenanceDate().toLocalDate().atStartOfDay();
+                    if (lastMaintenance.isBefore(threeMonthsAgo)) {
+                        vehiclesNeedingMaintenance.add(vehicle);
+                    }
+                }
+            }
+            
             request.setAttribute("vehicleList", vehicleList);
+            request.setAttribute("vehiclesNeedingMaintenance", vehiclesNeedingMaintenance);
             
             // Get maintenance tasks
             List<MaintenanceTask> tasks = taskManager.getAllMaintenanceTasks();
@@ -90,9 +114,9 @@ public class MaintenanceServlet extends HttpServlet {
                 taskManager.createMaintenanceTask(
                     Integer.parseInt(vehicleNumber),
                     taskType,
-                    "Maintenance task for vehicle " + vehicleNumber,
                     LocalDateTime.parse(scheduledDate + "T00:00:00"),
-                    "System"
+                    "System",
+                    priority
                 );
                 
                 response.sendRedirect("MaintenanceServlet");

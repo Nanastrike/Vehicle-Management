@@ -12,21 +12,8 @@
         return;
     }
     
-    // Debug information
-    List<Vehicle> debugVehicleList = (List<Vehicle>) request.getAttribute("vehicleList");
-    System.out.println("=== JSP Debug Information ===");
-    if (debugVehicleList != null) {
-        System.out.println("Vehicle list is available in JSP");
-        System.out.println("Vehicle list size: " + debugVehicleList.size());
-        for (Vehicle v : debugVehicleList) {
-            System.out.println("Vehicle in JSP: ID=" + v.getVehicleID() + 
-                             ", Number=" + v.getVehicleNumber() + 
-                             ", Type=" + v.getVehicleType().getTypeName());
-        }
-    } else {
-        System.out.println("Vehicle list is NULL in JSP");
-    }
-    System.out.println("=== End JSP Debug Information ===");
+    List<Vehicle> vehicleList = (List<Vehicle>) request.getAttribute("vehicleList");
+    Vehicle currentVehicle = (Vehicle) request.getAttribute("currentVehicle");
 %>
 
 <!DOCTYPE html>
@@ -35,10 +22,6 @@
         <title>Maintenance Management</title>
         <!-- Google Font - Quicksand for consistency -->
         <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
-        <!-- Include jQuery UI for datepicker -->
-        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
         <style>
             body {
@@ -130,41 +113,6 @@
                 margin-bottom: 20px;
             }
 
-            /* Alert Styles */
-            .alert-container {
-                margin-top: 20px;
-            }
-
-            .alert {
-                margin: 10px 0;
-                padding: 15px;
-                border-radius: 8px;
-                background-color: #fff;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            }
-
-            .alert.critical {
-                border-left: 4px solid #ff4444;
-            }
-
-            .alert.warning {
-                border-left: 4px solid #ffbb33;
-            }
-
-            .alert.normal {
-                border-left: 4px solid #00C851;
-            }
-
-            .alert-info {
-                margin: 5px 0;
-                color: #555;
-            }
-
-            .alert-info strong {
-                color: #333;
-                font-weight: 600;
-            }
-
             /* Table Styles */
             .maintenance-table {
                 width: 100%;
@@ -188,6 +136,175 @@
             .maintenance-table tr:hover {
                 background-color: #f8f9fa;
             }
+
+            .component-status {
+                margin-top: 20px;
+            }
+
+            .status-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+                margin-top: 20px;
+            }
+
+            .status-section {
+                background-color: #fff;
+                padding: 15px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .status-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+
+            .status-table th,
+            .status-table td {
+                padding: 8px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .status-table th {
+                background-color: #f8f9fa;
+                font-weight: 600;
+            }
+
+            .critical {
+                color: #dc3545;
+                font-weight: bold;
+            }
+
+            .warning {
+                color: #ffc107;
+                font-weight: bold;
+            }
+
+            .normal {
+                color: #28a745;
+            }
+
+            .alert {
+                margin: 10px 0;
+                padding: 15px;
+                border-radius: 8px;
+                background-color: #fff;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .alert.critical {
+                border-left: 4px solid #dc3545;
+            }
+
+            .alert.warning {
+                border-left: 4px solid #ffc107;
+            }
+
+            .alert.normal {
+                border-left: 4px solid #28a745;
+            }
+
+            .alert-info {
+                margin: 5px 0;
+            }
+
+            .alert-info strong {
+                color: #333;
+                font-weight: 600;
+            }
+
+            .monitoring-buttons {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+                flex-wrap: wrap;
+            }
+
+            .monitoring-btn {
+                flex: 1;
+                min-width: 200px;
+                margin: 5px;
+                padding: 10px;
+                background-color: #4a90e2;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+            }
+
+            .monitoring-btn:hover {
+                background-color: #357abd;
+            }
+
+            .modal-toggle {
+                display: none;
+            }
+
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.4);
+            }
+
+            .modal-content {
+                background-color: #fefefe;
+                margin: 15% auto;
+                padding: 20px;
+                border: 1px solid #888;
+                width: 80%;
+                max-width: 600px;
+                border-radius: 8px;
+                position: relative;
+            }
+
+            .close {
+                color: #aaa;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+                cursor: pointer;
+                position: absolute;
+                right: 20px;
+                top: 10px;
+            }
+
+            .close:hover {
+                color: black;
+            }
+
+            #mechanical-modal-toggle:checked ~ #mechanicalModal,
+            #electrical-modal-toggle:checked ~ #electricalModal,
+            #engine-modal-toggle:checked ~ #engineModal {
+                display: block;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            .form-group input,
+            .form-group select {
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
         </style>
     </head>
     <body>
@@ -195,25 +312,30 @@
         <jsp:include page="navbar.jsp" />
 
         <div class="container">
-            <!-- Debug Information Section -->
-            <div class="section">
-                <h3>Debug Information</h3>
-                <p>Vehicle List Status: ${vehicleList != null ? 'Available' : 'Not Available'}</p>
-                <p>Vehicle List Size: ${vehicleList != null ? vehicleList.size() : '0'}</p>
-                <c:if test="${not empty vehicleList}">
-                    <p>Available Vehicles:</p>
-                    <ul>
-                        <c:forEach var="vehicle" items="${vehicleList}">
-                            <li>
-                                ID: ${vehicle.vehicleID}, 
-                                Number: ${vehicle.vehicleNumber}, 
-                                Type: ${vehicle.vehicleType.typeName}
-                            </li>
-                        </c:forEach>
-                    </ul>
+            <!-- Maintenance Alert Section -->
+            <div class="maintenance-alert-section">
+                <h2>Maintenance Alerts</h2>
+                <c:if test="${not empty vehiclesNeedingMaintenance}">
+                    <div class="alert warning">
+                        <h3>Vehicles requiring maintenance (over 3 months since last service):</h3>
+                        <ul>
+                            <c:forEach var="vehicle" items="${vehiclesNeedingMaintenance}">
+                                <li>
+                                    Vehicle Number: ${vehicle.vehicleNumber} - 
+                                    Vehicle Type: ${vehicle.vehicleType.typeName} - 
+                                    Last Maintenance Date: ${vehicle.lastMaintenanceDate}
+                                </li>
+                            </c:forEach>
+                        </ul>
+                    </div>
+                </c:if>
+                <c:if test="${empty vehiclesNeedingMaintenance}">
+                    <div class="alert normal">
+                        <p>No vehicles currently require maintenance.</p>
+                    </div>
                 </c:if>
             </div>
-            
+
             <div class="section">
                 <h2>Schedule Maintenance Task</h2>
                 <form action="MaintenanceServlet" method="post">
@@ -254,25 +376,8 @@
                             </select>
                         </div>
                     </div>
-                    <button type="submit" class="btn">Schedule Task</button>
+                        <button type="submit" class="btn">Schedule Task</button>
                 </form>
-            </div>
-
-            <div class="section">
-                <h2>Component Monitoring</h2>
-                <div class="btn-container">
-                    <button class="btn" onclick="checkMechanical()">Check Mechanical Components</button>
-                    <button class="btn" onclick="checkElectrical()">Check Electrical Components</button>
-                    <button class="btn" onclick="checkEngine()">Check Engine Diagnostics</button>
-                    <button class="btn" onclick="clearAlerts()">Clear All Alerts</button>
-                </div>
-
-                <div class="alert-container">
-                    <h2>Maintenance Alerts</h2>
-                    <div id="alertsList">
-                        <!-- Alerts will be displayed here dynamically -->
-                    </div>
-                </div>
             </div>
 
             <div class="section">
@@ -280,7 +385,7 @@
                 <table class="maintenance-table">
                     <thead>
                         <tr>
-                            <th>Vehicle ID</th>
+                            <th>Vehicle Number</th>
                             <th>Task Type</th>
                             <th>Scheduled Date</th>
                             <th>Priority</th>
@@ -291,7 +396,7 @@
                     <tbody>
                         <c:forEach var="task" items="${scheduledTasks}">
                             <tr>
-                                <td>${task.vehicleId}</td>
+                                <td>${task.vehicleNumber}</td>
                                 <td>${task.taskType}</td>
                                 <td>${task.scheduledDate}</td>
                                 <td>${task.priority}</td>
@@ -308,183 +413,177 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="section">
+                <h2>Component Monitoring</h2>
+                <div class="section">
+                    <form action="MaintenanceServlet" method="GET">
+                        <div class="form-group">
+                            <label for="vehicleNumber">Vehicle Number:</label>
+                            <select id="vehicleNumber" name="vehicleNumber" onchange="this.form.submit()">
+                                <option value="">Select Vehicle</option>
+                                <c:forEach items="${vehicleList}" var="vehicle">
+                                    <option value="${vehicle.vehicleNumber}" ${param.vehicleNumber eq vehicle.vehicleNumber ? 'selected' : ''}>
+                                        ${vehicle.vehicleNumber}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Last Maintenance Date:</label>
+                            <span>
+                                <c:choose>
+                                    <c:when test="${currentVehicle != null && currentVehicle.lastMaintenanceDate != null}">
+                                        ${currentVehicle.lastMaintenanceDate}
+                                    </c:when>
+                                    <c:otherwise>
+                                        No maintenance record
+                                    </c:otherwise>
+                                </c:choose>
+                            </span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Components to Check:</label>
+                            <div class="checkbox-group">
+                                <h4>Mechanical Components:</h4>
+                                <input type="checkbox" id="brakes" name="components" value="brakes">
+                                <label for="brakes">Brakes</label>
+                                <input type="checkbox" id="tires" name="components" value="tires">
+                                <label for="tires">Tires</label>
+                                
+                                <h4>Electrical Components:</h4>
+                                <input type="checkbox" id="battery" name="components" value="battery">
+                                <label for="battery">Battery</label>
+                                <input type="checkbox" id="lights" name="components" value="lights">
+                                <label for="lights">Lights</label>
+                                
+                                <h4>Engine Components:</h4>
+                                <input type="checkbox" id="oil" name="components" value="oil">
+                                <label for="oil">Oil Level</label>
+                                <input type="checkbox" id="coolant" name="components" value="coolant">
+                                <label for="coolant">Coolant Level</label>
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" name="action" value="checkComponents">
+                        <button type="submit" class="btn">Submit Maintenance Check</button>
+                    </form>
+                </div>
+
+                <h2>Component Status</h2>
+                <div class="status-grid">
+                    <div class="status-section">
+                        <h3>Mechanical Components</h3>
+                        <table class="status-table">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle Number</th>
+                                    <th>Component</th>
+                                    <th>Hours Used</th>
+                                    <th>Wear Level</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <c:forEach var="status" items="${componentStatuses}">
+                                    <tr>
+                                        <td>${status.vehicleId}</td>
+                                        <td>${status.componentName}</td>
+                                        <td>${status.hoursUsed}</td>
+                                        <td>${status.wearLevel}%</td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="status-section">
+                        <h3>Electrical Components</h3>
+                        <table class="status-table">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle Number</th>
+                                    <th>Component</th>
+                                    <th>Hours Used</th>
+                                    <th>Wear Level</th>
+                                </tr>
+                            </thead>
+                            <tbody id="electricalStatus">
+                                <!-- This will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="status-section">
+                        <h3>Engine Diagnostics</h3>
+                        <table class="status-table">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle Number</th>
+                                    <th>Parameter</th>
+                                    <th>Value</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="engineStatus">
+                                <!-- This will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 維護警報顯示 -->
+            <div class="alert-container">
+                <h2>Maintenance Alerts</h2>
+                <div id="alertsList">
+                    <c:forEach var="alert" items="${maintenanceAlerts}">
+                        <div class="alert ${alert.componentStatus.status == 'CRITICAL' ? 'critical' : alert.componentStatus.status == 'WARNING' ? 'warning' : 'normal'}">
+                            <div class="alert-info"><strong>Time:</strong> ${alert.timestamp}</div>
+                            <div class="alert-info"><strong>Vehicle ID:</strong> ${alert.componentStatus.vehicleId}</div>
+                            <div class="alert-info"><strong>Component:</strong> ${alert.componentStatus.componentName}</div>
+                            <div class="alert-info"><strong>Hours Used:</strong> ${alert.componentStatus.hoursUsed}</div>
+                            <div class="alert-info"><strong>Wear Level:</strong> ${alert.componentStatus.wearLevel}%</div>
+                            <div class="alert-info"><strong>Message:</strong> ${alert.componentStatus.alertMessage}</div>
+                        </div>
+                    </c:forEach>
+                </div>
+            </div>
         </div>
 
         <script>
-            $(document).ready(function() {
-                // Initialize datepicker
-                $("#scheduledDate").datepicker({
-                    dateFormat: 'yy-mm-dd',
-                    minDate: 0
-                });
-                
-                // Load scheduled tasks
-                loadScheduledTasks();
+            document.getElementById('vehicleNumber').addEventListener('change', function() {
+                const vehicleNumber = this.value;
+                // 這裡應該發送AJAX請求來獲取最後維修日期
+                // 示例代碼：
+                fetch(`/getLastMaintenance?vehicleNumber=${vehicleNumber}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('lastMaintenanceDate').textContent = data.lastMaintenanceDate;
+                        updateComponentStatus(vehicleNumber);
+                    });
             });
 
-            function scheduleMaintenanceTask(event) {
-                event.preventDefault();
-                const formData = new FormData(event.target);
-                const task = Object.fromEntries(formData.entries());
-
-                fetch('MaintenanceServlet', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams({
-                        'action': 'scheduleTask',
-                        'vehicleId': task.vehicleId,
-                        'taskType': task.taskType,
-                        'scheduledDate': task.scheduledDate,
-                        'priority': task.priority,
-                        'description': task.description
-                    })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        window.location.reload();
-                    } else {
-                        throw new Error('Failed to schedule task');
-                    }
-                })
-                .catch(error => {
-                    alert('Error scheduling task: ' + error.message);
-                });
-
-                return false;
-            }
-
-            function loadScheduledTasks() {
-                fetch('api/maintenance/tasks')
+            function updateComponentStatus(vehicleNumber) {
+                // 這裡應該發送AJAX請求來獲取組件狀態
+                // 示例代碼：
+                fetch(`/getComponentStatus?vehicleNumber=${vehicleNumber}`)
                     .then(response => response.json())
-                    .then(tasks => {
-                        const tbody = document.getElementById('scheduledTasksList');
+                    .then(data => {
+                        const tbody = document.getElementById('mechanicalStatus');
                         tbody.innerHTML = '';
-                        tasks.forEach(task => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${task.vehicleId}</td>
-                                <td>${task.taskType}</td>
-                                <td>${task.scheduledDate}</td>
-                                <td>${task.priority}</td>
-                                <td>${task.status}</td>
-                                <td>
-                                    <button class="btn" onclick="updateTaskStatus(${task.id}, 'COMPLETED')">Complete</button>
-                                    <button class="btn" onclick="deleteTask(${task.id})">Delete</button>
-                                </td>
-                            `;
-                            tbody.appendChild(row);
-                        });
+                        
+                        // 添加剎車行
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${data.vehicleNumber}</td>
+                                <td>Brakes</td>
+                                <td>${data.brakeHours}</td>
+                                <td>${data.brakeWearLevel.toFixed(1)}%</td>
+                            </tr>
+                        `;
                     });
-            }
-
-            function updateTaskStatus(taskId, status) {
-                fetch(`api/maintenance/tasks/${taskId}/status`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ status: status })
-                })
-                .then(() => {
-                    loadScheduledTasks();
-                });
-            }
-
-            function deleteTask(taskId) {
-                if (confirm('Are you sure you want to delete this task?')) {
-                    fetch(`api/maintenance/tasks/${taskId}`, {
-                        method: 'DELETE'
-                    })
-                    .then(() => {
-                        loadScheduledTasks();
-                    });
-                }
-            }
-
-            function checkMechanical() {
-                fetch('api/maintenance/mechanical', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        componentType: 'Brake System',
-                        hoursOfUse: 800
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    displayAlert(data);
-                });
-            }
-
-            function checkElectrical() {
-                fetch('api/maintenance/electrical', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        componentType: 'Pantograph',
-                        voltage: 750,
-                        current: 50
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    displayAlert(data);
-                });
-            }
-
-            function checkEngine() {
-                fetch('api/maintenance/engine', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        componentType: 'Engine',
-                        temperature: 85,
-                        pressure: 180
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    displayAlert(data);
-                });
-            }
-
-            function clearAlerts() {
-                fetch('api/maintenance/clear', {
-                    method: 'POST'
-                })
-                .then(() => {
-                    document.getElementById('alertsList').innerHTML = '';
-                });
-            }
-
-            function displayAlert(alert) {
-                const alertsList = document.getElementById('alertsList');
-                const alertDiv = document.createElement('div');
-                alertDiv.className = 'alert ' + getAlertClass(alert.wearLevel);
-                
-                alertDiv.innerHTML = `
-                    <div class="alert-info"><strong>Time:</strong> ${alert.timestamp}</div>
-                    <div class="alert-info"><strong>Vehicle ID:</strong> ${alert.vehicleId}</div>
-                    <div class="alert-info"><strong>Component Type:</strong> ${alert.componentType}</div>
-                    <div class="alert-info"><strong>Wear Level:</strong> ${alert.wearLevel}%</div>
-                    <div class="alert-info"><strong>Alert Message:</strong> ${alert.alertMessage}</div>
-                `;
-                
-                alertsList.insertBefore(alertDiv, alertsList.firstChild);
-            }
-
-            function getAlertClass(wearLevel) {
-                if (wearLevel >= 80) return 'critical';
-                if (wearLevel >= 60) return 'warning';
-                return 'normal';
             }
         </script>
     </body>
