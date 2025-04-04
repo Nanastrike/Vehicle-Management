@@ -1,6 +1,5 @@
 package presentation;
 
-import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,18 +11,17 @@ import model.VehicleManagement.Vehicle;
 import data.VehicleDAO;
 import data.DatabaseConnection;
 import model.MaintenanceTask.MaintenanceTaskManager;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Date;
 
 @WebServlet(name = "ComponentMonitoringServlet", urlPatterns = {"/maintenance", "/getLastMaintenance", "/getComponentStatus"})
 public class ComponentMonitoringServlet extends HttpServlet {
-    private final Gson gson = new Gson();
     private VehicleComponentMonitor componentMonitor;
     private VehicleDAO vehicleDAO;
 
@@ -186,7 +184,8 @@ public class ComponentMonitoringServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
-        out.print(gson.toJson(data));
+        JSONObject jsonObject = new JSONObject(data);
+        out.print(jsonObject.toString());
         out.flush();
     }
 } 
