@@ -3,7 +3,6 @@
 <%@ page import="java.util.List" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ include file="operatorNavBar.jsp" %>
-
 <html>
     <head>
         <title>Operator Dashboard</title>
@@ -43,12 +42,22 @@
                 font-size: 20px;
                 color: #2e8b57;
             }
+            .message {
+                color: green;
+                font-weight: bold;
+            }
         </style>
     </head>
     <body>
         <div class="container">
             <h2>Operator Dashboard</h2>
 
+            <!-- ✅ 成功到达终点提示 -->
+            <c:if test="${justArrived}">
+                <p class="message">✅ Vehicle has reached the destination. Please select a new vehicle to start.</p>
+            </c:if>
+
+            <!-- ✅ 还没开始开车，显示车辆选择表单 -->
             <c:if test="${!isDriving}">
                 <form action="startDriving" method="post">
                     <label for="vehicle">Select Vehicle:</label>
@@ -61,6 +70,7 @@
                 </form>
             </c:if>
 
+            <!-- ✅ 正在开车时显示状态 -->
             <c:if test="${isDriving}">
                 <div class="status-box">
                     <c:choose>
@@ -71,16 +81,24 @@
                             <p style="color:red;">[Error] Vehicle data not found in session.</p>
                         </c:otherwise>
                     </c:choose>
+
                     <p class="distance">Current Distance: ${carDistance} km</p>
+                    
+                    <c:choose>
 
-                    <form action="takeBreak" method="post">
-                        <input type="hidden" name="vehicleId" value="${currentVehicle.vehicleID}" />
-                        <button type="submit">Take a Break</button>
-                    </form>
+                        <c:when test="${isPaused}">
+                            <form action="resumeDriving" method="post">
+                                <button type="submit">Resume Driving</button>
+                            </form>
+                        </c:when>
 
-                    <form action="stopDriving" method="post">
-                        <button type="submit">Stop Service</button>
-                    </form>
+                       
+                        <c:otherwise>
+                            <form action="pauseDriving" method="post">
+                                <button type="submit">Take a Break</button>
+                            </form>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </c:if>
         </div>
