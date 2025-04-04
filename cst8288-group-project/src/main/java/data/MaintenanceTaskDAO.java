@@ -5,10 +5,10 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MaintenanceTasksDAO {
+public class MaintenanceTaskDAO {
     private final Connection connection;
     
-    public MaintenanceTasksDAO(Connection connection) {
+    public MaintenanceTaskDAO(Connection connection) {
         this.connection = connection;
     }
     
