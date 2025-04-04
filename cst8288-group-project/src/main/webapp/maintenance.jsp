@@ -2,6 +2,7 @@
 <%@ page import="model.User.User" %>
 <%@ page import="model.VehicleManagement.Vehicle" %>
 <%@ page import="java.util.List" %>
+<%@ page import="model.MaintenanceTask.ComponentStatus" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%
@@ -14,6 +15,8 @@
     
     List<Vehicle> vehicleList = (List<Vehicle>) request.getAttribute("vehicleList");
     Vehicle currentVehicle = (Vehicle) request.getAttribute("currentVehicle");
+    List<ComponentStatus> componentStatuses = (List<ComponentStatus>) request.getAttribute("componentStatuses");
+    String error = (String) request.getAttribute("error");
 %>
 
 <!DOCTYPE html>
@@ -22,6 +25,7 @@
         <title>Maintenance Management</title>
         <!-- Google Font - Quicksand for consistency -->
         <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
         <style>
             body {
@@ -305,6 +309,36 @@
                 border: 1px solid #ddd;
                 border-radius: 4px;
             }
+
+            .table th, .table td {
+                text-align: center;
+                vertical-align: middle;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+            .status-normal { color: green; }
+            .status-warning { color: orange; }
+            .status-critical { color: red; }
+            .form-group {
+                margin: 10px 0;
+            }
+            .component-group {
+                margin: 15px 0;
+                padding: 10px;
+                border: 1px solid #ddd;
+            }
         </style>
     </head>
     <body>
@@ -420,7 +454,7 @@
                     <form action="MaintenanceServlet" method="GET">
                         <div class="form-group">
                             <label for="vehicleNumber">Vehicle Number:</label>
-                            <select id="vehicleNumber" name="vehicleNumber" onchange="this.form.submit()">
+                            <select id="vehicleNumber" name="vehicleNumber" onchange="this.form.submit()" class="form-select" required>
                                 <option value="">Select Vehicle</option>
                                 <c:forEach items="${vehicleList}" var="vehicle">
                                     <option value="${vehicle.vehicleNumber}" ${param.vehicleNumber eq vehicle.vehicleNumber ? 'selected' : ''}>
@@ -450,20 +484,20 @@
                                 <h4>Mechanical Components:</h4>
                                 <input type="checkbox" id="brakes" name="components" value="brakes">
                                 <label for="brakes">Brakes</label>
-                                <input type="checkbox" id="tires" name="components" value="tires">
-                                <label for="tires">Tires</label>
+                                <input type="checkbox" id="wheels" name="components" value="wheels">
+                                <label for="wheels">Wheels/Tires</label>
                                 
                                 <h4>Electrical Components:</h4>
-                                <input type="checkbox" id="battery" name="components" value="battery">
-                                <label for="battery">Battery</label>
-                                <input type="checkbox" id="lights" name="components" value="lights">
-                                <label for="lights">Lights</label>
+                                <input type="checkbox" id="catenary" name="components" value="catenary">
+                                <label for="catenary">Catenary</label>
+                                <input type="checkbox" id="pantograph" name="components" value="pantograph">
+                                <label for="pantograph">Pantograph</label>
                                 
                                 <h4>Engine Components:</h4>
                                 <input type="checkbox" id="oil" name="components" value="oil">
-                                <label for="oil">Oil Level</label>
+                                <label for="oil">Oil Change</label>
                                 <input type="checkbox" id="coolant" name="components" value="coolant">
-                                <label for="coolant">Coolant Level</label>
+                                <label for="coolant">Coolant Change</label>
                             </div>
                         </div>
                         
@@ -473,64 +507,50 @@
                 </div>
 
                 <h2>Component Status</h2>
-                <div class="status-grid">
-                    <div class="status-section">
-                        <h3>Mechanical Components</h3>
-                        <table class="status-table">
-                            <thead>
+                <div class="status-section">
+                    <table class="status-table">
+                        <thead>
+                            <tr>
+                                <th>Vehicle Number</th>
+                                <th>Component</th>
+                                <th>Hours Used</th>
+                                <th>Wear Level</th>
+                                <th>Status</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach items="${componentStatuses}" var="status">
                                 <tr>
-                                    <th>Vehicle Number</th>
-                                    <th>Component</th>
-                                    <th>Hours Used</th>
-                                    <th>Wear Level</th>
+                                    <td>${status.vehicleId}</td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${status.componentName eq 'brakes'}">Brakes</c:when>
+                                            <c:when test="${status.componentName eq 'wheels'}">Wheels/Tires</c:when>
+                                            <c:when test="${status.componentName eq 'catenary'}">Catenary</c:when>
+                                            <c:when test="${status.componentName eq 'pantograph'}">Pantograph</c:when>
+                                            <c:when test="${status.componentName eq 'oil'}">Oil</c:when>
+                                            <c:when test="${status.componentName eq 'coolant'}">Coolant</c:when>
+                                            <c:otherwise>${status.componentName}</c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>${status.hoursUsed}</td>
+                                    <td>${status.wearLevel}%</td>
+                                    <td>
+                                        <span class="badge ${status.status == 'NORMAL' ? 'bg-success' : 'bg-danger'}">
+                                            ${status.status}
+                                        </span>
+                                    </td>
+                                    <td>${status.lastUpdated}</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach var="status" items="${componentStatuses}">
-                                    <tr>
-                                        <td>${status.vehicleId}</td>
-                                        <td>${status.componentName}</td>
-                                        <td>${status.hoursUsed}</td>
-                                        <td>${status.wearLevel}%</td>
-                                    </tr>
-                                </c:forEach>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="status-section">
-                        <h3>Electrical Components</h3>
-                        <table class="status-table">
-                            <thead>
+                            </c:forEach>
+                            <c:if test="${empty componentStatuses}">
                                 <tr>
-                                    <th>Vehicle Number</th>
-                                    <th>Component</th>
-                                    <th>Hours Used</th>
-                                    <th>Wear Level</th>
+                                    <td colspan="6" style="text-align: center;">No component status data available</td>
                                 </tr>
-                            </thead>
-                            <tbody id="electricalStatus">
-                                <!-- This will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="status-section">
-                        <h3>Engine Diagnostics</h3>
-                        <table class="status-table">
-                            <thead>
-                                <tr>
-                                    <th>Vehicle Number</th>
-                                    <th>Parameter</th>
-                                    <th>Value</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="engineStatus">
-                                <!-- This will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
+                            </c:if>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -555,36 +575,110 @@
         <script>
             document.getElementById('vehicleNumber').addEventListener('change', function() {
                 const vehicleNumber = this.value;
-                // 這裡應該發送AJAX請求來獲取最後維修日期
-                // 示例代碼：
+                if (!vehicleNumber) return;
+                
                 fetch(`/getLastMaintenance?vehicleNumber=${vehicleNumber}`)
                     .then(response => response.json())
                     .then(data => {
-                        document.getElementById('lastMaintenanceDate').textContent = data.lastMaintenanceDate;
-                        updateComponentStatus(vehicleNumber);
+                        updateComponentStatus(vehicleNumber, data.lastMaintenanceDate);
                     });
             });
 
-            function updateComponentStatus(vehicleNumber) {
-                // 這裡應該發送AJAX請求來獲取組件狀態
-                // 示例代碼：
-                fetch(`/getComponentStatus?vehicleNumber=${vehicleNumber}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const tbody = document.getElementById('mechanicalStatus');
-                        tbody.innerHTML = '';
-                        
-                        // 添加剎車行
-                        tbody.innerHTML += `
-                            <tr>
-                                <td>${data.vehicleNumber}</td>
-                                <td>Brakes</td>
-                                <td>${data.brakeHours}</td>
-                                <td>${data.brakeWearLevel.toFixed(1)}%</td>
+            function calculateWearLevel(hoursUsed) {
+                if (hoursUsed < 100) return 20;
+                if (hoursUsed < 200) return 40;
+                if (hoursUsed < 300) return 60;
+                return 80;
+            }
+
+            function updateComponentStatus(vehicleNumber, lastMaintenanceDate) {
+                if (!lastMaintenanceDate) return;
+                
+                const lastMaintenance = new Date(lastMaintenanceDate);
+                const today = new Date();
+                const daysDiff = Math.floor((today - lastMaintenance) / (1000 * 60 * 60 * 24));
+                const hoursUsed = daysDiff * 24;
+                
+                // Update Mechanical Components
+                const mechanicalComponents = ['Brakes', 'Wheels/Tires'];
+                const mechanicalTbody = document.getElementById('mechanicalStatus');
+                mechanicalTbody.innerHTML = '';
+                
+                mechanicalComponents.forEach(component => {
+                    const wearLevel = calculateWearLevel(hoursUsed);
+                    mechanicalTbody.innerHTML += `
+                        <tr>
+                            <td>${vehicleNumber}</td>
+                            <td>${component}</td>
+                            <td>${hoursUsed}</td>
+                            <td>${wearLevel}%</td>
+                            <td>${lastMaintenanceDate}</td>
+                        </tr>
+                    `;
+                });
+                
+                // Update Electrical Components
+                const electricalComponents = ['Catenary', 'Pantograph'];
+                const electricalTbody = document.getElementById('electricalStatus');
+                electricalTbody.innerHTML = '';
+                
+                electricalComponents.forEach(component => {
+                    const wearLevel = calculateWearLevel(hoursUsed);
+                    electricalTbody.innerHTML += `
+                        <tr>
+                            <td>${vehicleNumber}</td>
+                            <td>${component}</td>
+                            <td>${hoursUsed}</td>
+                            <td>${wearLevel}%</td>
+                            <td>${lastMaintenanceDate}</td>
+                        </tr>
+                    `;
+                });
+                
+                // Update Engine Diagnostics
+                const engineParameters = ['Oil Change', 'Coolant Change'];
+                const engineTbody = document.getElementById('engineStatus');
+                engineTbody.innerHTML = '';
+                
+                engineParameters.forEach(parameter => {
+                    const status = daysDiff > 180 ? '需更換' : '正常';
+                    engineTbody.innerHTML += `
+                        <tr>
+                            <td>${vehicleNumber}</td>
+                            <td>${parameter}</td>
+                            <td>${lastMaintenanceDate}</td>
+                            <td>${status}</td>
                             </tr>
                         `;
                     });
+                
+                // Send data to server to update database
+                fetch('/updateComponentStatus', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        vehicleNumber,
+                        lastMaintenanceDate,
+                        hoursUsed,
+                        mechanicalComponents: mechanicalComponents.map(component => ({
+                            component,
+                            wearLevel: calculateWearLevel(hoursUsed)
+                        })),
+                        electricalComponents: electricalComponents.map(component => ({
+                            component,
+                            wearLevel: calculateWearLevel(hoursUsed)
+                        })),
+                        engineParameters: engineParameters.map(parameter => ({
+                            parameter,
+                            status: daysDiff > 180 ? '需更換' : '正常'
+                        }))
+                    })
+                });
             }
         </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html> 
