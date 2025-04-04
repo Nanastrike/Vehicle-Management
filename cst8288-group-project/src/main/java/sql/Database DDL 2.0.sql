@@ -16,6 +16,8 @@ DROP TABLE IF EXISTS VehicleTypes;
 DROP TABLE IF EXISTS FuelTypes;
 DROP TABLE IF EXISTS AlertSeverity;
 DROP TABLE IF EXISTS OperatorStatusTypes;
+DROP TABLE IF EXISTS Component_Status;
+DROP TABLE IF EXISTS Maintenance_Tasks;
 
 -- User Types Lookup Table
 CREATE TABLE UserTypes (
@@ -129,6 +131,32 @@ CREATE TABLE Operator_Status (
     FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE,
     FOREIGN KEY (VehicleID) REFERENCES Vehicles(VehicleID) ON DELETE CASCADE,
     FOREIGN KEY (StatusID) REFERENCES OperatorStatusTypes(StatusID) ON DELETE CASCADE
+);
+
+-- Component Status Table (For tracking component wear)
+CREATE TABLE Component_Status (
+    ComponentID INT AUTO_INCREMENT PRIMARY KEY,
+    VehicleID INT NOT NULL,
+    ComponentName VARCHAR(100) NOT NULL,
+    HoursUsed INT NOT NULL DEFAULT 0,
+    WearLevel DECIMAL(5,2) NOT NULL DEFAULT 0,
+    LastUpdated DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (VehicleID) REFERENCES Vehicles(VehicleID) ON DELETE CASCADE
+);
+
+-- Maintenance Tasks Table (For scheduling maintenance)
+CREATE TABLE Maintenance_Tasks (
+    TaskID INT AUTO_INCREMENT PRIMARY KEY,
+    VehicleID INT NOT NULL,
+    ComponentID INT,
+    MaintenanceDate DATETIME NOT NULL,
+    Status VARCHAR(20) NOT NULL DEFAULT 'Scheduled',
+    CreatedBy VARCHAR(100),
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Priority VARCHAR(20) NOT NULL DEFAULT 'MEDIUM',
+    TaskType VARCHAR(50) NOT NULL,
+    FOREIGN KEY (VehicleID) REFERENCES Vehicles(VehicleID) ON DELETE CASCADE,
+    FOREIGN KEY (ComponentID) REFERENCES Component_Status(ComponentID) ON DELETE SET NULL
 );
 
 -- Insert default values for lookup tables
