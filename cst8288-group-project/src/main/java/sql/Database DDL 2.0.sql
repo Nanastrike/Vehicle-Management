@@ -121,16 +121,10 @@ CREATE TABLE Maintenance_Alerts (
 );
 
 -- Operator Status Table (For Logging Breaks & Out-of-Service Times)
-CREATE TABLE Operator_Status (
-    StatusEntryID INT AUTO_INCREMENT PRIMARY KEY,
-    UserID INT NOT NULL,
-    VehicleID INT NOT NULL,
-    StatusID INT NOT NULL,
-    StartTime DATETIME DEFAULT CURRENT_TIMESTAMP,
-    EndTime DATETIME NULL,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY (VehicleID) REFERENCES Vehicles(VehicleID) ON DELETE CASCADE,
-    FOREIGN KEY (StatusID) REFERENCES OperatorStatusTypes(StatusID) ON DELETE CASCADE
+CREATE TABLE Operator (
+    OperatorID INT AUTO_INCREMENT PRIMARY KEY,
+    UserID INT NOT NULL UNIQUE,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
 );
 
 -- Component Status Table (For tracking component wear)

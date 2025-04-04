@@ -1,5 +1,5 @@
 // StopDrivingServlet.java
-package presentation;
+package presentation.gps_tracking;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

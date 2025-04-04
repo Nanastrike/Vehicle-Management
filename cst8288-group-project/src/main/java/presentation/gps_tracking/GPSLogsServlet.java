@@ -2,15 +2,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package presentation;
+package presentation.gps_tracking;
 
 import data.DatabaseConnection;
-import data.RouteDao;
-import data.RouteDaoImpl;
-import data.VehicleActionDTO;
+import data.gps_tracking.RouteDao;
+import data.gps_tracking.RouteDaoImpl;
+import data.gps_tracking.VehicleActionDTO;
 import jakarta.servlet.http.HttpServlet;
-import data.VehicleActionDao;
-import data.VehicleActionDaoImpl;
+import data.gps_tracking.VehicleActionDao;
+import data.gps_tracking.VehicleActionDaoImpl;
 import data.VehicleDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,7 +43,7 @@ public class GPSLogsServlet extends HttpServlet {
         List<TrackingDisplayDTO> displayList = new ArrayList<>();
 
         if ((refreshParam != null && refreshParam.equals("true")) || vehicleNumberParam == null || vehicleNumberParam.trim().isEmpty()) {
-            // ✅ 全部车辆 => 显示每辆车最新的一条记录
+            //  全部车辆 => 显示每辆车最新的一条记录
             List<VehicleActionDTO> logs = vehicleActionDao.getAllVehicleLogs();
             for (VehicleActionDTO log : logs) {
                 Vehicle vehicle = vehicleDao.getVehicleByID(log.getVehicleID());
@@ -62,7 +62,7 @@ public class GPSLogsServlet extends HttpServlet {
             }
 
         } else {
-            // ✅ 查询某辆车的所有记录
+            // 查询某辆车的所有记录
             Vehicle vehicle = vehicleDao.getVehicleByNumber(vehicleNumberParam.trim());
             if (vehicle != null) {
                 List<VehicleActionDTO> logs = vehicleActionDao.getAllLogsByVehicleID(vehicle.getVehicleID());

@@ -4,17 +4,15 @@
  */
 package module.GPS_Tracking.vehicles;
 
-import data.RouteDao;
-import data.RouteDaoImpl;
-import data.VehicleActionDTO;
-import data.VehicleActionDao;
-import data.VehicleActionDaoImpl;
+import data.gps_tracking.RouteDao;
+import data.gps_tracking.RouteDaoImpl;
+import data.gps_tracking.VehicleActionDTO;
+import data.gps_tracking.VehicleActionDao;
+import data.gps_tracking.VehicleActionDaoImpl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;

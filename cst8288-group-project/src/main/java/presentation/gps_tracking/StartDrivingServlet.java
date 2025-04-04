@@ -1,4 +1,4 @@
-package presentation;
+package presentation.gps_tracking;
 
 import data.DatabaseConnection;
 import data.VehicleDAO;
