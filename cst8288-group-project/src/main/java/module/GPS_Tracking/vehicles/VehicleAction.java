@@ -15,12 +15,14 @@ public interface VehicleAction {
     boolean isArrived(double carDistance, int roadNumber);
     
     //车辆行驶距离，内置一个math.random();
-    double vehicleMovedDistance(int roadNumber);
+    double vehicleMovedDistance(int roadNumber, int operatorID);
     
     //发送坐标id
     double updatePosition(double position);
     
     //车的状态，行驶中还是停止中？已到站是另一个method
     void setRunning(boolean running);
+    
+    void setOperatorID(int operatorID);
 
 }

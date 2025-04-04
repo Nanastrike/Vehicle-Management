@@ -43,6 +43,10 @@
 <div class="container">
     <div class="card">
         <h2>Fuel Consumption Dashboard</h2>
+<jsp:include page="/navbar.jsp" />
+<body class="container mt-4">
+    
+<h2>Fuel Consumption Dashboard</h2>
 
         <form action="DashboardServlet" method="post" class="mb-4">
             <div class="row g-3 align-items-center">
