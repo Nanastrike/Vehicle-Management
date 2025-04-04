@@ -11,8 +11,37 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Servlet that handles user registration.
+ * <p>
+ * It collects user input from the registration form,
+ * hashes the password using SHA-256, checks if the email is already registered,
+ * and inserts a new user into the database.
+ * </p>
+ *
+ * <p>Upon success, it forwards to the login page with a success message.
+ * Otherwise, it returns the user to the registration form with an error.</p>
+ *
+ * @author Zhennan Deng
+ * @version 1.0
+ * @since Java 1.21
+ *
+ * @see jakarta.servlet.http.HttpServlet
+ * @see jakarta.servlet.http.HttpServletRequest
+ * @see jakarta.servlet.http.HttpServletResponse
+ * @see data.UserDAO
+ * @see model.User.User
+ */
 public class RegisterServlet extends HttpServlet {
 
+    /**
+     * Processes registration form submission via HTTP POST.
+     *
+     * @param request  the HTTP request object containing user-submitted form data
+     * @param response the HTTP response object
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -58,7 +87,12 @@ public class RegisterServlet extends HttpServlet {
         }
     }
 
-    // Hash password method
+    /**
+     * Hashes the plain-text password using SHA-256.
+     *
+     * @param password the plain-text password
+     * @return the hashed password in hexadecimal string format
+     */
     private String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");

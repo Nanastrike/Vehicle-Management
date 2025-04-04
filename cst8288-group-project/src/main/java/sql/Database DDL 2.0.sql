@@ -103,6 +103,7 @@ CREATE TABLE Fuel_Consumption (
     FuelTypeID INT NOT NULL,
     FuelUsed FLOAT NOT NULL,
     DistanceTraveled FLOAT NOT NULL,
+    Status VARCHAR(20) DEFAULT 'Normal';
     Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (VehicleID) REFERENCES Vehicles(VehicleID) ON DELETE CASCADE,
     FOREIGN KEY (FuelTypeID) REFERENCES FuelTypes(FuelTypeID) ON DELETE CASCADE
@@ -121,16 +122,10 @@ CREATE TABLE Maintenance_Alerts (
 );
 
 -- Operator Status Table (For Logging Breaks & Out-of-Service Times)
-CREATE TABLE Operator_Status (
-    StatusEntryID INT AUTO_INCREMENT PRIMARY KEY,
-    UserID INT NOT NULL,
-    VehicleID INT NOT NULL,
-    StatusID INT NOT NULL,
-    StartTime DATETIME DEFAULT CURRENT_TIMESTAMP,
-    EndTime DATETIME NULL,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE,
-    FOREIGN KEY (VehicleID) REFERENCES Vehicles(VehicleID) ON DELETE CASCADE,
-    FOREIGN KEY (StatusID) REFERENCES OperatorStatusTypes(StatusID) ON DELETE CASCADE
+CREATE TABLE Operator (
+    OperatorID INT AUTO_INCREMENT PRIMARY KEY,
+    UserID INT NOT NULL UNIQUE,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) ON DELETE CASCADE
 );
 
 -- Component Status Table (For tracking component wear)
@@ -183,3 +178,11 @@ INSERT INTO vehicles (
 );
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+INSERT INTO Vehicles (
+    VehicleID, VehicleNumber, VehicleTypeID, FuelTypeID, 
+    ConsumptionRate, DieselRate, ElectricRate,
+    MaxPassengers, RouteID, LastMaintenanceDate, Status
+) VALUES (
+    1, 'BUS-001', 1, 1, 5.0, 25.0, 0.0, 40, 1, '2024-01-01','Nomal'
+);

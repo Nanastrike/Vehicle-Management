@@ -4,17 +4,15 @@
  */
 package module.GPS_Tracking.vehicles;
 
-import data.RouteDao;
-import data.RouteDaoImpl;
-import data.VehicleActionDTO;
-import data.VehicleActionDao;
-import data.VehicleActionDaoImpl;
+import data.gps_tracking.RouteDao;
+import data.gps_tracking.RouteDaoImpl;
+import data.gps_tracking.VehicleActionDTO;
+import data.gps_tracking.VehicleActionDao;
+import data.gps_tracking.VehicleActionDaoImpl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -40,6 +38,7 @@ public class VehicleActionImpl implements VehicleAction {
     private LocalDateTime arriveTime;
     private VehicleActionDao vehicleDao = new VehicleActionDaoImpl(); // 用于操作数据库
     private final RouteDao routeDao = new RouteDaoImpl(); //用于连接route表
+    private int operatorID;
 
     public VehicleActionImpl(Vehicle vehicle) {
         super();
@@ -93,7 +92,8 @@ public class VehicleActionImpl implements VehicleAction {
      * and 5 each instance has its own carDistance
      */
     @Override
-    public double vehicleMovedDistance(int roadNumber) {
+    public double vehicleMovedDistance(int roadNumber, int operatorID) {
+        this.operatorID = operatorID;
         //计算每次行径距离
         double i = 0.5 + Math.random() * (5.0 - 0.5); //每次行径距离在0-5之间
         BigDecimal rounded = new BigDecimal(i).setScale(2, RoundingMode.HALF_UP);
@@ -123,6 +123,7 @@ public class VehicleActionImpl implements VehicleAction {
             }
             newLog.setLeavingTime(this.leavingTime);
             newLog.setArriveTime(this.arriveTime);
+            newLog.setOperatorID(this.operatorID);
 
             try {
                 dao.insertDistanceLog(newLog);
@@ -194,4 +195,8 @@ public class VehicleActionImpl implements VehicleAction {
             listener.onRunningStateChanged(vehicleID, running);
         }
     }
+    
+    public void setOperatorID(int operatorID) {
+    this.operatorID = operatorID;
+}
 }

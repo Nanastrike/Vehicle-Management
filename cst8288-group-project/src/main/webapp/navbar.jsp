@@ -11,9 +11,9 @@
     <div class="nav-links">
         <a href="VehicleManagementServlet?action=dashboard">Home</a>
         <a href="VehicleManagementServlet?action=list">Vehicle Management</a>
-        <a href="gpsLogs">GPS Tracking</a>
-        <a href="fuel_monitor.jsp">Fuel/Energy Monitor</a>
-        <a href="MaintenanceServlet">Maintenance Alerts</a>
+        <a href="gps_tracking.jsp">GPS Tracking</a>
+        <a href="Fuel_dashboard.jsp">Fuel/Energy Monitor</a>
+        <a href="maintenance.jsp">Maintenance Alerts</a>
         <a href="reports.jsp">Reports</a>
     </div>
 
