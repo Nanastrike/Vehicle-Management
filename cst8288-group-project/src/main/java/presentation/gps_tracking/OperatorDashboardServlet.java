@@ -35,7 +35,6 @@ public class OperatorDashboardServlet extends HttpServlet {
         VehicleDAO vehicleDAO = new VehicleDAO(conn);
         RouteDao routeDao = new RouteDaoImpl();
 
-        // 获取所有车辆列表用于下拉选择
         List<Vehicle> vehicleList = vehicleDAO.getAllVehicles();
         request.setAttribute("vehicleList", vehicleList);
 
@@ -44,30 +43,33 @@ public class OperatorDashboardServlet extends HttpServlet {
         Boolean isDriving = (Boolean) session.getAttribute("isDriving");
         Boolean isPaused = (Boolean) session.getAttribute("isPaused");
 
-        // 默认值处理
         if (isDriving == null) isDriving = false;
         if (isPaused == null) isPaused = false;
         if (carDistance == null) carDistance = 0.0;
 
-        // 如果已经开车，判断是否到达终点
         boolean isArrived = false;
         if (isDriving && !isPaused && currentVehicle != null) {
             int routeID = currentVehicle.getRouteID();
             VehicleAction vehicleAction = new VehicleActionImpl(currentVehicle);
             isArrived = vehicleAction.isArrived(carDistance, routeID);
 
-            // 如果已经到达终点，则清空状态，回首页状态
             if (isArrived) {
                 session.removeAttribute("isDriving");
                 session.removeAttribute("isPaused");
                 session.removeAttribute("currentVehicle");
                 session.removeAttribute("carDistance");
-                // 可以设置一个提示用变量
-                request.setAttribute("justArrived", true);
+
+                session.setAttribute("justArrived", true);
             }
         }
 
-        // 设置状态传给前端
+        // ✅ 读取 justArrived flag 给 JSP 提示用
+        Boolean justArrived = (Boolean) session.getAttribute("justArrived");
+        if (justArrived != null && justArrived) {
+            request.setAttribute("justArrived", true);
+            session.removeAttribute("justArrived");
+        }
+
         request.setAttribute("isDriving", isDriving);
         request.setAttribute("isPaused", isPaused);
         request.setAttribute("carDistance", carDistance);

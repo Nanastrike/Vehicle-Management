@@ -54,7 +54,7 @@
 
             <!-- ✅ 成功到达终点提示 -->
             <c:if test="${justArrived}">
-                <p class="message">✅ Vehicle has reached the destination. Please select a new vehicle to start.</p>
+                <p class="message">Vehicle has reached the destination. Please select a new vehicle to start.</p>
             </c:if>
 
             <!-- ✅ 还没开始开车，显示车辆选择表单 -->
