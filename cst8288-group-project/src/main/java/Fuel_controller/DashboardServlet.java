@@ -71,7 +71,7 @@ public class DashboardServlet extends HttpServlet {
             case "Electric Light Rail":
                 unit = "kWh";
                 break;
-            case "Diesel-Electric Train":
+            case "Diesel Electric Train":
             case "Diesel Bus":
                 unit = "L";
                 break;

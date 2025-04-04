@@ -163,7 +163,7 @@
         </div>
     </form>
 
-    <!-- 结果提示 -->
+    
     <%
         Double calculated = (Double) request.getAttribute("calculatedConsumption");
         String alert = (String) request.getAttribute("alertMessage");
