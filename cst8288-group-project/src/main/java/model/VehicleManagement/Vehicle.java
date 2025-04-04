@@ -34,7 +34,7 @@ public class Vehicle {
     private double dieselRate;   // new
     private double electricRate; //new
     private VehicleInterface vehicleInterface; // Factory-based vehicle type
-    private VehicleInterface vehicleInterface;
+
 
     /**
      * Default constructor.
