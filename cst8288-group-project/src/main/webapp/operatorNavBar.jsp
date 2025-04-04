@@ -11,7 +11,7 @@
     <div class="nav-links">
         <a href="VehicleManagementServlet?action=dashboard">Home</a>
         <a href="VehicleManagementServlet?action=list">Vehicle Management</a>
-        <a href="gps_tracking.jsp">GPS Tracking</a>
+        <a href="${pageContext.request.contextPath}/operatorDashboard">Operator Dashboard</a>
     </div>
 
     <!-- User Info and Logout Button (if user is logged in) -->
