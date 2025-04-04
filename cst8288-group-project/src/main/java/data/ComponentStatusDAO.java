@@ -29,17 +29,6 @@ public class ComponentStatusDAO {
         }
     }
     
-    public void updateComponentStatus(ComponentStatus status) throws SQLException {
-        String sql = "UPDATE Component_Status SET HoursUsed = ?, WearLevel = ?, LastUpdated = ? WHERE ComponentID = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, status.getHoursUsed());
-            stmt.setDouble(2, status.getWearLevel());
-            stmt.setTimestamp(3, Timestamp.valueOf(status.getLastUpdated()));
-            stmt.setInt(4, status.getComponentId());
-            stmt.executeUpdate();
-        }
-    }
-    
     public List<ComponentStatus> getComponentStatusesByVehicle(String vehicleId) throws SQLException {
         String sql = "SELECT * FROM Component_Status WHERE VehicleID = ?";
         List<ComponentStatus> statuses = new ArrayList<>();
@@ -61,6 +50,17 @@ public class ComponentStatusDAO {
             }
         }
         return statuses;
+    }
+    
+    public void updateComponentStatus(ComponentStatus status) throws SQLException {
+        String sql = "UPDATE Component_Status SET HoursUsed = ?, WearLevel = ?, LastUpdated = ? WHERE ComponentID = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, status.getHoursUsed());
+            stmt.setDouble(2, status.getWearLevel());
+            stmt.setTimestamp(3, Timestamp.valueOf(status.getLastUpdated()));
+            stmt.setInt(4, status.getComponentId());
+            stmt.executeUpdate();
+        }
     }
     
     public ComponentStatus getComponentStatus(int componentId) throws SQLException {

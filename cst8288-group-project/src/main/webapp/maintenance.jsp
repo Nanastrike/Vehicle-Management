@@ -13,6 +13,7 @@
     }
     
     List<Vehicle> vehicleList = (List<Vehicle>) request.getAttribute("vehicleList");
+    Vehicle currentVehicle = (Vehicle) request.getAttribute("currentVehicle");
 %>
 
 <!DOCTYPE html>
@@ -415,203 +416,175 @@
 
             <div class="section">
                 <h2>Component Monitoring</h2>
-                <div class="monitoring-buttons">
-                    <label for="mechanical-modal-toggle" class="btn monitoring-btn">Check Mechanical Components</label>
-                    <label for="electrical-modal-toggle" class="btn monitoring-btn">Check Electrical Components</label>
-                    <label for="engine-modal-toggle" class="btn monitoring-btn">Check Engine Diagnostics</label>
-                    <form action="MaintenanceServlet" method="post" style="display: inline;">
-                        <input type="hidden" name="action" value="clearAlerts">
-                        <button type="submit" class="btn monitoring-btn">Clear All Alerts</button>
+                <div class="section">
+                    <form action="MaintenanceServlet" method="GET">
+                        <div class="form-group">
+                            <label for="vehicleNumber">Vehicle Number:</label>
+                            <select id="vehicleNumber" name="vehicleNumber" onchange="this.form.submit()">
+                                <option value="">Select Vehicle</option>
+                                <c:forEach items="${vehicleList}" var="vehicle">
+                                    <option value="${vehicle.vehicleNumber}" ${param.vehicleNumber eq vehicle.vehicleNumber ? 'selected' : ''}>
+                                        ${vehicle.vehicleNumber}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Last Maintenance Date:</label>
+                            <span>
+                                <c:choose>
+                                    <c:when test="${currentVehicle != null && currentVehicle.lastMaintenanceDate != null}">
+                                        ${currentVehicle.lastMaintenanceDate}
+                                    </c:when>
+                                    <c:otherwise>
+                                        No maintenance record
+                                    </c:otherwise>
+                                </c:choose>
+                            </span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Components to Check:</label>
+                            <div class="checkbox-group">
+                                <h4>Mechanical Components:</h4>
+                                <input type="checkbox" id="brakes" name="components" value="brakes">
+                                <label for="brakes">Brakes</label>
+                                <input type="checkbox" id="tires" name="components" value="tires">
+                                <label for="tires">Tires</label>
+                                
+                                <h4>Electrical Components:</h4>
+                                <input type="checkbox" id="battery" name="components" value="battery">
+                                <label for="battery">Battery</label>
+                                <input type="checkbox" id="lights" name="components" value="lights">
+                                <label for="lights">Lights</label>
+                                
+                                <h4>Engine Components:</h4>
+                                <input type="checkbox" id="oil" name="components" value="oil">
+                                <label for="oil">Oil Level</label>
+                                <input type="checkbox" id="coolant" name="components" value="coolant">
+                                <label for="coolant">Coolant Level</label>
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" name="action" value="checkComponents">
+                        <button type="submit" class="btn">Submit Maintenance Check</button>
                     </form>
                 </div>
 
-                <!-- Hidden checkboxes for modal control -->
-                <input type="checkbox" id="mechanical-modal-toggle" class="modal-toggle">
-                <input type="checkbox" id="electrical-modal-toggle" class="modal-toggle">
-                <input type="checkbox" id="engine-modal-toggle" class="modal-toggle">
-
-                <!-- Mechanical Components Modal -->
-                <div class="modal" id="mechanicalModal">
-                    <div class="modal-content">
-                        <label for="mechanical-modal-toggle" class="close">&times;</label>
-                        <h4>Mechanical Components Monitoring</h4>
-                        <form action="MaintenanceServlet" method="post">
-                            <input type="hidden" name="action" value="checkMechanical">
-                            <div class="form-group">
-                                <label for="vehicleId">Vehicle Number</label>
-                                <select id="vehicleId" name="vehicleId" required>
-                                    <option value="">Select Vehicle</option>
-                                    <c:forEach var="vehicle" items="${vehicleList}">
-                                        <option value="${vehicle.vehicleID}">${vehicle.vehicleNumber} - ${vehicle.vehicleType.typeName}</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="brakeWear">Brake Wear (%)</label>
-                                <input type="number" id="brakeWear" name="brakeWear" min="0" max="100" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="wheelWear">Wheel/Tire Wear (%)</label>
-                                <input type="number" id="wheelWear" name="wheelWear" min="0" max="100" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="bearingWear">Axle Bearing Wear (%)</label>
-                                <input type="number" id="bearingWear" name="bearingWear" min="0" max="100" required>
-                            </div>
-                            <button type="submit" class="btn">Submit</button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Electrical Components Modal -->
-                <div class="modal" id="electricalModal">
-                    <div class="modal-content">
-                        <label for="electrical-modal-toggle" class="close">&times;</label>
-                        <h4>Electrical Components Monitoring</h4>
-                        <form action="MaintenanceServlet" method="post">
-                            <input type="hidden" name="action" value="checkElectrical">
-                            <div class="form-group">
-                                <label for="vehicleId">Vehicle Number</label>
-                                <select id="vehicleId" name="vehicleId" required>
-                                    <option value="">Select Vehicle</option>
-                                    <c:forEach var="vehicle" items="${vehicleList}">
-                                        <option value="${vehicle.vehicleID}">${vehicle.vehicleNumber} - ${vehicle.vehicleType.typeName}</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="catenaryWear">Catenary Wear (%)</label>
-                                <input type="number" id="catenaryWear" name="catenaryWear" min="0" max="100" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="pantographWear">Pantograph Wear (%)</label>
-                                <input type="number" id="pantographWear" name="pantographWear" min="0" max="100" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="breakerWear">Circuit Breaker Wear (%)</label>
-                                <input type="number" id="breakerWear" name="breakerWear" min="0" max="100" required>
-                            </div>
-                            <button type="submit" class="btn">Submit</button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Engine Diagnostics Modal -->
-                <div class="modal" id="engineModal">
-                    <div class="modal-content">
-                        <label for="engine-modal-toggle" class="close">&times;</label>
-                        <h4>Engine Diagnostics Monitoring</h4>
-                        <form action="MaintenanceServlet" method="post">
-                            <input type="hidden" name="action" value="checkEngine">
-                            <div class="form-group">
-                                <label for="vehicleId">Vehicle Number</label>
-                                <select id="vehicleId" name="vehicleId" required>
-                                    <option value="">Select Vehicle</option>
-                                    <c:forEach var="vehicle" items="${vehicleList}">
-                                        <option value="${vehicle.vehicleID}">${vehicle.vehicleNumber} - ${vehicle.vehicleType.typeName}</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="engineTemp">Engine Temperature (°C)</label>
-                                <input type="number" id="engineTemp" name="engineTemp" min="0" max="200" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="oilPressure">Oil Pressure (PSI)</label>
-                                <input type="number" id="oilPressure" name="oilPressure" min="0" max="100" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="fuelEfficiency">Fuel Efficiency (km/L)</label>
-                                <input type="number" id="fuelEfficiency" name="fuelEfficiency" min="0" max="50" step="0.1" required>
-                            </div>
-                            <button type="submit" class="btn">Submit</button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Component Status Display -->
-                <div class="component-status">
-                    <h3>Component Status</h3>
-                    <div class="status-grid">
-                        <div class="status-section">
-                            <h4>Mechanical Components</h4>
-                            <table class="status-table">
+                <h2>Component Status</h2>
+                <div class="status-grid">
+                    <div class="status-section">
+                        <h3>Mechanical Components</h3>
+                        <table class="status-table">
+                            <thead>
                                 <tr>
+                                    <th>Vehicle Number</th>
                                     <th>Component</th>
                                     <th>Hours Used</th>
                                     <th>Wear Level</th>
                                 </tr>
-                                <c:forEach var="status" items="${mechanicalStatuses}">
+                            </thead>
+                            <tbody>
+                                <c:forEach var="status" items="${componentStatuses}">
                                     <tr>
+                                        <td>${status.vehicleId}</td>
                                         <td>${status.componentName}</td>
                                         <td>${status.hoursUsed}</td>
-                                        <td class="${status.wearLevel > 80 ? 'critical' : status.wearLevel > 60 ? 'warning' : 'normal'}">
-                                            ${status.wearLevel}%
-                                        </td>
+                                        <td>${status.wearLevel}%</td>
                                     </tr>
                                 </c:forEach>
-                            </table>
-                        </div>
-
-                        <div class="status-section">
-                            <h4>Electrical Components</h4>
-                            <table class="status-table">
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="status-section">
+                        <h3>Electrical Components</h3>
+                        <table class="status-table">
+                            <thead>
                                 <tr>
+                                    <th>Vehicle Number</th>
                                     <th>Component</th>
                                     <th>Hours Used</th>
                                     <th>Wear Level</th>
                                 </tr>
-                                <c:forEach var="status" items="${electricalStatuses}">
-                                    <tr>
-                                        <td>${status.componentName}</td>
-                                        <td>${status.hoursUsed}</td>
-                                        <td class="${status.wearLevel > 80 ? 'critical' : status.wearLevel > 60 ? 'warning' : 'normal'}">
-                                            ${status.wearLevel}%
-                                        </td>
-                                    </tr>
-                                </c:forEach>
-                            </table>
-                        </div>
-
-                        <div class="status-section">
-                            <h4>Engine Diagnostics</h4>
-                            <table class="status-table">
+                            </thead>
+                            <tbody id="electricalStatus">
+                                <!-- This will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="status-section">
+                        <h3>Engine Diagnostics</h3>
+                        <table class="status-table">
+                            <thead>
                                 <tr>
+                                    <th>Vehicle Number</th>
                                     <th>Parameter</th>
                                     <th>Value</th>
                                     <th>Status</th>
                                 </tr>
-                                <c:forEach var="status" items="${engineStatuses}">
-                                    <tr>
-                                        <td>${status.componentName}</td>
-                                        <td>${status.value}</td>
-                                        <td class="${status.status == 'CRITICAL' ? 'critical' : status.status == 'WARNING' ? 'warning' : 'normal'}">
-                                            ${status.status}
-                                        </td>
-                                    </tr>
-                                </c:forEach>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 維護警報顯示 -->
-                <div class="alert-container">
-                    <h2>Maintenance Alerts</h2>
-                    <div id="alertsList">
-                        <c:forEach var="alert" items="${maintenanceAlerts}">
-                            <div class="alert ${alert.componentStatus.status == 'CRITICAL' ? 'critical' : alert.componentStatus.status == 'WARNING' ? 'warning' : 'normal'}">
-                                <div class="alert-info"><strong>Time:</strong> ${alert.timestamp}</div>
-                                <div class="alert-info"><strong>Vehicle ID:</strong> ${alert.componentStatus.vehicleId}</div>
-                                <div class="alert-info"><strong>Component:</strong> ${alert.componentStatus.componentName}</div>
-                                <div class="alert-info"><strong>Hours Used:</strong> ${alert.componentStatus.hoursUsed}</div>
-                                <div class="alert-info"><strong>Wear Level:</strong> ${alert.componentStatus.wearLevel}%</div>
-                                <div class="alert-info"><strong>Message:</strong> ${alert.componentStatus.alertMessage}</div>
-                            </div>
-                        </c:forEach>
+                            </thead>
+                            <tbody id="engineStatus">
+                                <!-- This will be populated by JavaScript -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+
+            <!-- 維護警報顯示 -->
+            <div class="alert-container">
+                <h2>Maintenance Alerts</h2>
+                <div id="alertsList">
+                    <c:forEach var="alert" items="${maintenanceAlerts}">
+                        <div class="alert ${alert.componentStatus.status == 'CRITICAL' ? 'critical' : alert.componentStatus.status == 'WARNING' ? 'warning' : 'normal'}">
+                            <div class="alert-info"><strong>Time:</strong> ${alert.timestamp}</div>
+                            <div class="alert-info"><strong>Vehicle ID:</strong> ${alert.componentStatus.vehicleId}</div>
+                            <div class="alert-info"><strong>Component:</strong> ${alert.componentStatus.componentName}</div>
+                            <div class="alert-info"><strong>Hours Used:</strong> ${alert.componentStatus.hoursUsed}</div>
+                            <div class="alert-info"><strong>Wear Level:</strong> ${alert.componentStatus.wearLevel}%</div>
+                            <div class="alert-info"><strong>Message:</strong> ${alert.componentStatus.alertMessage}</div>
+                        </div>
+                    </c:forEach>
+                </div>
+            </div>
         </div>
+
+        <script>
+            document.getElementById('vehicleNumber').addEventListener('change', function() {
+                const vehicleNumber = this.value;
+                // 這裡應該發送AJAX請求來獲取最後維修日期
+                // 示例代碼：
+                fetch(`/getLastMaintenance?vehicleNumber=${vehicleNumber}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('lastMaintenanceDate').textContent = data.lastMaintenanceDate;
+                        updateComponentStatus(vehicleNumber);
+                    });
+            });
+
+            function updateComponentStatus(vehicleNumber) {
+                // 這裡應該發送AJAX請求來獲取組件狀態
+                // 示例代碼：
+                fetch(`/getComponentStatus?vehicleNumber=${vehicleNumber}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const tbody = document.getElementById('mechanicalStatus');
+                        tbody.innerHTML = '';
+                        
+                        // 添加剎車行
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${data.vehicleNumber}</td>
+                                <td>Brakes</td>
+                                <td>${data.brakeHours}</td>
+                                <td>${data.brakeWearLevel.toFixed(1)}%</td>
+                            </tr>
+                        `;
+                    });
+            }
+        </script>
     </body>
 </html> 

@@ -7,20 +7,27 @@ import model.MaintenanceTask.MaintenanceAlert;
 import model.MaintenanceTask.MaintenanceTaskManager;
 import model.MaintenanceTask.ComponentType;
 import model.MaintenanceTask.ComponentMonitoringParams;
+import model.VehicleManagement.Vehicle;
 import view.MaintenanceView;
+import data.VehicleDAO;
+import data.DatabaseConnection;
+
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
+import java.util.ArrayList;
 
 public class MaintenancePresenter {
     private final MaintenanceView view;
     private final VehicleComponentMonitor monitor;
     private final MaintenanceTaskManager taskManager;
+    private final VehicleDAO vehicleDAO;
     
     public MaintenancePresenter(MaintenanceView view) throws SQLException {
         this.view = view;
         this.monitor = new VehicleComponentMonitor();
         this.taskManager = new MaintenanceTaskManager();
+        this.vehicleDAO = new VehicleDAO(DatabaseConnection.getInstance().getConnection());
         this.monitor.addObserver(view);
     }
     
@@ -35,37 +42,45 @@ public class MaintenancePresenter {
             .toList();
         view.displayComponentAlerts(alerts);
     }
-    
-    public void monitorComponent(ComponentMonitoringParams params) {
-        String vehicleId = params.getVehicleId();
-        Map<String, Double> measurements = params.getParameters();
+
+    public List<Vehicle> getVehiclesNeedingMaintenance() throws SQLException {
+        List<Vehicle> vehicleList = vehicleDAO.getAllVehicles();
+        List<Vehicle> vehiclesNeedingMaintenance = new ArrayList<>();
+        LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
         
-        switch (params.getComponentType()) {
-            case MECHANICAL:
-                double brakeWear = measurements.getOrDefault("brakeWear", 0.0);
-                double wheelWear = measurements.getOrDefault("wheelWear", 0.0);
-                double bearingWear = measurements.getOrDefault("bearingWear", 0.0);
-                monitor.monitorMechanicalComponents(vehicleId, brakeWear, wheelWear, bearingWear);
-                break;
-                
-            case ELECTRICAL:
-                double catenaryWear = measurements.getOrDefault("catenaryWear", 0.0);
-                double pantographWear = measurements.getOrDefault("pantographWear", 0.0);
-                double breakerWear = measurements.getOrDefault("breakerWear", 0.0);
-                monitor.monitorElectricalComponents(vehicleId, catenaryWear, pantographWear, breakerWear);
-                break;
-                
-            case ENGINE:
-                double engineTemp = measurements.getOrDefault("engineTemp", 0.0);
-                double oilPressure = measurements.getOrDefault("oilPressure", 0.0);
-                double fuelEfficiency = measurements.getOrDefault("fuelEfficiency", 0.0);
-                monitor.monitorEngineDiagnostics(vehicleId, engineTemp, oilPressure, fuelEfficiency);
-                break;
+        for (Vehicle vehicle : vehicleList) {
+            if (vehicle.getLastMaintenanceDate() != null) {
+                LocalDateTime lastMaintenance = vehicle.getLastMaintenanceDate().toLocalDate().atStartOfDay();
+                if (lastMaintenance.isBefore(threeMonthsAgo)) {
+                    vehiclesNeedingMaintenance.add(vehicle);
+                }
+            }
         }
+        
+        return vehiclesNeedingMaintenance;
+    }
+
+    public List<Vehicle> getAllVehicles() throws SQLException {
+        return vehicleDAO.getAllVehicles();
+    }
+
+    public void scheduleMaintenanceTask(String vehicleNumber, String taskType, 
+                                      LocalDateTime scheduledDate, String priority) throws SQLException {
+        taskManager.createMaintenanceTask(
+            Integer.parseInt(vehicleNumber),
+            taskType,
+            scheduledDate,
+            "System",
+            priority
+        );
+    }
+
+    public void deleteMaintenanceTask(int taskId) throws SQLException {
+        taskManager.deleteMaintenanceTask(taskId);
     }
     
-    // 使用示例：
-    public void monitorMechanicalExample(String vehicleId, double brakeWear, double wheelWear, double bearingWear) {
+    public void monitorMechanicalComponents(String vehicleId, double brakeWear, 
+                                          double wheelWear, double bearingWear) {
         ComponentMonitoringParams params = new ComponentMonitoringParams(vehicleId, ComponentType.MECHANICAL);
         params.addParameter("brakeWear", brakeWear);
         params.addParameter("wheelWear", wheelWear);
@@ -73,7 +88,8 @@ public class MaintenancePresenter {
         monitorComponent(params);
     }
     
-    public void monitorElectricalExample(String vehicleId, double catenaryWear, double pantographWear, double breakerWear) {
+    public void monitorElectricalComponents(String vehicleId, double catenaryWear, 
+                                          double pantographWear, double breakerWear) {
         ComponentMonitoringParams params = new ComponentMonitoringParams(vehicleId, ComponentType.ELECTRICAL);
         params.addParameter("catenaryWear", catenaryWear);
         params.addParameter("pantographWear", pantographWear);
@@ -81,12 +97,27 @@ public class MaintenancePresenter {
         monitorComponent(params);
     }
     
-    public void monitorEngineExample(String vehicleId, double engineTemp, double oilPressure, double fuelEfficiency) {
+    public void monitorEngineDiagnostics(String vehicleId, double engineTemp, 
+                                        double oilPressure, double fuelEfficiency) {
         ComponentMonitoringParams params = new ComponentMonitoringParams(vehicleId, ComponentType.ENGINE);
         params.addParameter("engineTemp", engineTemp);
         params.addParameter("oilPressure", oilPressure);
         params.addParameter("fuelEfficiency", fuelEfficiency);
         monitorComponent(params);
+    }
+
+    private void monitorComponent(ComponentMonitoringParams params) {
+        // Implementation of component monitoring logic
+        ComponentStatus status = new ComponentStatus(
+            params.getVehicleId(),
+            params.getComponentType().getDisplayName(),
+            0, // hoursUsed - could be calculated based on maintenance history
+            params.getParameters().values().stream()
+                .mapToDouble(v -> (double) v)
+                .average()
+                .orElse(0.0)
+        );
+        monitor.updateComponentStatus(status);
     }
     
     public void clearAlerts() {
