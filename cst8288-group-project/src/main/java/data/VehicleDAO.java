@@ -52,6 +52,8 @@ public class VehicleDAO {
             stmt.setInt(5, vehicle.getMaxPassengers());
             stmt.setInt(6, vehicle.getRouteID());
             stmt.setDate(7, vehicle.getLastMaintenanceDate());
+            stmt.setDouble(8, vehicle.getDieselRate());
+            stmt.setDouble(9, vehicle.getElectricRate());
 
             int rowsInserted = stmt.executeUpdate();
             System.out.println("Rows inserted: " + rowsInserted);
@@ -151,6 +153,8 @@ public class VehicleDAO {
             stmt.setObject(6, vehicle.getRouteID() != 0 ? vehicle.getRouteID() : null);
             stmt.setDate(7, vehicle.getLastMaintenanceDate());
             stmt.setInt(8, vehicle.getVehicleID());
+            stmt.setDouble(9, vehicle.getDieselRate());
+            stmt.setDouble(10, vehicle.getElectricRate());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -191,12 +195,17 @@ public class VehicleDAO {
         int maxPassengers = rs.getInt("MaxPassengers");
         int routeID = rs.getObject("RouteID") != null ? rs.getInt("RouteID") : 0;
         Date lastMaintenanceDate = rs.getDate("LastMaintenanceDate");
+        double dieselRate = rs.getDouble("DieselRate");
+        double electricRate = rs.getDouble("ElectricRate");
+       
 
         VehicleType vehicleType = new VehicleType(vehicleTypeID, vehicleTypeName);
         FuelType fuelType = new FuelType(fuelTypeID, fuelTypeName);
 
         // Create Vehicle object using Factory Design Pattern
         Vehicle vehicle = new Vehicle(vehicleID, vehicleNumber, vehicleType, fuelType, consumptionRate, maxPassengers, routeID, lastMaintenanceDate);
+        vehicle.setDieselRate(dieselRate);
+        vehicle.setElectricRate(electricRate);
         System.out.println("Vehicle Retrieved: " + vehicleNumber);
         return vehicle;
     }
