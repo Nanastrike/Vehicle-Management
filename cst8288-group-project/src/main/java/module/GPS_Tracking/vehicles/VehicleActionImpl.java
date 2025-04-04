@@ -38,6 +38,7 @@ public class VehicleActionImpl implements VehicleAction {
     private LocalDateTime arriveTime;
     private VehicleActionDao vehicleDao = new VehicleActionDaoImpl(); // 用于操作数据库
     private final RouteDao routeDao = new RouteDaoImpl(); //用于连接route表
+    private int operatorID;
 
     public VehicleActionImpl(Vehicle vehicle) {
         super();
@@ -91,7 +92,8 @@ public class VehicleActionImpl implements VehicleAction {
      * and 5 each instance has its own carDistance
      */
     @Override
-    public double vehicleMovedDistance(int roadNumber) {
+    public double vehicleMovedDistance(int roadNumber, int operatorID) {
+        this.operatorID = operatorID;
         //计算每次行径距离
         double i = 0.5 + Math.random() * (5.0 - 0.5); //每次行径距离在0-5之间
         BigDecimal rounded = new BigDecimal(i).setScale(2, RoundingMode.HALF_UP);
@@ -121,6 +123,7 @@ public class VehicleActionImpl implements VehicleAction {
             }
             newLog.setLeavingTime(this.leavingTime);
             newLog.setArriveTime(this.arriveTime);
+            newLog.setOperatorID(this.operatorID);
 
             try {
                 dao.insertDistanceLog(newLog);
@@ -192,4 +195,8 @@ public class VehicleActionImpl implements VehicleAction {
             listener.onRunningStateChanged(vehicleID, running);
         }
     }
+    
+    public void setOperatorID(int operatorID) {
+    this.operatorID = operatorID;
+}
 }
