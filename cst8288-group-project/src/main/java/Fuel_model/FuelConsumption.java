@@ -13,6 +13,9 @@ public class FuelConsumption {
     private float fuelUsed;
     private float distanceTraveled;
     private Timestamp timestamp;
+    private String status;
+
+
 
     // Constructors
     public FuelConsumption() {}
@@ -72,5 +75,13 @@ public class FuelConsumption {
 
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
+    }
+    
+    public String getStatus() {
+    return status;
+}
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

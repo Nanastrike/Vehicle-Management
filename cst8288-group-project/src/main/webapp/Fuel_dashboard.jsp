@@ -94,6 +94,7 @@
                 status = "Critical";
                 badgeClass = "badge bg-danger";
             }
+            fc.setStatus(status);
     %>
         <tr>
             <td><%= fc.getConsumptionId() %></td>
@@ -102,7 +103,7 @@
             <td><%= fc.getFuelUsed() %></td>
             <td><%= fc.getDistanceTraveled() %></td>
             <td><%= fc.getTimestamp() %></td>
-            <td><span class="<%= badgeClass %>"><%= status %></span></td>
+            <td><span class="<%= badgeClass %>"><%= fc.getStatus() %></span></td>
             <td>
                 <a href="Fuel_edit.jsp?id=<%= fc.getConsumptionId() %>" class="btn btn-sm btn-warning">Edit</a>
                 <a href="Fuel_delete.jsp?id=<%= fc.getConsumptionId() %>" class="btn btn-sm btn-danger"
