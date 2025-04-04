@@ -289,4 +289,40 @@ public List<VehicleActionDTO> getAllLogsByVehicleID(int vehicleID) {
         return logs;
     }
 
+    /**
+     *
+     * @return
+     * @throws SQLException
+     */
+@Override
+    public int getRunningVehiclesCount() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM GPS_Tracking WHERE ArriveTime IS NULL OR ArriveTime > NOW()";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            return rs.next() ? rs.getInt(1) : 0;
+        }
+    }
+
+    @Override
+    public List<VehicleActionDTO> getRecentVehicleActions(int limit) throws SQLException {
+        String sql = "SELECT * FROM GPS_Tracking ORDER BY LeavingTime DESC LIMIT ?";
+        List<VehicleActionDTO> actions = new ArrayList<>();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, limit);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                VehicleActionDTO action = new VehicleActionDTO();
+                action.setVehicleID(rs.getInt("VehicleID"));
+                action.setCarDistance(rs.getDouble("CarDistance"));
+                action.setLeavingTime(rs.getTimestamp("LeavingTime").toLocalDateTime());
+                action.setArriveTime(rs.getTimestamp("ArriveTime") != null ? rs.getTimestamp("ArriveTime").toLocalDateTime() : null);
+                action.setOperatorID(rs.getInt("OperatorID"));
+                action.setOperatorName(rs.getString("OperatorName"));
+                actions.add(action);
+            }
+        }
+        return actions;
+    }
+
+
 }

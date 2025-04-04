@@ -1,8 +1,10 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="model.MaintenanceTask.MaintenanceTask" %>
+
 
 <%
     Integer highPriorityCount = (Integer) request.getAttribute("highPriorityCount");
-    MaintenanceTask recentTask = (MaintenanceTask) request.getAttribute("recentTask");
+    MaintenanceTask mostRecentTask = (MaintenanceTask) request.getAttribute("mostRecentTask");
 %>
 
 <div class="card">
@@ -27,12 +29,12 @@
         <!-- Most Recent Task -->
         <div style="width: 50%;">
             <h3>Most Recent Task</h3>
-            <% if (recentTask != null) { %>
-                <p><strong>Vehicle ID:</strong> <%= recentTask.getVehicleId() %></p>
-                <p><strong>Task Type:</strong> <%= recentTask.getTaskType() %></p>
-                <p><strong>Priority:</strong> <%= recentTask.getPriority() %></p>
-                <p><strong>Status:</strong> <%= recentTask.getStatus() %></p>
-                <p><strong>Scheduled Date:</strong> <%= recentTask.getScheduledDate() %></p>
+            <% if (mostRecentTask != null) { %>
+                <p><strong>Vehicle ID:</strong> <%= mostRecentTask.getVehicleId() %></p>
+                <p><strong>Task Type:</strong> <%= mostRecentTask.getTaskType() %></p>
+                <p><strong>Priority:</strong> <%= mostRecentTask.getPriority() %></p>
+                <p><strong>Status:</strong> <%= mostRecentTask.getStatus() %></p>
+                <p><strong>Scheduled Date:</strong> <%= mostRecentTask.getScheduledDate() %></p>
             <% } else { %>
                 <p>No recent maintenance task found.</p>
             <% } %>
