@@ -31,6 +31,9 @@ public class Vehicle {
     private int maxPassengers;
     private int routeID;
     private Date lastMaintenanceDate;
+    private double dieselRate;   // new
+    private double electricRate; //new
+    private VehicleInterface vehicleInterface; // Factory-based vehicle type
     private VehicleInterface vehicleInterface;
 
     /**
@@ -137,5 +140,21 @@ public class Vehicle {
 
     public void setLastMaintenanceDate(Date lastMaintenanceDate) {
         this.lastMaintenanceDate = lastMaintenanceDate;
+    }
+    
+    public double getDieselRate() {
+        return dieselRate;
+    }
+
+    public void setDieselRate(double dieselRate) {
+        this.dieselRate = dieselRate;
+    }
+
+    public double getElectricRate() {
+        return electricRate;
+    }
+
+    public void setElectricRate(double electricRate) {
+        this.electricRate = electricRate;
     }
 }
