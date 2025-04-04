@@ -11,9 +11,11 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import model.MaintenanceTask.MaintenanceTask;
 
 /**
  * VehicleManagementServlet handles all vehicle-related actions such as listing,
@@ -81,10 +83,13 @@ public class VehicleManagementServlet extends HttpServlet {
             request.setAttribute("lastVehicle", lastVehicle);
 
             request.getRequestDispatcher("DashboardPage.jsp").forward(request, response);
+        } else if (action.equals("update")) {
+            showEditForm(request, response);
         } else {
-            response.sendRedirect("DashboardPage.jsp"); // Fallback
+            response.sendRedirect("DashboardPage.jsp");
         }
     }
+
 
     /**
      * Handles POST requests for inserting or updating vehicles.
