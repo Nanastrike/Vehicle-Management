@@ -23,7 +23,7 @@ public class Main {
 
         // 创建车辆并设置 vehicleID
         Vehicle vehicle = new Vehicle();
-        vehicle.setVehicleID(1); // 可改为任意不重复 ID
+        vehicle.setVehicleID(2); // 可改为任意不重复 ID
         VehicleActionImpl vehicleAction = new VehicleActionImpl(vehicle);
 
         // 设置数据库 DAO，并传入 vehicleAction 中
@@ -39,7 +39,7 @@ public class Main {
         operator.runVehicle(vehicleAction);
 
         // 模拟车辆不断前进直到到达终点
-        int roadNumber = 1;
+        int roadNumber = 2;
         while (!vehicleAction.isArrived(vehicleAction.vehicleMovedDistance(roadNumber), roadNumber)) {
             try {
                 Thread.sleep(1000); // 模拟每秒移动一次
