@@ -61,4 +61,8 @@ public interface VehicleActionDao {
      * @return 
      */
     LocalDateTime getLeavingTimeFromDB(int vehicleID);
+    
+    int getRunningVehiclesCount() throws SQLException;
+    
+    List<VehicleActionDTO> getRecentVehicleActions(int limit) throws SQLException;
 }
