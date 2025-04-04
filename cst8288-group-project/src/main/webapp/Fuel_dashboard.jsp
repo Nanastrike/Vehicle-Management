@@ -21,7 +21,6 @@
     <title>Fuel Consumption Dashboard</title>
     <!-- 字体 -->
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
-
     <style>
         body {
             font-family: 'Quicksand', sans-serif;
