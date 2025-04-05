@@ -10,8 +10,8 @@ import java.util.List;
  * Provides methods for creating, updating, deleting, and querying maintenance tasks
  * in the database.
  *
- * <p>This class handles all database interactions related to maintenance tasks,
- * including CRUD operations and specialized queries for task management.</p>
+ * This class handles all database interactions related to maintenance tasks,
+ * including CRUD operations and specialized queries for task management.
  *
  * @author Yen-Yi Hsu
  * @version 1.0
