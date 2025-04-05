@@ -63,7 +63,9 @@ public class Vehicle {
         this.routeID = routeID;
         this.lastMaintenanceDate = lastMaintenanceDate;
         this.vehicleInterface = VehicleFactory.getVehicle(
-                VehicleTypeEnum.valueOf(vehicleType.getTypeName().toUpperCase().replace(" ", "_")));
+        VehicleTypeEnum.valueOf(vehicleType.getTypeName().toUpperCase().replace("-", "_").replace(" ", "_"))
+    );
+
     }
 
     /**

@@ -1,4 +1,3 @@
-
 package presentation;
 
 import data.UserDAO;
@@ -12,14 +11,18 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Handles login requests by validating user credentials and redirecting
- * users to the appropriate dashboard based on their role.
+ * Handles login requests by validating user credentials and redirecting users
+ * to the appropriate dashboard based on their role.
  *
- * <p>This servlet receives POST requests from the login form, hashes the password
- * using SHA-256, and checks credentials through {@link data.UserDAO}. On successful login,
- * a session is created and the user is redirected to the main dashboard.</p>
+ * <p>
+ * This servlet receives POST requests from the login form, hashes the password
+ * using SHA-256, and checks credentials through {@link data.UserDAO}. On
+ * successful login, a session is created and the user is redirected to the main
+ * dashboard.</p>
  *
- * <p>If login fails, the user is forwarded back to the login page with an error message.</p>
+ * <p>
+ * If login fails, the user is forwarded back to the login page with an error
+ * message.</p>
  *
  * @author Zhennan Deng
  * @version 1.0
@@ -34,10 +37,10 @@ public class LoginServlet extends HttpServlet {
     /**
      * Handles POST requests for user login.
      *
-     * @param request  the HttpServletRequest containing login form data
+     * @param request the HttpServletRequest containing login form data
      * @param response the HttpServletResponse to send a redirect or forward
      * @throws ServletException if a servlet-related error occurs
-     * @throws IOException      if an I/O error occurs
+     * @throws IOException if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -58,7 +61,7 @@ public class LoginServlet extends HttpServlet {
             // Successful login → Create session
             HttpSession session = request.getSession();
             session.setAttribute("loggedInUser", user);
-
+            session.setAttribute("userID", user.getUserId());
             // Redirect to dashboard.jsp
             response.sendRedirect("VehicleManagementServlet?action=dashboard");
         } else {

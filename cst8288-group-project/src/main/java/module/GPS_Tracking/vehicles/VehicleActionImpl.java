@@ -134,6 +134,7 @@ public class VehicleActionImpl implements VehicleAction {
         } else {
             // 有记录 => 更新
             log.setCarDistance(this.carDistance);
+            log.setOperatorID(this.operatorID); 
 
             if (this.arriveTime != null && log.getArriveTime() == null) {
                 log.setArriveTime(this.arriveTime);
