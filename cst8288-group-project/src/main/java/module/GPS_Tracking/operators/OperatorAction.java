@@ -7,16 +7,30 @@ package module.GPS_Tracking.operators;
 import module.GPS_Tracking.vehicles.VehicleAction;
 
 /**
- *
- * @author silve
+ * Defines an interface representing actions performed by an operator.
+ * This includes starting and stopping a vehicle through an associated vehicle action object.
+ * 
+ * @author :Qinyu Luo
+ * @version: 1.0
+ * @course: CST8288
+ * @assignment: group project
+ * @time: 2025/04/05
+ * Description: Represents operator-initiated actions such as running or stopping a vehicle.
  */
 
-//以操作员的行为为主体的interface
 public interface OperatorAction {
-    
-    //驾驶一辆车
+
+    /**
+     * Starts or resumes driving a given vehicle.
+     *
+     * @param vehicle the vehicle to be driven
+     */
     void runVehicle(VehicleAction vehicle);
-    
-    //暂停一辆车
+
+    /**
+     * Pauses or stops the given vehicle.
+     *
+     * @param vehicle the vehicle to be stopped
+     */
     void stopVehicle(VehicleAction vehicle);
 }

@@ -5,35 +5,50 @@
 package data.gps_tracking;
 
 /**
+ * Data Access Object (DAO) interface for retrieving route-related information.
+ * Provides methods to query a route's distance, name, start point, and destination
+ * by its unique ID.
+ * 
+ * This interface is used by vehicle tracking logic to determine progress,
+ * evaluate arrival, and display route metadata.
  *
- * @author silve
+ * @author : Qinyu Luo
+ * @version: 1.0
+ * @course: CST8288
+ * @assignment: Group Project
+ * @time: 2025/04/05
+ * @Description: Defines data access methods for route information used in vehicle tracking.
  */
 public interface RouteDao {
     /**
-     * return the total length of the rode
-     * @param routeID
-     * @return the total length of the rode
+     * Returns the total distance of the route in kilometers (or applicable units).
+     *
+     * @param routeID the ID of the route
+     * @return the total length of the route
      */
     double getRoadDistanceByRouteID(int routeID);
     
     /**
-     * return the destination of the rode
-     * @param routeID
-     * @return 
+     * Returns the destination (end location) of the route.
+     *
+     * @param routeID the ID of the route
+     * @return the destination name
      */
     String getRoadDestinationByID(int routeID);
     
     /**
-     * return the start location of the rode
-     * @param routeID
-     * @return 
+     * Returns the start location of the route.
+     *
+     * @param routeID the ID of the route
+     * @return the starting point name
      */
     String getRoadStartByID(int routeID);
     
     /**
-     * return the name of the rode
-     * @param routeID
-     * @return the name of the rode
+     * Returns the display name of the route (e.g., "Downtown Loop").
+     *
+     * @param routeID the ID of the route
+     * @return the name of the route
      */
     String getRoadNameByID(int routeID);
 }
