@@ -36,7 +36,6 @@ public class DashboardServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 从表单获取 vehicleNumber 和 distance
         String vehicleNumber = request.getParameter("vehicleNumber");
         double distance = parseDouble(request.getParameter("distance"), 100.0);
 
@@ -60,6 +59,21 @@ public class DashboardServlet extends HttpServlet {
         record.setDistanceTraveled((float) distance);
         record.setTimestamp(new java.sql.Timestamp(System.currentTimeMillis()));
 
+        String status;
+        if (distance == 0) {
+            status = "Normal"; 
+        } else {
+            float rate = (float) result / (float) distance * 100;
+            if (rate < 10) {
+                status = "Normal";
+            } else if (rate < 20) {
+                status = "Warning";
+            } else {
+                status = "Critical";
+            }
+        }
+        record.setStatus(status);
+        
         FuelConsumptionDAO fuelDAO = new FuelConsumptionDAO();
         fuelDAO.insertFuelConsumption(record);
 
