@@ -148,4 +148,37 @@ public class FuelConsumptionDAO {
         }
         return fc;
     }
+    
+    public int getCriticalFuelCount() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Fuel_Consumption WHERE Status = 'Critical'";
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    // Get most recent 3 fuel consumption records
+    public List<FuelConsumption> getRecentFuelRecords(int limit) throws SQLException {
+        List<FuelConsumption> list = new ArrayList<>();
+        String sql = "SELECT * FROM Fuel_Consumption ORDER BY Timestamp DESC LIMIT ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, limit);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                FuelConsumption fc = new FuelConsumption();
+                fc.setConsumptionId(rs.getInt("ConsumptionID"));
+                fc.setVehicleId(rs.getInt("VehicleID"));
+                fc.setFuelTypeId(rs.getInt("FuelTypeID"));
+                fc.setFuelUsed(rs.getFloat("FuelUsed"));
+                fc.setDistanceTraveled(rs.getFloat("DistanceTraveled"));
+                fc.setTimestamp(rs.getTimestamp("Timestamp"));
+                fc.setStatus(rs.getString("Status"));
+                list.add(fc);
+            }
+        }
+        return list;
+    }
 }

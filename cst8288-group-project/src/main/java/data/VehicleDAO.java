@@ -43,7 +43,7 @@ public class VehicleDAO {
      * @return true if insertion is successful, false otherwise
      */
      public boolean addVehicle(Vehicle vehicle) {
-        String sql = "INSERT INTO Vehicles (VehicleNumber, VehicleTypeID, FuelTypeID, ConsumptionRate, MaxPassengers, RouteID, LastMaintenanceDate) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Vehicles (VehicleNumber, VehicleTypeID, FuelTypeID, ConsumptionRate, MaxPassengers, RouteID, LastMaintenanceDate, DieselRate, ElectricRate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, vehicle.getVehicleNumber());
             stmt.setInt(2, vehicle.getVehicleType().getVehicleTypeID());
