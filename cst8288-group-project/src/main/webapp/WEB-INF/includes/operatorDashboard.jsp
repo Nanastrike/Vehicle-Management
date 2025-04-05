@@ -99,7 +99,7 @@
             <div class="card">
                 <jsp:include page="/WEB-INF/includes/vehicleOverviewCard.jsp" />
             </div>
-            <jsp:include page="/WEB-INF/includes/gpsTrackingCardOperator.jsp" />
+            <jsp:include page="/WEB-INF/includes/gpsTrackingCard.jsp" />
         </div>
 
     </div>
