@@ -22,12 +22,14 @@ import java.io.IOException;
 @WebServlet("/resumeDriving")
 public class ResumeDrivingServlet extends HttpServlet {
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         Vehicle currentVehicle = (Vehicle) request.getSession().getAttribute("currentVehicle");
         Integer operatorId = (Integer) request.getSession().getAttribute("userID");
 
         if (currentVehicle != null && operatorId != null) {
-            int routeId = currentVehicle.getRouteID();  // ✅ 从 Vehicle 里拿 routeID
+            int routeId = currentVehicle.getRouteID();  // ✅ 从 Vehicle 拿路线 ID
 
             VehicleAction vehicleAction = new VehicleActionImpl(currentVehicle);
             double updatedDistance = vehicleAction.vehicleMovedDistance(routeId, operatorId);
@@ -40,9 +42,13 @@ public class ResumeDrivingServlet extends HttpServlet {
                 request.getSession().removeAttribute("currentVehicle");
                 request.getSession().removeAttribute("carDistance");
                 request.getSession().removeAttribute("isPaused");
+
+                // 设置一个提示 flag
+                request.getSession().setAttribute("justArrived", true);
             }
         }
 
+        // ✅ 跳转回 dashboard
         response.sendRedirect("operatorDashboard");
     }
 }

@@ -35,44 +35,55 @@ public class OperatorDashboardServlet extends HttpServlet {
         VehicleDAO vehicleDAO = new VehicleDAO(conn);
         RouteDao routeDao = new RouteDaoImpl();
 
-        // 获取所有车辆列表用于下拉选择
+        // ✅ 1. 获取所有车辆列表用于下拉框展示
         List<Vehicle> vehicleList = vehicleDAO.getAllVehicles();
         request.setAttribute("vehicleList", vehicleList);
 
+        // ✅ 2. 取出 session 中的状态变量
         Vehicle currentVehicle = (Vehicle) session.getAttribute("currentVehicle");
         Double carDistance = (Double) session.getAttribute("carDistance");
         Boolean isDriving = (Boolean) session.getAttribute("isDriving");
         Boolean isPaused = (Boolean) session.getAttribute("isPaused");
 
-        // 默认值处理
+        // 防空处理
         if (isDriving == null) isDriving = false;
         if (isPaused == null) isPaused = false;
         if (carDistance == null) carDistance = 0.0;
 
-        // 如果已经开车，判断是否到达终点
         boolean isArrived = false;
+
+        // ✅ 3. 如果在开车状态，判断是否已经到达终点
         if (isDriving && !isPaused && currentVehicle != null) {
             int routeID = currentVehicle.getRouteID();
             VehicleAction vehicleAction = new VehicleActionImpl(currentVehicle);
             isArrived = vehicleAction.isArrived(carDistance, routeID);
 
-            // 如果已经到达终点，则清空状态，回首页状态
             if (isArrived) {
+                // 清除行驶状态，回到初始界面
                 session.removeAttribute("isDriving");
                 session.removeAttribute("isPaused");
                 session.removeAttribute("currentVehicle");
                 session.removeAttribute("carDistance");
-                // 可以设置一个提示用变量
-                request.setAttribute("justArrived", true);
+
+                // 标记终点到达
+                session.setAttribute("justArrived", true);
             }
         }
 
-        // 设置状态传给前端
+        // ✅ 4. 如果刚到达终点，则展示提示
+        Boolean justArrived = (Boolean) session.getAttribute("justArrived");
+        if (justArrived != null && justArrived) {
+            request.setAttribute("justArrived", true);  // 给 JSP 使用
+            session.removeAttribute("justArrived");     // 清除避免重复
+        }
+
+        // ✅ 5. 设置 JSP 页面需要的状态
         request.setAttribute("isDriving", isDriving);
         request.setAttribute("isPaused", isPaused);
         request.setAttribute("carDistance", carDistance);
         request.setAttribute("isArrived", isArrived);
 
+        // ✅ 6. 转发到操作员页面
         request.getRequestDispatcher("operator_status.jsp").forward(request, response);
     }
 }

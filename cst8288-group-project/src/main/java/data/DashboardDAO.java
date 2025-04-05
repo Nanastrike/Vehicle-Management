@@ -1,5 +1,7 @@
 package data;
 
+import Fuel_dao.FuelConsumptionDAO;
+import Fuel_model.FuelConsumption;
 import data.gps_tracking.VehicleActionDTO;
 import data.gps_tracking.VehicleActionDaoImpl;
 import java.sql.PreparedStatement;
@@ -14,11 +16,16 @@ public class DashboardDAO {
     private VehicleDAO vehicleDAO;
     private MaintenanceTaskDAO maintenanceTaskDAO;
     private VehicleActionDaoImpl vehicleActionDaoImpl;
-
-    public DashboardDAO(VehicleDAO vehicleDAO, MaintenanceTaskDAO maintenanceTaskDAO, VehicleActionDaoImpl vehicleActionDaoImpl) {
+    private FuelConsumptionDAO fuelDAO;
+    
+    public DashboardDAO(VehicleDAO vehicleDAO, 
+            MaintenanceTaskDAO maintenanceTaskDAO, 
+            VehicleActionDaoImpl vehicleActionDaoImpl,
+            FuelConsumptionDAO fuelDAO) {
         this.vehicleDAO = vehicleDAO;
         this.maintenanceTaskDAO = maintenanceTaskDAO;
         this.vehicleActionDaoImpl = vehicleActionDaoImpl;
+        this.fuelDAO = fuelDAO;
     }
 
     public Map<String, Integer> getVehicleTypeCounts() {
@@ -52,5 +59,13 @@ public class DashboardDAO {
     
     public List<VehicleActionDTO> getRecentVehicleActions(int limit) throws SQLException{
         return vehicleActionDaoImpl.getRecentVehicleActions(3);
+    }
+    
+    public int getCriticalFuelCount() throws SQLException{
+        return fuelDAO.getCriticalFuelCount();
+    }
+    
+    public List<FuelConsumption> getRecentFuelRecords(int limit) throws SQLException{
+        return fuelDAO.getRecentFuelRecords(3);
     }
 } 

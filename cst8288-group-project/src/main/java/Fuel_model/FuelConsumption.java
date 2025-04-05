@@ -16,7 +16,6 @@ public class FuelConsumption {
     private String status;
 
 
-
     // Constructors
     public FuelConsumption() {}
 
@@ -78,8 +77,9 @@ public class FuelConsumption {
     }
     
     public String getStatus() {
-    return status;
-}
+        return status;
+    }
+
 
     public void setStatus(String status) {
         this.status = status;
