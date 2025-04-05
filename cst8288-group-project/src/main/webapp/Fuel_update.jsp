@@ -17,6 +17,20 @@
         float fuelUsed = Float.parseFloat(fuelUsedParam);
         float distance = Float.parseFloat(distanceParam);
 
+        String status;
+        if (distance == 0) {
+            status = "Normal"; 
+        } else {
+            float rate = fuelUsed / distance * 100;
+            if (rate < 10) {
+                status = "Normal";
+            } else if (rate < 20) {
+                status = "Warning";
+            } else {
+                status = "Critical";
+            }
+        }
+          
         FuelConsumption fuel = new FuelConsumption();
         fuel.setConsumptionId(id);
         fuel.setVehicleId(vehicleId);
@@ -24,6 +38,7 @@
         fuel.setFuelUsed(fuelUsed);
         fuel.setDistanceTraveled(distance);
         fuel.setTimestamp(new Timestamp(System.currentTimeMillis()));
+        fuel.setStatus(status); 
 
         FuelConsumptionDAO dao = new FuelConsumptionDAO();
         boolean updated = dao.updateFuelConsumption(fuel);
