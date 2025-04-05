@@ -7,6 +7,7 @@ package data.gps_tracking;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -65,4 +66,6 @@ public interface VehicleActionDao {
     int getRunningVehiclesCount() throws SQLException;
     
     List<VehicleActionDTO> getRecentVehicleActions(int limit) throws SQLException;
+    
+    Map<String, Double> calculateOperatorEfficiency() throws SQLException;
 }

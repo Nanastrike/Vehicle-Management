@@ -14,7 +14,7 @@
         <a href="gps_tracking.jsp">GPS Tracking</a>
         <a href="Fuel_dashboard.jsp">Fuel/Energy Monitor</a>
         <a href="MaintenanceServlet">Maintenance Alerts</a>
-        <a href="reports.jsp">Reports</a>
+        <a href="reportPage.jsp">Reports</a>
     </div>
 
     <!-- User Info and Logout Button (if user is logged in) -->

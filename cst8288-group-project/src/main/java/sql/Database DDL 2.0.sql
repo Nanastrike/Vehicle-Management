@@ -158,6 +158,16 @@ CREATE TABLE Maintenance_Tasks (
     FOREIGN KEY (ComponentID) REFERENCES Component_Status(ComponentID) ON DELETE SET NULL
 );
 
+-- Step 2: Create Report Table
+CREATE TABLE Reports (
+    ReportID INT AUTO_INCREMENT PRIMARY KEY,
+    Title VARCHAR(255) NOT NULL,
+    ReportType VARCHAR(50) NOT NULL,
+    Content TEXT NOT NULL,
+    CreatedBy VARCHAR(100) NOT NULL,
+    CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Insert default values for lookup tables
 INSERT INTO UserTypes (TypeName) VALUES ('Manager'), ('Operator');
 INSERT INTO VehicleTypes (TypeName) VALUES ('Diesel Bus'), ('Electric Light Rail'), ('Diesel-Electric Train');
