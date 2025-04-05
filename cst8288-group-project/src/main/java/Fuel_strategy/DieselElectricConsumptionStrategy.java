@@ -34,6 +34,12 @@ public class DieselElectricConsumptionStrategy implements ConsumptionStrategy {
         double dieselRate = vehicle.getDieselRate();       // in L/100km
         double electricRate = vehicle.getElectricRate();   // in kWh/km
 
+        if (dieselRate <= 0.0) {
+        dieselRate = 10.0;  // fallback default in L/100km
+        }
+        if (electricRate <= 0.0) {
+            electricRate = 1.5; // fallback default in kWh/km
+        }
         // Diesel consumption (L)
         double dieselConsumption = dieselRate * distance / 100.0;
 

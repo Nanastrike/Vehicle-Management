@@ -32,6 +32,9 @@ public class LightRailConsumptionStrategy implements ConsumptionStrategy {
     @Override
     public double calculateConsumption(Vehicle vehicle, double distance) {
         double electricRate = vehicle.getElectricRate();  // in kWh/km
+        if (electricRate == 0.0) {
+        electricRate = 1.5;  // Default fallback value
+        }
         return electricRate * distance;
     }
 }
