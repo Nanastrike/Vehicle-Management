@@ -155,7 +155,7 @@
             <select name="vehicleTypeID" id="vehicleTypeID" required>
                 <option value="1">Diesel Bus</option>
                 <option value="2">Electric Light Rail</option>
-                <option value="3">Diesel-Electric Train</option>
+                <option value="3">Diesel Electric Train</option>
             </select>
 
             <label for="fuelTypeID">Fuel Type:</label>
