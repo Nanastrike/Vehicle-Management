@@ -14,7 +14,9 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import module.GPS_Tracking.TrackingDisplayDTO;
@@ -340,7 +342,22 @@ public List<VehicleActionDTO> getAllLogsByVehicleID(int vehicleID) {
     }
     return actions;
 }
+    @Override
+    public Map<String, Double> calculateOperatorEfficiency() throws SQLException {
+        String sql = "SELECT u.Name AS OperatorName, SUM(gt.Position) AS TotalDistance " +
+                     "FROM GPS_Tracking gt " +
+                     "JOIN Users u ON gt.OperatorID = u.UserID " +
+                     "GROUP BY gt.OperatorID, u.Name";
+        Map<String, Double> efficiencyMap = new HashMap<>();
 
-
-
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                String name = rs.getString("OperatorName");
+                double totalDistance = rs.getDouble("TotalDistance");
+                efficiencyMap.put(name, totalDistance);
+            }
+        }
+        return efficiencyMap;
+    }
 }
