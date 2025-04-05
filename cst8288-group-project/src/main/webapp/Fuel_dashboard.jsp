@@ -6,11 +6,39 @@
 <%@ page import="data.VehicleDAO" %>
 <%@ page import="data.DatabaseConnection" %>
 
+<%--
+ * File: Fuel_dashboard.jsp
+ * Author: Xiaoxi Yang
+ * Student ID: 041124876
+ * Course: CST8288 
+ * Section: 030/031
+ * Date: 2025-04-05
+ * 
+ * Description:
+ * This JSP page provides a dashboard for monitoring fuel and energy consumption data
+ * for public transit vehicles. It allows users to:
+ * 
+ * - Select a vehicle and input a distance to calculate estimated fuel or energy usage.
+ * - Display the calculation result dynamically using values returned by the servlet.
+ * - View a list of all historical fuel consumption records including vehicle ID, fuel used,
+ *   distance traveled, timestamp, and status level (Normal, Warning, or Critical) based on 
+ *   fuel usage per 100 km.
+ * - Access editing and deletion options for each consumption record.
+ *
+ * The page integrates with:
+ * - DashboardServlet (for consumption calculation and logic processing)
+ * - FuelConsumptionDAO (for data retrieval)
+ * - VehicleDAO (to populate the dropdown menu with vehicles)
+ *
+ * CSS styling is applied directly within the page to enhance layout and readability.
+--%>
+
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Fuel Consumption Dashboard</title>
-    <!-- 字体 -->
+   
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -182,7 +210,7 @@
         }
     %>
 
-    <!-- 数据表格 -->
+
     <table>
         <thead>
         <tr>

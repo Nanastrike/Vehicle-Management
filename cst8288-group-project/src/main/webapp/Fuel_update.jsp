@@ -1,4 +1,27 @@
 <%@ page import="java.sql.Timestamp, Fuel_model.FuelConsumption, Fuel_dao.FuelConsumptionDAO" %>
+
+<%--
+ * File: Fuel_update.jsp
+ * Author: Xiaoxi Yang
+ * Student ID: 041124876
+ * Course: CST8288 
+ * Section: 030/031
+ * Date: 2025-04-05
+ *
+ * Description:
+ * This JSP page handles the POST submission from the fuel consumption edit form.
+ *
+ * Features:
+ * - Retrieves form parameters for fuel consumption record update.
+ * - Parses and validates input values including vehicle ID, fuel type ID, fuel used, and distance.
+ * - Dynamically calculates consumption status ("Normal", "Warning", or "Critical") based on usage rate.
+ * - Updates the record in the database using `FuelConsumptionDAO`.
+ * - Redirects back to the dashboard upon success or displays an error on failure.
+ *
+ * This page supports the fuel tracking functionality within the PTFMS project.
+--%>
+
+
 <%
     request.setCharacterEncoding("UTF-8");
 
