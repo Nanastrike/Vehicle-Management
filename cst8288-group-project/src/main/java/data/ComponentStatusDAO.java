@@ -5,13 +5,36 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object (DAO) class for handling component status database operations.
+ * Provides methods for creating, updating, and querying component status records
+ * in the database.
+ *
+ * <p>This class manages the persistence of component status information,
+ * including wear levels, hours used, and current operational status.</p>
+ *
+ * @author Yen-Yi Hsu
+ * @version 1.0
+ * @since Java 1.21
+ * @see ComponentStatus
+ */
 public class ComponentStatusDAO {
+    /** Database connection instance */
     private final Connection connection;
     
+    /**
+     * Constructs a new ComponentStatusDAO with the specified database connection.
+     * @param connection The database connection to be used for operations
+     */
     public ComponentStatusDAO(Connection connection) {
         this.connection = connection;
     }
     
+    /**
+     * Creates a new component status record in the database.
+     * @param status The component status object to be created
+     * @throws SQLException if a database access error occurs
+     */
     public void createComponentStatus(ComponentStatus status) throws SQLException {
         String sql = "INSERT INTO Component_Status (VehicleID, ComponentName, HoursUsed, WearLevel, Status, LastUpdated) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -31,6 +54,12 @@ public class ComponentStatusDAO {
         }
     }
     
+    /**
+     * Retrieves all component statuses for a specific vehicle.
+     * @param vehicleId The ID of the vehicle to get component statuses for
+     * @return List of component status records associated with the vehicle
+     * @throws SQLException if a database access error occurs
+     */
     public List<ComponentStatus> getComponentStatusesByVehicle(String vehicleId) throws SQLException {
         String sql = "SELECT * FROM Component_Status WHERE VehicleID = ?";
         List<ComponentStatus> statuses = new ArrayList<>();
@@ -55,15 +84,21 @@ public class ComponentStatusDAO {
         return statuses;
     }
     
+    /**
+     * Updates an existing component status or creates a new one if it doesn't exist.
+     * Performs a check for existing component before deciding whether to update or create.
+     * @param status The component status object to be updated or created
+     * @throws SQLException if a database access error occurs
+     */
     public void updateComponentStatus(ComponentStatus status) throws SQLException {
-        // 先檢查組件是否存在
+        // Check if component exists
         String checkSql = "SELECT ComponentID FROM Component_Status WHERE VehicleID = ? AND ComponentName = ?";
         try (PreparedStatement checkStmt = connection.prepareStatement(checkSql)) {
             checkStmt.setString(1, status.getVehicleId());
             checkStmt.setString(2, status.getComponentName());
             try (ResultSet rs = checkStmt.executeQuery()) {
                 if (rs.next()) {
-                    // 組件存在，更新它
+                    // Component exists, update it
                     String updateSql = "UPDATE Component_Status SET HoursUsed = ?, WearLevel = ?, Status = ?, LastUpdated = ? WHERE ComponentID = ?";
                     try (PreparedStatement updateStmt = connection.prepareStatement(updateSql)) {
                         updateStmt.setInt(1, status.getHoursUsed());
@@ -74,13 +109,19 @@ public class ComponentStatusDAO {
                         updateStmt.executeUpdate();
                     }
                 } else {
-                    // 組件不存在，創建它
+                    // Component doesn't exist, create it
                     createComponentStatus(status);
                 }
             }
         }
     }
     
+    /**
+     * Retrieves a specific component status by its ID.
+     * @param componentId The ID of the component to retrieve
+     * @return The component status object if found, null otherwise
+     * @throws SQLException if a database access error occurs
+     */
     public ComponentStatus getComponentStatus(int componentId) throws SQLException {
         String sql = "SELECT * FROM Component_Status WHERE ComponentID = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -103,6 +144,12 @@ public class ComponentStatusDAO {
         return null;
     }
     
+    /**
+     * Performs a batch update of multiple component statuses.
+     * This method is more efficient than updating components individually.
+     * @param statuses List of component status objects to be updated
+     * @throws SQLException if a database access error occurs during batch execution
+     */
     public void batchUpdateComponentStatus(List<ComponentStatus> statuses) throws SQLException {
         String sql = "UPDATE Component_Status SET HoursUsed = ?, WearLevel = ?, Status = ?, LastUpdated = ? " +
                     "WHERE VehicleID = ? AND ComponentName = ?";
