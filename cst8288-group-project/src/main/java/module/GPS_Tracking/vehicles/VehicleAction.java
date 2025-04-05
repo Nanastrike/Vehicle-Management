@@ -9,11 +9,12 @@ package module.GPS_Tracking.vehicles;
  * interface is used to control vehicle movement, status, and coordinate updates
  * during the operation process.
  *
- * @author :Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: group project
- * @time: 2025/04/05
+ * @author Qinyu Luo
+ * @version 1.0
+ * @since 2025/04/05
+ * course CST8288
+ * assignment group project
+ *
  * Description: Defines methods for vehicle-related logic,
  * including movement, position updates, and arrival detection.
  */

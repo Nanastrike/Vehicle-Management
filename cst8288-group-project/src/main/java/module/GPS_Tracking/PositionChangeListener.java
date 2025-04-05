@@ -5,12 +5,14 @@
 package module.GPS_Tracking;
 
 /**
- * @author :Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: group project
- * @time: 2025/04/05
- * @description: Defines a listener for detecting and responding to vehicle position updates.
+ * @author Qinyu Luo
+ * @version 1.0
+ * @since 2025/04/05
+ * 
+ * course CST8288
+ * assignment group project
+ * 
+ * description Defines a listener for detecting and responding to vehicle position updates.
  * Interface for listening to vehicle position changes.
  * Classes implementing this interface will be notified when a vehicle's position changes.
  */

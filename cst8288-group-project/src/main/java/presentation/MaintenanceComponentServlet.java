@@ -32,6 +32,10 @@ import java.util.List;
  */
 @WebServlet(name = "MaintenanceComponentServlet", urlPatterns = {"/MaintenanceComponentServlet"})
 public class MaintenanceComponentServlet extends HttpServlet {
+    /**
+ * The presenter component that handles the business logic for maintenance operations.
+ * Acts as an intermediary between this servlet and the maintenance view.
+ */
     private MaintenancePresenter presenter;
 
     /**

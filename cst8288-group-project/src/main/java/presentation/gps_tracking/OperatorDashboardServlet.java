@@ -23,14 +23,16 @@ import module.GPS_Tracking.vehicles.VehicleActionImpl;
  * Servlet that handles rendering of the operator dashboard. It provides vehicle
  * information for dropdowns, retrieves driving status from session, and
  * prepares values for display in the dashboard page.
- *
- * @author :Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: group project
- * @time: 2025/04/05
+ * 
  * Description: Displays the operator interface for vehicle
  * selection and status tracking.
+ * 
+ * 
+ * @author Qinyu Luo
+ * @version 1.0
+ * @since 2025/04/05
+ * 
+ *
  */
 @WebServlet("/operatorDashboard")
 public class OperatorDashboardServlet extends HttpServlet {

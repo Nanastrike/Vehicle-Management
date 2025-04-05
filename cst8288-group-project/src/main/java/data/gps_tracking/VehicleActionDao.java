@@ -14,12 +14,12 @@ import java.util.Map;
  * Provides CRUD operations and utility queries for handling vehicle movement
  * data, including distance, timestamps, and operator-related logs.
  *
- * @author : Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: Group Project
- * @time: 2025/04/05
- * @Description: Defines database interaction methods for vehicle GPS tracking
+ * @author  Qinyu Luo
+ * @version 1.0
+ * course CST8288
+ * assignment Group Project
+ * time 2025/04/05
+ * Description Defines database interaction methods for vehicle GPS tracking
  * records, based primarily on vehicle ID.
  */
 public interface VehicleActionDao {

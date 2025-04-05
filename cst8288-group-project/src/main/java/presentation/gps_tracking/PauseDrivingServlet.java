@@ -4,10 +4,6 @@
  */
 package presentation.gps_tracking;
 
-/**
- *
- * @author silve
- */
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -24,11 +20,10 @@ import java.io.IOException;
  * information for dropdowns, retrieves driving status from session, and
  * prepares values for display in the dashboard page.
  *
- * @author :Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: group project
- * @time: 2025/04/05
+ * @author Qinyu Luo
+ * @version 1.0
+ * @since 2025/04/05
+ * 
  * Description: Displays the operator interface for vehicle
  * selection and status tracking.
  */
@@ -41,8 +36,7 @@ public class PauseDrivingServlet extends HttpServlet {
 
         if (currentVehicle != null) {
             VehicleAction vehicleAction = new VehicleActionImpl(currentVehicle);
-            vehicleAction.setRunning(false); // 暂停状态
-
+            vehicleAction.setRunning(false); 
             request.getSession().setAttribute("isPaused", true);
         }
 

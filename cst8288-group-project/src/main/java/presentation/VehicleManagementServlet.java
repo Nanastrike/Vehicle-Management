@@ -31,7 +31,7 @@ import model.MaintenanceTask.MaintenanceTask;
  * {@link data.DashboardDAO} for dashboard-specific statistics.
  * </p>
  *
- * <h3>Supported Actions:</h3>
+ * <h2>Supported Actions:</h2>
  * <ul>
  *     <li><code>?action=list</code> – List all vehicles</li>
  *     <li><code>?action=insert</code> – Insert a new vehicle</li>

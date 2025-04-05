@@ -20,13 +20,13 @@ import java.io.IOException;
  * Servlet that handles resuming vehicle driving after being paused.
  * It continues updating the vehicle's position and checks if the destination is reached.
  * If arrived, it clears session data and sets a flag for arrival notification.
+ * 
+ * Resumes vehicle operation and updates state accordingly.
+ * Developed for CST8288 group project.
  *
- * @author :Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: group project
- * @time: 2025/04/05 
- * @Description: Resumes vehicle operation and updates state accordingly.
+ * @author Qinyu Luo
+ * @version 1.0
+ * @since 2025/04/05
  */
 @WebServlet("/resumeDriving")
 public class ResumeDrivingServlet extends HttpServlet {

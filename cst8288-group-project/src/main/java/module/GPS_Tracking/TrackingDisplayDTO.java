@@ -7,12 +7,14 @@ package module.GPS_Tracking;
 import java.time.LocalDateTime;
 
 /**
- * @author :Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: group project
- * @time: 2025/04/05
- * @description:Holds vehicle tracking data used for presentation in the
+ * @author Qinyu Luo
+ * @version 1.0
+ * @since 2025/04/05
+ * 
+ * course CST8288
+ * assignment group project
+ * 
+ * description Holds vehicle tracking data used for presentation in the
  * tracking interface. Data Transfer Object (DTO) for displaying real-time
  * vehicle tracking information. This class encapsulates various details such as
  * vehicle number, route, position, destination, arrival status, operator info,

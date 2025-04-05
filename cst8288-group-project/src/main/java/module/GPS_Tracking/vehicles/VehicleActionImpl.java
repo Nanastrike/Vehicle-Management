@@ -26,12 +26,13 @@ import module.GPS_Tracking.RunningStateListener;
  * behavior, including tracking its movement, updating position, handling
  * running state, and marking arrival time.
  *
- * @author :Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: group project
- * @time: 2025/04/05
- * Description: Implements vehicle-related logic for tracking
+ * @author Qinyu Luo
+ * @version 1.0
+ * @since  2025/04/05
+ * course CST8288
+ * assignment group project
+ * 
+ * Description Implements vehicle-related logic for tracking
  * distance, position updates, running state changes, and route completion.
  */
 public class VehicleActionImpl implements VehicleAction {

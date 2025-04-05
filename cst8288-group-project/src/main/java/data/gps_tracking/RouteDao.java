@@ -12,12 +12,12 @@ package data.gps_tracking;
  * This interface is used by vehicle tracking logic to determine progress,
  * evaluate arrival, and display route metadata.
  *
- * @author : Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: Group Project
- * @time: 2025/04/05
- * @Description: Defines data access methods for route information used in vehicle tracking.
+ * @author  Qinyu Luo
+ * @version 1.0
+ * course CST8288
+ * assignment Group Project
+ * time 2025/04/05
+ * Description Defines data access methods for route information used in vehicle tracking.
  */
 public interface RouteDao {
     /**

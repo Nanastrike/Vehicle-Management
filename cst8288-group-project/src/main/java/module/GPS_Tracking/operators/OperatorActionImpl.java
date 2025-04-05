@@ -12,11 +12,13 @@ import module.GPS_Tracking.vehicles.VehicleActionImpl;
  * actions. This class triggers changes in the vehicle's running state, and sets
  * the vehicle's leaving time if applicable when a vehicle starts moving.
  *
- * @author :Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: group project
- * @time: 2025/04/05
+ * @author Qinyu Luo
+ * @version 1.0
+ * @since 2025/04/05
+ * 
+ * course CST8288
+ * assignment group project
+ * 
  * Description: Concrete implementation of operator actions
  * such as starting and stopping a vehicle.
  */
