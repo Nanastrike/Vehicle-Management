@@ -19,14 +19,38 @@ import java.util.List;
 import java.util.Map;
 import model.User.User;
 
+/**
+ * Servlet responsible for generating and saving different types of system reports.
+ * 
+ * <p>This servlet handles POST requests to generate reports based on the selected type:
+ * <ul>
+ *   <li><b>maintenance</b> - Pending maintenance task summary</li>
+ *   <li><b>fuel</b> - Fuel efficiency of vehicles</li>
+ *   <li><b>operator</b> - Total distance driven by operators</li>
+ * </ul>
+ * 
+ * The generated report is also saved to the database via {@link reportDAO}.</p>
+ *
+ * <p>On success, the report content and title are forwarded to <code>reportPage.jsp</code>.</p>
+ * 
+ * @author Zhennan
+ * @version 1.0
+ * @since Java 21
+ */
 @WebServlet("/ReportServlet")
 public class ReportServlet extends HttpServlet {
+
     private Connection conn;
     private MaintenanceTaskDAO maintenanceDAO;
     private FuelConsumptionDAO fuelDAO;
     private reportDAO reportDao;
     private VehicleActionDaoImpl vehicleActionDaoImpl;
-    
+
+    /**
+     * Initializes database connections and DAO objects used for generating reports.
+     *
+     * @throws ServletException if initialization fails
+     */
     @Override
     public void init() throws ServletException {
         try {
@@ -40,9 +64,18 @@ public class ReportServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Processes the incoming report generation request based on the selected type.
+     *
+     * @param request  HTTP request containing the 'type' parameter
+     * @param response HTTP response used to forward data to the report page
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
+
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("loggedInUser");
         String type = request.getParameter("type");  // "maintenance", "fuel", "operator"
@@ -83,16 +116,17 @@ public class ReportServlet extends HttpServlet {
                 reportContent = sb.toString();
 
             } else if ("operator".equalsIgnoreCase(type)) {
-            reportTitle = "Operator Efficiency Report";
-            Map<String, Double> operatorEfficiency = vehicleActionDaoImpl.calculateOperatorEfficiency();
+                reportTitle = "Operator Efficiency Report";
+                Map<String, Double> operatorEfficiency = vehicleActionDaoImpl.calculateOperatorEfficiency();
 
-            StringBuilder sb = new StringBuilder();
-            for (Map.Entry<String, Double> entry : operatorEfficiency.entrySet()) {
-                sb.append("Operator: ").append(entry.getKey())
-                  .append(", Total Distance: ").append(String.format("%.2f", entry.getValue())).append(" km\n");
-            }
-            reportContent = sb.toString();
-            }else {
+                StringBuilder sb = new StringBuilder();
+                for (Map.Entry<String, Double> entry : operatorEfficiency.entrySet()) {
+                    sb.append("Operator: ").append(entry.getKey())
+                      .append(", Total Distance: ").append(String.format("%.2f", entry.getValue())).append(" km\n");
+                }
+                reportContent = sb.toString();
+
+            } else {
                 request.setAttribute("error", "Invalid report type.");
                 request.getRequestDispatcher("reportPage.jsp").forward(request, response);
                 return;
@@ -107,6 +141,7 @@ public class ReportServlet extends HttpServlet {
             report.setCreatedBy(user != null ? user.getName() : "System");
             reportDao.insertReport(report);
 
+            // Pass data to JSP
             request.setAttribute("success", reportTitle + " generated and saved successfully.");
             request.setAttribute("reportTitle", reportTitle);
             request.setAttribute("reportContent", reportContent);
