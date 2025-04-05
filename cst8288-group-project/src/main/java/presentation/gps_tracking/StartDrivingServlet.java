@@ -49,6 +49,7 @@ public class StartDrivingServlet extends HttpServlet {
         request.getSession().removeAttribute("isPaused");
         request.getSession().setAttribute("currentVehicle", vehicle);
         request.getSession().setAttribute("carDistance", carDistance);
+        request.getSession().removeAttribute("tripCompleted");
 
         response.sendRedirect("operatorDashboard");
     }
