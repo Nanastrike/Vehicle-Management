@@ -45,6 +45,8 @@
             .message {
                 color: green;
                 font-weight: bold;
+                text-align: center;
+                display: block;
             }
         </style>
     </head>
@@ -81,9 +83,11 @@
                             <p style="color:red;">[Error] Vehicle data not found in session.</p>
                         </c:otherwise>
                     </c:choose>
+                    <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+                    <p class="distance">
+                        Current Distance: <fmt:formatNumber value="${carDistance}" type="number" maxFractionDigits="2" /> km
+                    </p>
 
-                    <p class="distance">Current Distance: ${carDistance} km</p>
-                    
                     <c:choose>
 
                         <c:when test="${isPaused}">
@@ -92,7 +96,7 @@
                             </form>
                         </c:when>
 
-                       
+
                         <c:otherwise>
                             <form action="pauseDriving" method="post">
                                 <button type="submit">Take a Break</button>

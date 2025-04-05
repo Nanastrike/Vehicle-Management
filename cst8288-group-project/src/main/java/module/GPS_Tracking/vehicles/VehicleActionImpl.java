@@ -70,6 +70,8 @@ public class VehicleActionImpl implements VehicleAction {
     @Override
     public boolean isArrived(double carDistance, int roadNumber) {
         double distanceLimit = routeDao.getRoadDistanceByRouteID(roadNumber);
+        System.out.println("distanceLimit: " + distanceLimit);
+        System.out.println("carDistance: " + carDistance);
         return carDistance >= distanceLimit;
     }
 
@@ -94,30 +96,32 @@ public class VehicleActionImpl implements VehicleAction {
     @Override
     public double vehicleMovedDistance(int roadNumber, int operatorID) {
         this.operatorID = operatorID;
-        //计算每次行径距离
-        double i = 0.5 + Math.random() * (5.0 - 0.5); //每次行径距离在0-5之间
-        BigDecimal rounded = new BigDecimal(i).setScale(2, RoundingMode.HALF_UP);
-        carDistance += rounded.doubleValue(); //只保留两位小数
 
-        //计算已有距离是否超过总长度
+        VehicleActionDao dao = new VehicleActionDaoImpl();
+        VehicleActionDTO log = dao.getVehicleLogs(vehicleID); // 查询已有记录
+
+        // ✅ 恢复之前的距离（解决距离减少问题）
+        if (log != null) {
+            this.carDistance = log.getCarDistance();
+        }
+
+        // ✅ 累加新的距离
+        double i = 0.5 + Math.random() * (5.0 - 0.5);
+        BigDecimal rounded = new BigDecimal(i).setScale(2, RoundingMode.HALF_UP);
+        carDistance += rounded.doubleValue();
+
         if (isArrived(carDistance, roadNumber)) {
-            setRunning(false); // 如果超过道路长度，判断车辆已停下
+            setRunning(false);
             if (arriveTime == null) {
-                this.arriveTime = LocalDateTime.now(); // 只设置一次
+                this.arriveTime = LocalDateTime.now();
             }
         }
 
-//        LocalDateTime leavingTimeFromDB = null;
-        VehicleActionDao dao = new VehicleActionDaoImpl();
-        VehicleActionDTO log = dao.getVehicleLogs(vehicleID); // 查有没有旧记录
-
         if (log == null) {
-            // 没有记录，说明是第一次 => 插入
+            // 第一次插入记录
             VehicleActionDTO newLog = new VehicleActionDTO();
             newLog.setVehicleID(this.vehicleID);
             newLog.setCarDistance(this.carDistance);
-
-            // leavingTime 只设一次（如果你还没有从数据库查它）
             if (this.leavingTime == null) {
                 this.leavingTime = LocalDateTime.now();
             }
@@ -132,9 +136,9 @@ public class VehicleActionImpl implements VehicleAction {
             }
 
         } else {
-            // 有记录 => 更新
+            // 更新记录
             log.setCarDistance(this.carDistance);
-            log.setOperatorID(this.operatorID); 
+            log.setOperatorID(this.operatorID);
 
             if (this.arriveTime != null && log.getArriveTime() == null) {
                 log.setArriveTime(this.arriveTime);
@@ -196,8 +200,8 @@ public class VehicleActionImpl implements VehicleAction {
             listener.onRunningStateChanged(vehicleID, running);
         }
     }
-    
+
     public void setOperatorID(int operatorID) {
-    this.operatorID = operatorID;
-}
+        this.operatorID = operatorID;
+    }
 }
