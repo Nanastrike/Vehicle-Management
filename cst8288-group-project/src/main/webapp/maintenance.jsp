@@ -457,7 +457,6 @@
                             <th>Vehicle Type</th>
                             <th>Last Maintenance Data</th>
                             <th>Component check</th>
-                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -478,14 +477,7 @@
                                         <h6>Engine Components</h6>
                                         <input type="checkbox" name="components" value="oil">Oil Change</input><br>
                                         <input type="checkbox" name="components" value="coolant">Coolant Change</input><br>
-                                        <button type="submit" class="btn">Done</button>
-                                    </form>
-                                </td>
-                                <td>
-                                    <form action="MaintenanceServlet" method="post" style="display: inline;">
-                                        <input type="hidden" name="action" value="deleteComponentStatus">
-                                        <input type="hidden" name="vehicleId" value="${vehicle.vehicleNumber}">
-                                        <button type="submit" class="btn btn-danger">Delete All</button>
+                                        <button type="submit" class="btn">Check</button>
                                     </form>
                                 </td>
                             </tr>

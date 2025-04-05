@@ -79,6 +79,16 @@ public class MaintenancePresenter {
         taskManager.deleteMaintenanceTask(taskId);
     }
     
+    /**
+     * Monitors mechanical components of a vehicle by tracking wear levels.
+     * Creates and processes monitoring parameters for mechanical components
+     * such as brakes, wheels, and bearings.
+     *
+     * @param vehicleId The ID of the vehicle to monitor
+     * @param brakeWear The wear level of the brakes (percentage)
+     * @param wheelWear The wear level of the wheels (percentage)
+     * @param bearingWear The wear level of the bearings (percentage)
+     */
     public void monitorMechanicalComponents(String vehicleId, double brakeWear, 
                                           double wheelWear, double bearingWear) {
         ComponentMonitoringParams params = new ComponentMonitoringParams(vehicleId, ComponentType.MECHANICAL);
@@ -88,6 +98,16 @@ public class MaintenancePresenter {
         monitorComponent(params);
     }
     
+    /**
+     * Monitors electrical components of a vehicle by tracking wear levels.
+     * Creates and processes monitoring parameters for electrical components
+     * such as catenary, pantograph, and circuit breakers.
+     *
+     * @param vehicleId The ID of the vehicle to monitor
+     * @param catenaryWear The wear level of the catenary system (percentage)
+     * @param pantographWear The wear level of the pantograph (percentage)
+     * @param breakerWear The wear level of the circuit breakers (percentage)
+     */
     public void monitorElectricalComponents(String vehicleId, double catenaryWear, 
                                           double pantographWear, double breakerWear) {
         ComponentMonitoringParams params = new ComponentMonitoringParams(vehicleId, ComponentType.ELECTRICAL);
@@ -97,6 +117,16 @@ public class MaintenancePresenter {
         monitorComponent(params);
     }
     
+    /**
+     * Monitors engine diagnostics by tracking various engine parameters.
+     * Creates and processes monitoring parameters for engine components
+     * including temperature, oil pressure, and fuel efficiency.
+     *
+     * @param vehicleId The ID of the vehicle to monitor
+     * @param engineTemp The engine temperature (degrees Celsius)
+     * @param oilPressure The oil pressure (PSI)
+     * @param fuelEfficiency The fuel efficiency (km/L)
+     */
     public void monitorEngineDiagnostics(String vehicleId, double engineTemp, 
                                         double oilPressure, double fuelEfficiency) {
         ComponentMonitoringParams params = new ComponentMonitoringParams(vehicleId, ComponentType.ENGINE);
@@ -106,8 +136,15 @@ public class MaintenancePresenter {
         monitorComponent(params);
     }
 
+    /**
+     * Processes component monitoring parameters and updates the component status.
+     * Calculates average parameter values and creates a new component status
+     * for monitoring.
+     *
+     * @param params The monitoring parameters to process
+     */
     private void monitorComponent(ComponentMonitoringParams params) {
-        // Implementation of component monitoring logic
+        // Create and update component status based on monitoring parameters
         ComponentStatus status = new ComponentStatus(
             params.getVehicleId(),
             params.getComponentType().getDisplayName(),
