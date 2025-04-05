@@ -6,15 +6,6 @@
 <%@ page import="data.VehicleDAO" %>
 <%@ page import="data.DatabaseConnection" %>
 
-<%
-    // 登录验证（如果需要）
-    // User user = (User) session.getAttribute("loggedInUser");
-    // if (user == null) {
-    //     response.sendRedirect("LoginPage.jsp");
-    //     return;
-    // }
-%>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -141,45 +132,46 @@
     <h2>Fuel Consumption Dashboard</h2>
 
     <form action="DashboardServlet" method="post" class="mb-4">
-    <div style="display: flex; align-items: center; gap: 16px;">
-        <div>
-            <label for="vehicleNumber" class="form-label">Select Vehicle:</label><br/>
-            <select name="vehicleNumber" class="form-select" required style="width: 200px;">
-                <option value="" disabled selected>-- Choose Vehicle --</option>
-                <%
-                    VehicleDAO vdao = new VehicleDAO(DatabaseConnection.getInstance().getConnection());
-                    List<Vehicle> vehicles = vdao.getAllVehicles();
-                    for (Vehicle v : vehicles) {
-                %>
-                <option value="<%= v.getVehicleNumber() %>">
-                    <%= v.getVehicleNumber() %> - <%= v.getVehicleType().getTypeName() %>
-                </option>
-                <%
-                    }
-                %>
-            </select>
-        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <div>
+                <label for="vehicleNumber" class="form-label">Select Vehicle:</label><br/>
+                <select name="vehicleNumber" class="form-select" required style="width: 200px;">
+                    <option value="" disabled selected>-- Choose Vehicle --</option>
+                    <%
+                        VehicleDAO vdao = new VehicleDAO(DatabaseConnection.getInstance().getConnection());
+                        List<Vehicle> vehicles = vdao.getAllVehicles();
+                        for (Vehicle v : vehicles) {
+                    %>
+                    <option value="<%= v.getVehicleNumber() %>">
+                        <%= v.getVehicleNumber() %> - <%= v.getVehicleType().getTypeName() %>
+                    </option>
+                    <%
+                        }
+                    %>
+                </select>
+            </div>
 
-        <div>
-            <label for="distance" class="form-label">Distance (km):</label><br/>
-            <input type="number" name="distance" step="0.1" class="form-control" style="width: 200px;" required/>
-        </div>
+            <div>
+                <label for="distance" class="form-label">Distance (km):</label><br/>
+                <input type="number" name="distance" step="0.1" class="form-control" style="width: 200px;" required/>
+            </div>
 
-        <div style="margin-top: 24px;">
-            <button type="submit" class="btn btn-primary">Calculate</button>
+            <div style="margin-top: 24px;">
+                <button type="submit" class="btn btn-primary">Calculate</button>
+            </div>
         </div>
-    </div>
     </form>
 
-
-    <!-- 结果提示 -->
+    
     <%
         Double calculated = (Double) request.getAttribute("calculatedConsumption");
         String alert = (String) request.getAttribute("alertMessage");
+        String unit = (String) request.getAttribute("unit");
         if (calculated != null) {
     %>
         <div class="alert alert-info">
-            <strong>Result:</strong> Estimated fuel consumption: <%= String.format("%.2f", calculated) %> L
+            <strong>Result:</strong> Estimated fuel consumption: 
+            <%= String.format("%.2f", calculated) %> <%= unit != null ? unit : "L" %>
         </div>
     <%
         }
@@ -197,7 +189,7 @@
             <th>ID</th>
             <th>Vehicle ID</th>
             <th>Fuel Type</th>
-            <th>Fuel Used (L)</th>
+            <th>Fuel Used</th>
             <th>Distance (km)</th>
             <th>Timestamp</th>
             <th>Status</th>

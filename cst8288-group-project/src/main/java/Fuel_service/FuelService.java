@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Fuel_service;
 
 import model.VehicleManagement.Vehicle;
@@ -12,10 +8,12 @@ import Fuel_strategy.DieselElectricConsumptionStrategy;
 import Fuel_strategy.LightRailConsumptionStrategy;
 
 /**
- *
- * @author xiaox
+ * Service responsible for calculating fuel or energy consumption
+ * using the Strategy design pattern based on vehicle type.
+ * Also notifies observers (e.g., AlertService) if consumption exceeds a threshold.
  */
 public class FuelService {
+
     private final ConsumptionMonitor monitor;
 
     public FuelService(ConsumptionMonitor monitor) {
@@ -23,34 +21,49 @@ public class FuelService {
     }
 
     /**
-     * Main method to calculate consumption for a given vehicle.This method automatically selects a strategy based on vehicleType,
- calculates consumption, and updates the monitor.
-     * @param vehicle
-     * @param distance
-     * @return 
+     * Calculates consumption based on the vehicle type and distance.
+     * Automatically selects the appropriate strategy and notifies the monitor.
+     *
+     * @param vehicle The vehicle object containing all configuration data
+     * @param distance The distance traveled in kilometers
+     * @return The calculated fuel or energy usage
      */
     public double calculateFuel(Vehicle vehicle, double distance) {
+        // Strategy selection based on vehicle type
         ConsumptionStrategy strategy = selectStrategy(vehicle);
+
+        // Perform calculation
         double consumption = strategy.calculateConsumption(vehicle, distance);
 
-        // Update monitor so that if it exceeds threshold, an alert is triggered
+        // Notify the monitor for alert purposes
         monitor.setConsumption(consumption);
 
         return consumption;
     }
 
+    /**
+     * Selects the correct ConsumptionStrategy implementation
+     * based on vehicle type (e.g., Bus, Light Rail, Diesel-Electric).
+     *
+     * @param vehicle The vehicle object
+     * @return An instance of a class that implements ConsumptionStrategy
+     */
     private ConsumptionStrategy selectStrategy(Vehicle vehicle) {
-        String type = vehicle.getVehicleType().getTypeName(); 
-        
+        String type = vehicle.getVehicleType().getTypeName();
+
         switch (type) {
             case "Diesel Bus":
+            case "CNG Bus":  // Optional: handle future expansion
                 return new BusConsumptionStrategy();
+
             case "Electric Light Rail":
                 return new LightRailConsumptionStrategy();
+
             case "Diesel-Electric Train":
                 return new DieselElectricConsumptionStrategy();
+
             default:
-                throw new UnsupportedOperationException("Unknown vehicle type: " + type);
+                throw new UnsupportedOperationException("Unsupported vehicle type: " + type);
         }
     }
 }

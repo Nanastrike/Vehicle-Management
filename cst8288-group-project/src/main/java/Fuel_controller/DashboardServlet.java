@@ -8,12 +8,10 @@ import Fuel_service.FuelService;
 import Fuel_observer.ConsumptionMonitor;
 import Fuel_observer.AlertService;
 import data.DatabaseConnection;
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
+import jakarta.servlet.RequestDispatcher;
 
 import java.io.IOException;
 
@@ -27,7 +25,7 @@ public class DashboardServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        monitor = new ConsumptionMonitor(50.0); // Example threshold
+        monitor = new ConsumptionMonitor(50.0); // Default alert threshold
         alertService = new AlertService("Transit Manager");
         monitor.attach(alertService);
 
@@ -38,14 +36,11 @@ public class DashboardServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 获取 vehicleNumber 而不是 vehicleId
+        // 从表单获取 vehicleNumber 和 distance
         String vehicleNumber = request.getParameter("vehicleNumber");
         double distance = parseDouble(request.getParameter("distance"), 100.0);
 
-        // 实例化 DAO
         VehicleDAO vehicleDAO = new VehicleDAO();
-
-        // 根据 vehicleNumber 查询车辆对象
         Vehicle vehicle = vehicleDAO.getVehicleByVehicleNumber(vehicleNumber);
 
         if (vehicle == null) {
@@ -54,9 +49,10 @@ public class DashboardServlet extends HttpServlet {
             return;
         }
 
-        // ✅ 计算消耗
+        // 计算燃料或能耗
         double result = fuelService.calculateFuel(vehicle, distance);
-        
+
+        // 保存到数据库
         FuelConsumption record = new FuelConsumption();
         record.setVehicleId(vehicle.getVehicleID());
         record.setFuelTypeId(vehicle.getFuelType().getFuelTypeID());
@@ -67,18 +63,36 @@ public class DashboardServlet extends HttpServlet {
         FuelConsumptionDAO fuelDAO = new FuelConsumptionDAO();
         fuelDAO.insertFuelConsumption(record);
 
-        // ✅ 设置用于 JSP 显示的参数
+        // 单位判断逻辑
+        String unit;
+        String vehicleTypeName = vehicle.getVehicleType().getTypeName();
+
+        switch (vehicleTypeName) {
+            case "Electric Light Rail":
+                unit = "kWh";
+                break;
+            case "Diesel Electric Train":
+            case "Diesel Bus":
+                unit = "L";
+                break;
+            default:
+                unit = "L";
+        }
+
+        // 设置传给 JSP 的属性
         request.setAttribute("calculatedConsumption", result);
+        request.setAttribute("unit", unit);
         request.setAttribute("vehicleNumber", vehicleNumber);
-        request.setAttribute("vehicleType", vehicle.getVehicleType().getTypeName());
+        request.setAttribute("vehicleType", vehicleTypeName);
         request.setAttribute("fuelType", vehicle.getFuelType().getTypeName());
 
         if (result > 50.0) {
             request.setAttribute("alertMessage", "ALERT: Consumption exceeded threshold!");
         }
 
-        // 返回 dashboard 页面
-        request.getRequestDispatcher("/Fuel_dashboard.jsp").forward(request, response);
+        // 返回结果页面
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/Fuel_dashboard.jsp");
+        dispatcher.forward(request, response);
     }
 
     private double parseDouble(String param, double defaultValue) {

@@ -176,6 +176,11 @@ INSERT INTO vehicles (
 
 SET FOREIGN_KEY_CHECKS = 1;
 
+
+ALTER TABLE Vehicles
+ADD COLUMN DieselRate DOUBLE DEFAULT 0.0,
+ADD COLUMN ElectricRate DOUBLE DEFAULT 0.0;
+
 INSERT INTO Vehicles (
     VehicleID, VehicleNumber, VehicleTypeID, FuelTypeID, 
     ConsumptionRate, DieselRate, ElectricRate,
@@ -183,3 +188,4 @@ INSERT INTO Vehicles (
 ) VALUES (
     1, 'BUS-001', 1, 1, 5.0, 25.0, 0.0, 40, 1, '2024-01-01','Nomal'
 );
+
