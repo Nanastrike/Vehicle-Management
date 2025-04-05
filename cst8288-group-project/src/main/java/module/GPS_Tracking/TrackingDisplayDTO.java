@@ -4,24 +4,66 @@
  */
 package module.GPS_Tracking;
 
-import data.VehicleDAO;
 import java.time.LocalDateTime;
 
 /**
- * used to display the info in the front end
- *
- * @author silve
+ * @author :Qinyu Luo
+ * @version: 1.0
+ * @course: CST8288
+ * @assignment: group project
+ * @time: 2025/04/05
+ * @description:Holds vehicle tracking data used for presentation in the
+ * tracking interface. Data Transfer Object (DTO) for displaying real-time
+ * vehicle tracking information. This class encapsulates various details such as
+ * vehicle number, route, position, destination, arrival status, operator info,
+ * and timing, primarily for front-end display.
  */
 public class TrackingDisplayDTO {
 
+    /**
+     * The unique identifier for the vehicle (e.g., license plate or unit
+     * number)
+     */
     private String vehicleNumber;
+
+    /**
+     * ID of the assigned route for the vehicle
+     */
     private int routeID;
+
+    /**
+     * Current position of the vehicle, represented as distance or coordinate
+     */
     private double position;
+
+    /**
+     * Destination name or endpoint of the route
+     */
     private String destination;
+
+    /**
+     * Indicates whether the vehicle has arrived ("yes"/"no" or similar)
+     */
     private String is_arrived;
+
+    /**
+     * The timestamp when the vehicle started the trip
+     */
     private LocalDateTime leavingTime;
+
+    /**
+     * The timestamp when the vehicle arrived at its destination
+     */
     private LocalDateTime arriveTime;
-    private int OperatorID;
+
+    /**
+     * ID of the operator (driver) currently assigned to this vehicle
+     */
+    private int operatorID; // Note: naming could be changed to 'operatorID' for consistency
+
+    /**
+     * Name of the operator (driver)
+     */
     private String operatorName;
 
     public String getOperatorName() {
@@ -33,11 +75,11 @@ public class TrackingDisplayDTO {
     }
 
     public int getOperatorID() {
-        return OperatorID;
+        return operatorID;
     }
 
-    public void setOperatorID(int OperatorID) {
-        this.OperatorID = OperatorID;
+    public void setOperatorID(int operatorID) {
+        this.operatorID = operatorID;
     }
 
     public String getVehicleNumber() {

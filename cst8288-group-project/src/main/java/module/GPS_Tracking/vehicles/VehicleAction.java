@@ -5,24 +5,60 @@
 package module.GPS_Tracking.vehicles;
 
 /**
+ * Interface representing behaviors and actions related to a vehicle. This
+ * interface is used to control vehicle movement, status, and coordinate updates
+ * during the operation process.
  *
- * @author silve
+ * @author :Qinyu Luo
+ * @version: 1.0
+ * @course: CST8288
+ * @assignment: group project
+ * @time: 2025/04/05
+ * Description: Defines methods for vehicle-related logic,
+ * including movement, position updates, and arrival detection.
  */
-//以车为主体的行为interface
 public interface VehicleAction {
-    
-    //根据行驶距离和道路id去判断是否已到站
+
+    /**
+     * Determines whether the vehicle has arrived at its destination.
+     *
+     * @param carDistance the distance the vehicle has traveled
+     * @param roadNumber the ID of the current route/road
+     * @return true if the vehicle has arrived, false otherwise
+     */
     boolean isArrived(double carDistance, int roadNumber);
-    
-    //车辆行驶距离，内置一个math.random();
+
+    /**
+     * Calculates the distance the vehicle has moved. This may use a random
+     * value generator internally to simulate movement.
+     *
+     * @param roadNumber the ID of the current route
+     * @param operatorID the ID of the assigned operator
+     * @return the updated distance moved
+     */
     double vehicleMovedDistance(int roadNumber, int operatorID);
-    
-    //发送坐标id
+
+    /**
+     * Updates the current position of the vehicle.
+     *
+     * @param position the new position value
+     * @return the updated position
+     */
     double updatePosition(double position);
-    
-    //车的状态，行驶中还是停止中？已到站是另一个method
+
+    /**
+     * Sets the running state of the vehicle (true for running, false for
+     * stopped).
+     *
+     * @param running true if the vehicle is running, false if stopped
+     */
     void setRunning(boolean running);
-    
+
+    /**
+     * Sets the ID of the operator currently controlling the vehicle.
+     *
+     * @param operatorID the ID of the operator
+     */
     void setOperatorID(int operatorID);
 
 }

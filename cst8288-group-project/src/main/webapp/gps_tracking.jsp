@@ -94,13 +94,14 @@
     <body>
         <div class="container">
             <h2>Vehicle Tracking Logs</h2>
-
+<!-- Search form to look up logs by vehicle number -->
             <form class="search-container" action="gpsLogs" method="get">
                 <input type="text" name="vehicleNumber" placeholder="Vehicle Number" />
                 <button type="submit">Search</button>
+                <!-- Refresh button to view latest record of each vehicle -->
                 <button type="submit" name="refresh" value="true">Refresh</button>
             </form>
-
+<!-- Logs table displaying vehicle movement details -->
             <table>
                 <thead>
                     <tr>
@@ -116,9 +117,11 @@
                 </thead>
                 <tbody>
                     <%
+                        // Get logs list from the request attribute (set in GPSLogsServlet)
                         List<TrackingDisplayDTO> logs = (List<TrackingDisplayDTO>) request.getAttribute("logs");
                         if (logs == null || logs.isEmpty()) {
                     %>
+                    <!--Display message when no logs found -->
                     <tr>
                         <td colspan="7" class="text-muted">No record found.</td>
                     </tr>
@@ -126,6 +129,7 @@
                     } else {
                         for (TrackingDisplayDTO log : logs) {
                     %>
+                    <!-- Loop through logs and render each row -->
                     <tr>
                         <td><%= log.getVehicleNumber()%></td>
                         <td><%= log.getRouteID()%></td>

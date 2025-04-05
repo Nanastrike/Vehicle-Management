@@ -1,3 +1,17 @@
+/**
+ * File: LightRailConsumptionStrategy.java
+ * Author: Xiaoxi Yang
+ * Student ID: 041124876
+ * Course: CST8288
+ * Section: 030/031
+ * Date: 2025-04-05
+ *
+ * Description:
+ * This class implements the ConsumptionStrategy interface and provides
+ * logic to calculate the electric energy consumption of light rail vehicles.
+ * It assumes the vehicle uses only electric energy, measured in kilowatt-hours
+ * per kilometer (kWh/km).
+ */
 package Fuel_strategy;
 
 import model.VehicleManagement.Vehicle;

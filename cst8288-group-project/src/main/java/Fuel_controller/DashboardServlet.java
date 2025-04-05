@@ -15,13 +15,42 @@ import jakarta.servlet.RequestDispatcher;
 
 import java.io.IOException;
 
+/**
+ * File: DashboardServlet.java
+ * Author: Xiaoxi Yang
+ * Student ID: 041124876
+ * Course: CST8288
+ * Section: 030/031
+ * Date: 2025-04-05
+ *
+ * Description:
+ * This servlet handles POST requests from the Fuel Consumption Dashboard form.
+ * It processes vehicle selection and distance input, calculates fuel or energy usage 
+ * using the Strategy and Observer patterns, stores the result in the database, 
+ * and forwards the output back to the dashboard for display.
+ *
+ * Key Responsibilities:
+ * - Retrieve selected vehicle and input distance from the form.
+ * - Use FuelService with appropriate strategy based on vehicle type.
+ * - Calculate consumption and determine fuel status (Normal, Warning, Critical).
+ * - Store result in the Fuel_Consumption table.
+ * - Notify AlertService if consumption exceeds threshold.
+ * - Forward results (including unit and alert) to Fuel_dashboard.jsp.
+ */
+
 @WebServlet(name = "DashboardServlet", urlPatterns = {"/DashboardServlet"})
 public class DashboardServlet extends HttpServlet {
 
     private static ConsumptionMonitor monitor;
     private static AlertService alertService;
     private static FuelService fuelService;
-
+    
+    /**
+    * Initializes the servlet, sets up the observer relationship between
+    * the fuel consumption monitor and alert service, and instantiates the fuel service.
+    *
+    * @throws ServletException if initialization fails
+    */
     @Override
     public void init() throws ServletException {
         super.init();
@@ -31,7 +60,17 @@ public class DashboardServlet extends HttpServlet {
 
         fuelService = new FuelService(monitor);
     }
-
+    
+    /**
+    * Handles the POST request from the fuel dashboard form.
+    * Retrieves vehicle info and distance, performs calculation,
+    * stores results, and forwards data to the JSP for display.
+    *
+    * @param request  the HttpServletRequest containing form parameters
+    * @param response the HttpServletResponse to forward the result
+    * @throws ServletException in case of servlet issues
+    * @throws IOException      in case of input/output issues
+    */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -58,7 +97,8 @@ public class DashboardServlet extends HttpServlet {
         record.setFuelUsed((float) result);
         record.setDistanceTraveled((float) distance);
         record.setTimestamp(new java.sql.Timestamp(System.currentTimeMillis()));
-
+        
+         // Determine status based on fuel usage rate
         String status;
         if (distance == 0) {
             status = "Normal"; 
@@ -77,7 +117,7 @@ public class DashboardServlet extends HttpServlet {
         FuelConsumptionDAO fuelDAO = new FuelConsumptionDAO();
         fuelDAO.insertFuelConsumption(record);
 
-    
+        // Determine unit of measurement based on vehicle type
         String unit;
         String vehicleTypeName = vehicle.getVehicleType().getTypeName();
 
@@ -94,6 +134,7 @@ public class DashboardServlet extends HttpServlet {
         }
 
        
+        // Set attributes for display
         request.setAttribute("calculatedConsumption", result);
         request.setAttribute("unit", unit);
         request.setAttribute("vehicleNumber", vehicleNumber);
@@ -109,6 +150,13 @@ public class DashboardServlet extends HttpServlet {
         dispatcher.forward(request, response);
     }
 
+    /**
+     * Utility method to parse a double from a string, falling back to default on failure.
+     *
+     * @param param         the input string to parse
+     * @param defaultValue  the fallback value in case of parsing error
+     * @return the parsed double or the default value
+     */
     private double parseDouble(String param, double defaultValue) {
         if (param == null || param.isEmpty()) return defaultValue;
         try {

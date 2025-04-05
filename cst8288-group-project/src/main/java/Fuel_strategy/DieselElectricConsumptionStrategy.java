@@ -1,3 +1,17 @@
+/**
+ * File: DieselElectricConsumptionStrategy.java
+ * Author: Xiaoxi Yang
+ * Student ID: 041124876
+ * Course: CST8288
+ * Section: 030/031
+ * Date: 2025-04-05
+ *
+ * Description:
+ * This class implements the ConsumptionStrategy interface to calculate
+ * the fuel and electric energy usage of a diesel-electric hybrid vehicle.
+ * It combines diesel consumption in liters and electric consumption in kilowatt-hours
+ * based on the vehicle's configured rates.
+ */
 package Fuel_strategy;
 
 import model.VehicleManagement.Vehicle;

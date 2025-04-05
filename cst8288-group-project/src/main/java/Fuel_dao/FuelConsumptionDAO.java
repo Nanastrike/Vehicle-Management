@@ -1,3 +1,16 @@
+/**
+ * File: FuelConsumptionDAO.java
+ * Author: Xiaoxi Yang
+ * Student ID: 041124876
+ * Course: CST8288
+ * Section: 030/031
+ * Date: 2025-04-05
+ *
+ * Description:
+ * This class provides Data Access Object (DAO) operations for the Fuel_Consumption table.
+ * It encapsulates all logic for inserting, retrieving, updating, and deleting fuel consumption records.
+ * It also includes analytical methods to retrieve recent entries and count critical usage records.
+ */
 package Fuel_dao;
 
 import Fuel_model.FuelConsumption;
@@ -149,6 +162,12 @@ public class FuelConsumptionDAO {
         return fc;
     }
     
+    /**
+     * Retrieves the count of fuel consumption records marked as "Critical".
+     *
+     * @return The total number of records with Critical status.
+     * @throws SQLException if a database access error occurs
+     */
     public int getCriticalFuelCount() throws SQLException {
         String sql = "SELECT COUNT(*) FROM Fuel_Consumption WHERE Status = 'Critical'";
         try (PreparedStatement stmt = conn.prepareStatement(sql);
@@ -160,7 +179,13 @@ public class FuelConsumptionDAO {
         return 0;
     }
 
-    // Get most recent 3 fuel consumption records
+    /**
+     * Retrieves the most recent fuel consumption records sorted by timestamp.
+     *
+     * @param limit The number of records to retrieve.
+     * @return A list of FuelConsumption records.
+     * @throws SQLException if a database access error occurs
+     */
     public List<FuelConsumption> getRecentFuelRecords(int limit) throws SQLException {
         List<FuelConsumption> list = new ArrayList<>();
         String sql = "SELECT * FROM Fuel_Consumption ORDER BY Timestamp DESC LIMIT ?";

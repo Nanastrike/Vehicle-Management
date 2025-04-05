@@ -54,12 +54,12 @@
         <div class="container">
             <h2>Operator Dashboard</h2>
 
-            <!-- ✅ 成功到达终点提示 -->
+            <!-- Display message if vehicle just arrived at the destination -->
             <c:if test="${justArrived}">
                 <p class="message">Vehicle has reached the destination. Please select a new vehicle to start.</p>
             </c:if>
 
-            <!-- ✅ 还没开始开车，显示车辆选择表单 -->
+            <!-- Show vehicle selection form if not currently driving -->
             <c:if test="${!isDriving}">
                 <form action="startDriving" method="post">
                     <label for="vehicle">Select Vehicle:</label>
@@ -72,7 +72,7 @@
                 </form>
             </c:if>
 
-            <!-- ✅ 正在开车时显示状态 -->
+            <!-- Show driving status and distance tracking if already driving-->
             <c:if test="${isDriving}">
                 <div class="status-box">
                     <c:choose>
@@ -83,13 +83,14 @@
                             <p style="color:red;">[Error] Vehicle data not found in session.</p>
                         </c:otherwise>
                     </c:choose>
+                    <!--  Show current distance with 2 decimal places -->
                     <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
                     <p class="distance">
                         Current Distance: <fmt:formatNumber value="${carDistance}" type="number" maxFractionDigits="2" /> km
                     </p>
 
                     <c:choose>
-
+                        <!-- Show "Resume" or "Pause" button depending on state -->
                         <c:when test="${isPaused}">
                             <form action="resumeDriving" method="post">
                                 <button type="submit">Resume Driving</button>
