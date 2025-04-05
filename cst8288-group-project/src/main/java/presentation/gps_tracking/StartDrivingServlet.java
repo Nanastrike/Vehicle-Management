@@ -26,12 +26,11 @@ import module.GPS_Tracking.vehicles.VehicleActionImpl;
  * This differs from ResumeDrivingServlet as it represents the first time a trip starts,
  * not a continuation.
  *
- * @author : Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: Group Project
- * @time: 2025/04/05
- * @Description: Initializes vehicle trip state and starts a new session for tracking.
+ * @author  Qinyu Luo
+ * @version 1.0
+ * course CST8288
+ * 
+ * Description: Initializes vehicle trip state and starts a new session for tracking.
  */
 @WebServlet("/startDriving")
 public class StartDrivingServlet extends HttpServlet {

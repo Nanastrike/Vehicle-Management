@@ -15,12 +15,12 @@ import java.sql.SQLException;
  * from the database. This class retrieves route distance, name, start location,
  * and destination by using SQL queries against the Routes table.
  *
- * @author : Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: Group Project
- * @time: 2025/04/05
- * @Description: Provides JDBC-based implementation of RouteDao interface
+ * @author  Qinyu Luo
+ * @version 1.0
+ * course CST8288
+ * assignment Group Project
+ * time 2025/04/05
+ * Description Provides JDBC-based implementation of RouteDao interface
  * methods.
  */
 public class RouteDaoImpl implements RouteDao {

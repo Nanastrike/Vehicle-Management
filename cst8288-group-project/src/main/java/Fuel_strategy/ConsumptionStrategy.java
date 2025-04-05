@@ -12,11 +12,13 @@ import model.VehicleManagement.Vehicle;
  */
 public interface ConsumptionStrategy {
     /**
-     * Calculates the total fuel/energy consumption for a given vehicle over a certain distance.
-     * @param vehicle
-     * @param distance
-     * @return 
-     */
+ * Strategy interface for calculating fuel or energy consumption.
+ * Implementations define how consumption is calculated based on vehicle type and distance.
+ * 
+ * @param vehicle The vehicle for which consumption is to be calculated.
+ * @param distance The distance traveled in kilometers.
+ * @return The calculated amount of fuel or energy consumed.
+ */
     double calculateConsumption(Vehicle vehicle, double distance);
 }
 

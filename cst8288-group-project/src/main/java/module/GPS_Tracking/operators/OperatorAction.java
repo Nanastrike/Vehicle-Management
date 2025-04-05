@@ -10,11 +10,13 @@ import module.GPS_Tracking.vehicles.VehicleAction;
  * Defines an interface representing actions performed by an operator.
  * This includes starting and stopping a vehicle through an associated vehicle action object.
  * 
- * @author :Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: group project
- * @time: 2025/04/05
+ * @author Qinyu Luo
+ * @version 1.0
+ * @since  2025/04/05
+ * 
+ * course CST8288
+ * assignment group project
+ * 
  * Description: Represents operator-initiated actions such as running or stopping a vehicle.
  */
 

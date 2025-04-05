@@ -32,10 +32,10 @@ public class AlertService implements Observer {
     }
 
     /**
-     * Constructs an AlertService assigned to a specific manager.
-     *
-     * @param managerName The name of the manager to notify.
-     */
+    * Receives update notifications about fuel or energy consumption.
+    *
+    * @param consumption The current consumption value that triggered the alert.
+    */
     @Override
     public void update(double consumption) {
         System.out.println("Alert for " + managerName 

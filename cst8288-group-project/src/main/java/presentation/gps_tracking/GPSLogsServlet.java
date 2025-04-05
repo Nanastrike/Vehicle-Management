@@ -4,10 +4,6 @@
  */
 package presentation.gps_tracking;
 
-/**
- *
- * @author silve
- */
 import data.DatabaseConnection;
 import data.gps_tracking.RouteDao;
 import data.gps_tracking.RouteDaoImpl;
@@ -32,11 +28,11 @@ import jakarta.servlet.annotation.WebServlet;
  * Depending on query parameters, it either returns the latest log for all vehicles
  * or the full tracking history for a specific vehicle.
  *
- * @author :Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: group project
- * @time: 2025/04/05
+ * @author Qinyu Luo
+ * @version 1.0
+ * 
+ * course CST8288
+ * 
  * Description: Handles display logic for GPS tracking logs, fetching vehicle,
  * operator, and route data, and passing it to the frontend for presentation.
  */

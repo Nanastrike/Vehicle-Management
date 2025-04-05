@@ -5,12 +5,14 @@
 package module.GPS_Tracking;
 
 /**
- * @author :Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: group project
- * @time: 2025/04/05
- * @description: Implements the PositionChangeListener interface to handle position updates.
+ * @author Qinyu Luo
+ * @version 1.0
+ * @since  2025/04/05
+ * 
+ * course CST8288
+ * assignment group project
+ * 
+ * description Implements the PositionChangeListener interface to handle position updates.
  * This class simply logs the vehicle's new position to the console when a change occurs.
  * Implements the RunningStateListener interface to handle vehicle running state changes.
  * This class logs a message to the console whenever a vehicle starts or stops.

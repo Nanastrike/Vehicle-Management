@@ -13,12 +13,12 @@ import java.time.LocalTime;
  * vehicle movement logs such as distance traveled, timestamps, and operator
  * information.
  *
- * @author : Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: Group Project
- * @time: 2025/04/05
- * @Description: Stores vehicle movement and operational data for logging or
+ * @author  Qinyu Luo
+ * @version 1.0
+ * course CST8288
+ * assignment Group Project
+ * time 2025/04/05
+ * Description Stores vehicle movement and operational data for logging or
  * display.
  */
 public class VehicleActionDTO {

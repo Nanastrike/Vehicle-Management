@@ -5,12 +5,14 @@
 package module.GPS_Tracking;
 
 /**
- * @author :Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: group project
- * @time: 2025/04/05
- * @description:Interface for detecting changes in the running state of vehicles.
+ * @author Qinyu Luo
+ * @version 1.0
+ * @since  2025/04/05
+ * 
+ * course CST8288
+ * assignment group project
+ * 
+ * description Interface for detecting changes in the running state of vehicles.
  * Implementing classes can define custom behaviors for start/stop events.
  * Defines an interface for listening to vehicle running state changes.
  * Classes implementing this interface can respond when a vehicle starts or stops.

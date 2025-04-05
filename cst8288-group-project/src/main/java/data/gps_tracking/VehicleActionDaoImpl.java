@@ -27,12 +27,12 @@ import module.GPS_Tracking.TrackingDisplayDTO;
  * retrieve, update, and delete vehicle movement records, and provides summary
  * statistics such as operator efficiency and currently running vehicle count.
  *
- * @author : Qinyu Luo
- * @version: 1.0
- * @course: CST8288
- * @assignment: Group Project
- * @time: 2025/04/05
- * @Description: Full DAO implementation for vehicle tracking logic with JDBC.
+ * @author  Qinyu Luo
+ * @version 1.0
+ * course CST8288
+ * assignment Group Project
+ * time 2025/04/05
+ * Description Full DAO implementation for vehicle tracking logic with JDBC.
  */
 public class VehicleActionDaoImpl implements VehicleActionDao {
 

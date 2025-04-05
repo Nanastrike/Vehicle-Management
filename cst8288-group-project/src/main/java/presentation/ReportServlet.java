@@ -22,14 +22,14 @@ import model.User.User;
 /**
  * Servlet responsible for generating and saving different types of system reports.
  * 
- * <p>This servlet handles POST requests to generate reports based on the selected type:
+ * <p>This servlet handles POST requests to generate reports based on the selected type:</p>
  * <ul>
  *   <li><b>maintenance</b> - Pending maintenance task summary</li>
  *   <li><b>fuel</b> - Fuel efficiency of vehicles</li>
  *   <li><b>operator</b> - Total distance driven by operators</li>
  * </ul>
  * 
- * The generated report is also saved to the database via {@link reportDAO}.</p>
+ * <p>The generated report is also saved to the database via {@link reportDAO}.</p>
  *
  * <p>On success, the report content and title are forwarded to <code>reportPage.jsp</code>.</p>
  * 
