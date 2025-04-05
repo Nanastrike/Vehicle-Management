@@ -133,10 +133,13 @@ CREATE TABLE Operator (
 CREATE TABLE Component_Status (
     ComponentID INT AUTO_INCREMENT PRIMARY KEY,
     VehicleID INT NOT NULL,
-    ComponentName VARCHAR(100) NOT NULL,
-    HoursUsed INT NOT NULL DEFAULT 0,
-    WearLevel DECIMAL(5,2) NOT NULL DEFAULT 0,
-    LastUpdated DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ComponentType VARCHAR(50) NOT NULL,       -- ex: 'mechanical', 'electrical', 'engine'
+    ComponentName VARCHAR(100) NOT NULL,      -- ex: 'brakes', 'pantograph', 'oil'
+    HoursUsed INT DEFAULT NULL,               -- NULL 適用於 engine 類別
+    WearLevel DECIMAL(5,2) DEFAULT NULL,      -- NULL 適用於 engine 類別
+    Status VARCHAR(50) DEFAULT NULL,          -- 僅 engine 類別使用 (ex: '正常', '需更換')
+    LastMaintenanceDate DATE DEFAULT NULL,    -- optional，方便查時數
+    LastUpdated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (VehicleID) REFERENCES Vehicles(VehicleID) ON DELETE CASCADE
 );
 
