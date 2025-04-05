@@ -17,15 +17,17 @@ public class DashboardDAO {
     private MaintenanceTaskDAO maintenanceTaskDAO;
     private VehicleActionDaoImpl vehicleActionDaoImpl;
     private FuelConsumptionDAO fuelDAO;
+    private reportDAO reportDAO;
     
     public DashboardDAO(VehicleDAO vehicleDAO, 
             MaintenanceTaskDAO maintenanceTaskDAO, 
             VehicleActionDaoImpl vehicleActionDaoImpl,
-            FuelConsumptionDAO fuelDAO) {
+            FuelConsumptionDAO fuelDAO, reportDAO reportDAO) {
         this.vehicleDAO = vehicleDAO;
         this.maintenanceTaskDAO = maintenanceTaskDAO;
         this.vehicleActionDaoImpl = vehicleActionDaoImpl;
         this.fuelDAO = fuelDAO;
+        this.reportDAO = reportDAO;
     }
 
     public Map<String, Integer> getVehicleTypeCounts() {
@@ -67,5 +69,9 @@ public class DashboardDAO {
     
     public List<FuelConsumption> getRecentFuelRecords(int limit) throws SQLException{
         return fuelDAO.getRecentFuelRecords(3);
+    }
+    
+    public Map<String, Integer> getReportTypeCounts() throws SQLException{
+        return reportDAO.getReportTypeCounts();
     }
 } 

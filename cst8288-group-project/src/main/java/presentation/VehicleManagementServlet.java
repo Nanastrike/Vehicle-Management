@@ -9,6 +9,7 @@ import data.DatabaseConnection;
 import data.DashboardDAO;
 import data.gps_tracking.VehicleActionDTO;
 import data.gps_tracking.VehicleActionDaoImpl;
+import data.reportDAO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -53,6 +54,7 @@ public class VehicleManagementServlet extends HttpServlet {
     private MaintenanceTaskDAO maintenanceTaskDAO;
     private VehicleActionDaoImpl vehicleActionDaoImpl;
     private FuelConsumptionDAO fuelDAO;
+    private reportDAO reportDAO;
 
     /**
      * Initializes the servlet and sets up database connection and DAO instance.
@@ -65,6 +67,7 @@ public class VehicleManagementServlet extends HttpServlet {
             maintenanceTaskDAO = new MaintenanceTaskDAO(conn);
             vehicleActionDaoImpl = new VehicleActionDaoImpl(conn);
             fuelDAO = new FuelConsumptionDAO();
+            reportDAO = new reportDAO(conn);
         } catch (Exception e) {
             throw new ServletException("Error initializing VehicleManagementServlet", e);
         }
@@ -87,7 +90,7 @@ public class VehicleManagementServlet extends HttpServlet {
         if (action == null || action.equals("list")) {
             listVehicles(request, response);
         } else if (action.equals("dashboard")) {
-            DashboardDAO dashboardDAO = new DashboardDAO(vehicleDAO, maintenanceTaskDAO, vehicleActionDaoImpl, fuelDAO);
+            DashboardDAO dashboardDAO = new DashboardDAO(vehicleDAO, maintenanceTaskDAO, vehicleActionDaoImpl, fuelDAO, reportDAO);
             try {
                 Map<String, Integer> vehicleTypeCounts = dashboardDAO.getVehicleTypeCounts();
                 Vehicle lastVehicle = dashboardDAO.getLastAddedVehicle();
@@ -98,19 +101,19 @@ public class VehicleManagementServlet extends HttpServlet {
                 List<VehicleActionDTO> recentVehicles = gpsDao.getRecentVehicleActions(3);
 
                 int criticalFuelCount = fuelDAO.getCriticalFuelCount();
+                Map<String, Integer> reportTypeCounts = reportDAO.getReportTypeCounts();
                 List<FuelConsumption> recentFuelList = fuelDAO.getRecentFuelRecords(3);
-
+                
+                
+                request.setAttribute("reportTypeCounts", reportTypeCounts);
                 request.setAttribute("criticalFuelCount", criticalFuelCount);
                 request.setAttribute("recentFuelList", recentFuelList);
-
                 request.setAttribute("runningVehicleCount", runningCount);
                 request.setAttribute("recentVehicles", recentVehicles);
-
                 request.setAttribute("vehicleTypeCounts", vehicleTypeCounts);
                 request.setAttribute("lastVehicle", lastVehicle);
                 request.setAttribute("highPriorityCount", highPriorityCount);
                 request.setAttribute("mostRecentTask", mostRecentTask);
-
                 request.getRequestDispatcher("DashboardPage.jsp").forward(request, response);
             } catch (Exception e) {
                 e.printStackTrace();
