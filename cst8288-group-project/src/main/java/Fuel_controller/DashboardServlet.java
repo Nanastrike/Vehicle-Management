@@ -36,7 +36,6 @@ public class DashboardServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 从表单获取 vehicleNumber 和 distance
         String vehicleNumber = request.getParameter("vehicleNumber");
         double distance = parseDouble(request.getParameter("distance"), 100.0);
 
