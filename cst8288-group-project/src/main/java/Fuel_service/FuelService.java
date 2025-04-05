@@ -1,3 +1,18 @@
+/**
+ * File: FuelService.java
+ * Author: Xiaoxi Yang
+ * Student ID: 041124876
+ * Course: CST8288
+ * Section: 030/031
+ * Date: 2025-04-05
+ *
+ * Description:
+ * This service class handles fuel or energy consumption calculation 
+ * using the Strategy Design Pattern. It dynamically selects an appropriate 
+ * strategy based on the vehicle type and invokes the calculation logic.
+ * It also interacts with the Observer (ConsumptionMonitor) to notify 
+ * registered observers when fuel consumption exceeds a defined threshold.
+ */
 package Fuel_service;
 
 import model.VehicleManagement.Vehicle;
@@ -15,7 +30,12 @@ import Fuel_strategy.LightRailConsumptionStrategy;
 public class FuelService {
 
     private final ConsumptionMonitor monitor;
-
+    
+    /**
+     * Constructs a FuelService and registers it with the provided monitor.
+     *
+     * @param monitor the ConsumptionMonitor used for alert triggering
+     */
     public FuelService(ConsumptionMonitor monitor) {
         this.monitor = monitor;
     }
