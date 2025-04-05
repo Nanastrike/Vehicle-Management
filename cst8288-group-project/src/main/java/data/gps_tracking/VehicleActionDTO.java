@@ -87,4 +87,8 @@ public class VehicleActionDTO {
         this.OperatorID = OperatorID;
     }
 
+    public void setCurrentTime(LocalDateTime currentTime) {
+        this.currentTime = currentTime;
+    }
+
 }

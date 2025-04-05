@@ -288,7 +288,7 @@ public List<VehicleActionDTO> getAllLogsByVehicleID(int vehicleID) {
 
         return logs;
     }
-
+    
     /**
      *
      * @return
@@ -305,24 +305,42 @@ public List<VehicleActionDTO> getAllLogsByVehicleID(int vehicleID) {
 
     @Override
     public List<VehicleActionDTO> getRecentVehicleActions(int limit) throws SQLException {
-        String sql = "SELECT * FROM GPS_Tracking ORDER BY LeavingTime DESC LIMIT ?";
-        List<VehicleActionDTO> actions = new ArrayList<>();
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, limit);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                VehicleActionDTO action = new VehicleActionDTO();
-                action.setVehicleID(rs.getInt("VehicleID"));
-                action.setCarDistance(rs.getDouble("CarDistance"));
-                action.setLeavingTime(rs.getTimestamp("LeavingTime").toLocalDateTime());
-                action.setArriveTime(rs.getTimestamp("ArriveTime") != null ? rs.getTimestamp("ArriveTime").toLocalDateTime() : null);
-                action.setOperatorID(rs.getInt("OperatorID"));
-                action.setOperatorName(rs.getString("OperatorName"));
-                actions.add(action);
-            }
+    String sql = """
+        SELECT g.VehicleID, g.LeavingTime, g.ArriveTime, g.OperatorID, g.CurrentTime,
+               u.Name AS OperatorName
+        FROM GPS_Tracking g
+        LEFT JOIN Users u ON g.OperatorID = u.UserID
+        ORDER BY g.LeavingTime DESC
+        LIMIT ?
+    """;
+
+    List<VehicleActionDTO> actions = new ArrayList<>();
+    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setInt(1, limit);
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            VehicleActionDTO action = new VehicleActionDTO();
+            action.setVehicleID(rs.getInt("VehicleID"));
+
+            Timestamp leaving = rs.getTimestamp("LeavingTime");
+            if (leaving != null) action.setLeavingTime(leaving.toLocalDateTime());
+
+            Timestamp arrive = rs.getTimestamp("ArriveTime");
+            if (arrive != null) action.setArriveTime(arrive.toLocalDateTime());
+
+            Timestamp current = rs.getTimestamp("CurrentTime");
+            if (current != null) action.setCurrentTime(current.toLocalDateTime());
+
+            action.setOperatorID(rs.getInt("OperatorID"));
+            action.setOperatorName(rs.getString("OperatorName")); // from JOINed Users.Name
+
+            actions.add(action);
         }
-        return actions;
     }
+    return actions;
+}
+
 
 
 }
