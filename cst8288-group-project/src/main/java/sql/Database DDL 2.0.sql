@@ -76,6 +76,8 @@ CREATE TABLE Vehicles (
     VehicleTypeID INT NOT NULL,
     FuelTypeID INT NOT NULL,
     ConsumptionRate FLOAT NOT NULL,
+    DieselRate DOUBLE DEFAULT 0.0,
+    ElectricRate DOUBLE DEFAULT 0.0,
     MaxPassengers INT NOT NULL,
     RouteID INT,
     LastMaintenanceDate DATE,
@@ -103,7 +105,7 @@ CREATE TABLE Fuel_Consumption (
     FuelTypeID INT NOT NULL,
     FuelUsed FLOAT NOT NULL,
     DistanceTraveled FLOAT NOT NULL,
-    Status VARCHAR(20) DEFAULT 'Normal';
+    Status VARCHAR(20) DEFAULT 'Normal',
     Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (VehicleID) REFERENCES Vehicles(VehicleID) ON DELETE CASCADE,
     FOREIGN KEY (FuelTypeID) REFERENCES FuelTypes(FuelTypeID) ON DELETE CASCADE
@@ -167,25 +169,16 @@ INSERT INTO Routes (RouteName, StartLocation, EndLocation, Distance) VALUES
 ('Airport Express', 'City Center', 'International Airport', 25.8),
 ('East-West Connector', 'East Side Depot', 'West Hills Terminal', 18.2);
 
-INSERT INTO vehicles (
+INSERT INTO Vehicles (
     VehicleID, VehicleNumber, VehicleTypeID, FuelTypeID, 
     ConsumptionRate, MaxPassengers, RouteID, LastMaintenanceDate
 ) VALUES (
     1, 'BUS-001', 1, 1, 5.0, 40, 1, '2024-01-01'
 );
 
+INSERT INTO Fuel_Consumption (VehicleID, FuelTypeID, FuelUsed, DistanceTraveled,Status)
+VALUES (1, 1, 10.5, 100, 'Normal');
+
+
 SET FOREIGN_KEY_CHECKS = 1;
-
-
-ALTER TABLE Vehicles
-ADD COLUMN DieselRate DOUBLE DEFAULT 0.0,
-ADD COLUMN ElectricRate DOUBLE DEFAULT 0.0;
-
-INSERT INTO Vehicles (
-    VehicleID, VehicleNumber, VehicleTypeID, FuelTypeID, 
-    ConsumptionRate, DieselRate, ElectricRate,
-    MaxPassengers, RouteID, LastMaintenanceDate, Status
-) VALUES (
-    1, 'BUS-001', 1, 1, 5.0, 25.0, 0.0, 40, 1, '2024-01-01','Nomal'
-);
 

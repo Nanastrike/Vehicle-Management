@@ -49,10 +49,10 @@ public class DashboardServlet extends HttpServlet {
             return;
         }
 
-        // 计算燃料或能耗
+       
         double result = fuelService.calculateFuel(vehicle, distance);
 
-        // 保存到数据库
+      
         FuelConsumption record = new FuelConsumption();
         record.setVehicleId(vehicle.getVehicleID());
         record.setFuelTypeId(vehicle.getFuelType().getFuelTypeID());
@@ -63,7 +63,7 @@ public class DashboardServlet extends HttpServlet {
         FuelConsumptionDAO fuelDAO = new FuelConsumptionDAO();
         fuelDAO.insertFuelConsumption(record);
 
-        // 单位判断逻辑
+    
         String unit;
         String vehicleTypeName = vehicle.getVehicleType().getTypeName();
 
@@ -79,7 +79,7 @@ public class DashboardServlet extends HttpServlet {
                 unit = "L";
         }
 
-        // 设置传给 JSP 的属性
+       
         request.setAttribute("calculatedConsumption", result);
         request.setAttribute("unit", unit);
         request.setAttribute("vehicleNumber", vehicleNumber);
@@ -90,7 +90,7 @@ public class DashboardServlet extends HttpServlet {
             request.setAttribute("alertMessage", "ALERT: Consumption exceeded threshold!");
         }
 
-        // 返回结果页面
+
         RequestDispatcher dispatcher = request.getRequestDispatcher("/Fuel_dashboard.jsp");
         dispatcher.forward(request, response);
     }
