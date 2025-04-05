@@ -46,7 +46,7 @@ public class StartDrivingServlet extends HttpServlet {
      * @throws java.io.IOException
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         //  Get form parameters
