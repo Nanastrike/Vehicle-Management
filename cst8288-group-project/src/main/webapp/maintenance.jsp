@@ -456,6 +456,7 @@
                             <th>Vehicle Number</th>
                             <th>Vehicle Type</th>
                             <th>Last Maintenance Data</th>
+                            <th>Component check</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -477,7 +478,14 @@
                                         <h6>Engine Components</h6>
                                         <input type="checkbox" name="components" value="oil">Oil Change</input><br>
                                         <input type="checkbox" name="components" value="coolant">Coolant Change</input><br>
-                                        <button type="submit" class="btn">Done</button><br>
+                                        <button type="submit" class="btn">Done</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form action="MaintenanceServlet" method="post" style="display: inline;">
+                                        <input type="hidden" name="action" value="deleteComponentStatus">
+                                        <input type="hidden" name="vehicleId" value="${vehicle.vehicleNumber}">
+                                        <button type="submit" class="btn btn-danger">Delete All</button>
                                     </form>
                                 </td>
                             </tr>
@@ -486,85 +494,6 @@
                 </table>
             </div>
 
-
-            
-            
-            <div class="section">
-                <h2>Components</h2>
-                <table class="maintenance-table">
-                    <thead>
-                        <tr>
-                            <th>Vehicle Number</th>
-                            <th>Brake</th>
-                            <th>Wheels</th>
-                            <th>Catenary</th>
-                            <th>Pantograph</th>
-                            <th>Oil</th>
-                            <th>Coolant</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach var="status" items="${componentStatuses}">
-                            <tr>
-                                <td>${status.vehicleId}</td>
-                                <td>
-                                    <c:choose>
-                                        <c:when test="${status.componentName eq 'brakes'}">
-                                            <span class="status-${status.status.toLowerCase()}">${status.status}</span>
-                                        </c:when>
-                                        <c:otherwise>-</c:otherwise>
-                                    </c:choose>
-                                </td>
-                                <td>
-                                    <c:choose>
-                                        <c:when test="${status.componentName eq 'wheels'}">
-                                            <span class="status-${status.status.toLowerCase()}">${status.status}</span>
-                                        </c:when>
-                                        <c:otherwise>-</c:otherwise>
-                                    </c:choose>
-                                </td>
-                                <td>
-                                    <c:choose>
-                                        <c:when test="${status.componentName eq 'catenary'}">
-                                            <span class="status-${status.status.toLowerCase()}">${status.status}</span>
-                                        </c:when>
-                                        <c:otherwise>-</c:otherwise>
-                                    </c:choose>
-                                </td>
-                                <td>
-                                    <c:choose>
-                                        <c:when test="${status.componentName eq 'pantograph'}">
-                                            <span class="status-${status.status.toLowerCase()}">${status.status}</span>
-                                        </c:when>
-                                        <c:otherwise>-</c:otherwise>
-                                    </c:choose>
-                                </td>
-                                <td>
-                                    <c:choose>
-                                        <c:when test="${status.componentName eq 'oil'}">
-                                            <span class="status-${status.status.toLowerCase()}">${status.status}</span>
-                                        </c:when>
-                                        <c:otherwise>-</c:otherwise>
-                                    </c:choose>
-                                </td>
-                                <td>
-                                    <c:choose>
-                                        <c:when test="${status.componentName eq 'coolant'}">
-                                            <span class="status-${status.status.toLowerCase()}">${status.status}</span>
-                                        </c:when>
-                                        <c:otherwise>-</c:otherwise>
-                                    </c:choose>
-                                </td>
-                            </tr>
-                        </c:forEach>
-                        <c:if test="${empty componentStatuses}">
-                            <tr>
-                                <td colspan="7" style="text-align: center;">No component status data available</td>
-                            </tr>
-                        </c:if>
-                    </tbody>
-                </table>
-            </div>
             
                 <h2>Component Status</h2>
                 <div class="status-section">
@@ -577,23 +506,14 @@
                                 <th>Wear Level</th>
                                 <th>Status</th>
                                 <th>Last Updated</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <c:forEach items="${componentStatuses}" var="status">
                                 <tr>
                                     <td>${status.vehicleId}</td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${status.componentName eq 'brakes'}">Brakes</c:when>
-                                            <c:when test="${status.componentName eq 'wheels'}">Wheels/Tires</c:when>
-                                            <c:when test="${status.componentName eq 'catenary'}">Catenary</c:when>
-                                            <c:when test="${status.componentName eq 'pantograph'}">Pantograph</c:when>
-                                            <c:when test="${status.componentName eq 'oil'}">Oil</c:when>
-                                            <c:when test="${status.componentName eq 'coolant'}">Coolant</c:when>
-                                            <c:otherwise>${status.componentName}</c:otherwise>
-                                        </c:choose>
-                                    </td>
+                                    <td>${status.componentName}</td>
                                     <td>${status.hoursUsed}</td>
                                     <td>${status.wearLevel}%</td>
                                     <td>
@@ -602,11 +522,20 @@
                                         </span>
                                     </td>
                                     <td>${status.lastUpdated}</td>
+                                    <td>
+                                        <form action="MaintenanceServlet" method="post" style="display: inline;">
+                                            <input type="hidden" name="action" value="deleteComponentStatus">
+                                            <input type="hidden" name="vehicleId" value="${status.vehicleId}">
+                                            <input type="hidden" name="componentName" value="${status.componentName}">
+                                            <input type="hidden" name="lastUpdated" value="${status.lastUpdated}">
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </td>
                                 </tr>
                             </c:forEach>
                             <c:if test="${empty componentStatuses}">
                                 <tr>
-                                    <td colspan="6" style="text-align: center;">No component status data available</td>
+                                    <td colspan="7" style="text-align: center;">No component status data available</td>
                                 </tr>
                             </c:if>
                         </tbody>
@@ -614,23 +543,6 @@
                 </div>
             </div>
 
-            <!-- 維護警報顯示 -->
-            <div class="alert-container">
-                <h2>Maintenance Alerts</h2>
-                <div id="alertsList">
-                    <c:forEach var="alert" items="${maintenanceAlerts}">
-                        <div class="alert ${alert.componentStatus.status == 'CRITICAL' ? 'critical' : alert.componentStatus.status == 'WARNING' ? 'warning' : 'normal'}">
-                            <div class="alert-info"><strong>Time:</strong> ${alert.timestamp}</div>
-                            <div class="alert-info"><strong>Vehicle ID:</strong> ${alert.componentStatus.vehicleId}</div>
-                            <div class="alert-info"><strong>Component:</strong> ${alert.componentStatus.componentName}</div>
-                            <div class="alert-info"><strong>Hours Used:</strong> ${alert.componentStatus.hoursUsed}</div>
-                            <div class="alert-info"><strong>Wear Level:</strong> ${alert.componentStatus.wearLevel}%</div>
-                            <div class="alert-info"><strong>Message:</strong> ${alert.componentStatus.alertMessage}</div>
-                        </div>
-                    </c:forEach>
-                </div>
-            </div>
-        </div>
 
         <script>
             document.getElementById('vehicleNumber').addEventListener('change', function() {
@@ -694,48 +606,8 @@
                         </tr>
                     `;
                 });
-                
-                // Update Engine Diagnostics
-                const engineParameters = ['Oil Change', 'Coolant Change'];
-                const engineTbody = document.getElementById('engineStatus');
-                engineTbody.innerHTML = '';
-                
-                engineParameters.forEach(parameter => {
-                    const status = daysDiff > 180 ? '需更換' : '正常';
-                    engineTbody.innerHTML += `
-                        <tr>
-                            <td>${vehicleNumber}</td>
-                            <td>${parameter}</td>
-                            <td>${lastMaintenanceDate}</td>
-                            <td>${status}</td>
-                            </tr>
-                        `;
-                    });
-                
-                // Send data to server to update database
-                fetch('/updateComponentStatus', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        vehicleNumber,
-                        lastMaintenanceDate,
-                        hoursUsed,
-                        mechanicalComponents: mechanicalComponents.map(component => ({
-                            component,
-                            wearLevel: calculateWearLevel(hoursUsed)
-                        })),
-                        electricalComponents: electricalComponents.map(component => ({
-                            component,
-                            wearLevel: calculateWearLevel(hoursUsed)
-                        })),
-                        engineParameters: engineParameters.map(parameter => ({
-                            parameter,
-                            status: daysDiff > 180 ? '需更換' : '正常'
-                        }))
-                    })
-                });
+             
+               
             }
         </script>
 
