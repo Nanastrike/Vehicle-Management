@@ -1,13 +1,24 @@
 package data;
 
-import model.VehicleManagement.Vehicle;
+import data.gps_tracking.VehicleActionDTO;
+import data.gps_tracking.VehicleActionDaoImpl;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
+import model.VehicleManagement.Vehicle;
+import model.MaintenanceTask.MaintenanceTask;
 
 public class DashboardDAO {
-    private VehicleDAO vehicleDAO;
 
-    public DashboardDAO(VehicleDAO vehicleDAO) {
+    private VehicleDAO vehicleDAO;
+    private MaintenanceTaskDAO maintenanceTaskDAO;
+    private VehicleActionDaoImpl vehicleActionDaoImpl;
+
+    public DashboardDAO(VehicleDAO vehicleDAO, MaintenanceTaskDAO maintenanceTaskDAO, VehicleActionDaoImpl vehicleActionDaoImpl) {
         this.vehicleDAO = vehicleDAO;
+        this.maintenanceTaskDAO = maintenanceTaskDAO;
+        this.vehicleActionDaoImpl = vehicleActionDaoImpl;
     }
 
     public Map<String, Integer> getVehicleTypeCounts() {
@@ -24,5 +35,22 @@ public class DashboardDAO {
         List<Vehicle> vehicles = vehicleDAO.getAllVehicles();
         return vehicles.isEmpty() ? null : vehicles.get(vehicles.size() - 1);
     }
-}
 
+    // ✅ Count HIGH priority maintenance tasks
+    public int getHighPriorityTaskCount() throws SQLException {
+        return maintenanceTaskDAO.getHighPriorityTaskCount();
+    }
+
+    // ✅ Get most recent maintenance task
+    public MaintenanceTask getMostRecentTask() throws SQLException {
+        return maintenanceTaskDAO.getMostRecentTask();
+    }
+    
+    public int getRunningVehiclesCount() throws SQLException{
+        return vehicleActionDaoImpl.getRunningVehiclesCount();
+    }
+    
+    public List<VehicleActionDTO> getRecentVehicleActions(int limit) throws SQLException{
+        return vehicleActionDaoImpl.getRecentVehicleActions(3);
+    }
+} 

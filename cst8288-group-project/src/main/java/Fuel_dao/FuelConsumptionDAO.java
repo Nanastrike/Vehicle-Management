@@ -26,8 +26,9 @@ public class FuelConsumptionDAO {
      * @param fuel The FuelConsumption object to insert.
      */
     public void insertFuelConsumption(FuelConsumption fuel) {
-        String sql = "INSERT INTO Fuel_Consumption (VehicleID, FuelTypeID, FuelUsed, DistanceTraveled, Timestamp) " +
-                     "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Fuel_Consumption (VehicleID, FuelTypeID, FuelUsed, DistanceTraveled, Timestamp, Status) VALUES (?, ?, ?, ?, ?, ?)";
+        
+
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, fuel.getVehicleId());
@@ -35,6 +36,7 @@ public class FuelConsumptionDAO {
             stmt.setDouble(3, fuel.getFuelUsed());
             stmt.setDouble(4, fuel.getDistanceTraveled());
             stmt.setTimestamp(5, new Timestamp(fuel.getTimestamp().getTime()));
+            stmt.setString(6, fuel.getStatus());
             stmt.executeUpdate();
             System.out.println("Fuel consumption inserted for VehicleID: " + fuel.getVehicleId());
         } catch (SQLException e) {
@@ -62,6 +64,7 @@ public class FuelConsumptionDAO {
                 fc.setFuelUsed(rs.getFloat("FuelUsed"));
                 fc.setDistanceTraveled(rs.getFloat("DistanceTraveled"));
                 fc.setTimestamp(rs.getTimestamp("Timestamp"));
+                fc.setStatus(rs.getString("Status"));
 
                 list.add(fc);
             }
@@ -79,8 +82,7 @@ public class FuelConsumptionDAO {
      * @return True if the update was successful; otherwise, false.
      */
     public boolean updateFuelConsumption(FuelConsumption fc) {
-        String sql = "UPDATE Fuel_Consumption SET VehicleID = ?, FuelTypeID = ?, FuelUsed = ?, " +
-                     "DistanceTraveled = ?, Timestamp = ? WHERE ConsumptionID = ?";
+         String sql = "UPDATE Fuel_Consumption SET VehicleID=?, FuelTypeID=?, FuelUsed=?, DistanceTraveled=?, Timestamp=?, Status=? WHERE ConsumptionID=?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, fc.getVehicleId());
@@ -88,7 +90,9 @@ public class FuelConsumptionDAO {
             stmt.setFloat(3, fc.getFuelUsed());
             stmt.setFloat(4, fc.getDistanceTraveled());
             stmt.setTimestamp(5, fc.getTimestamp());
-            stmt.setInt(6, fc.getConsumptionId());
+            stmt.setString(6, fc.getStatus());
+            stmt.setInt(7, fc.getConsumptionId());
+
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -137,6 +141,7 @@ public class FuelConsumptionDAO {
                 fc.setFuelUsed(rs.getFloat("FuelUsed"));
                 fc.setDistanceTraveled(rs.getFloat("DistanceTraveled"));
                 fc.setTimestamp(rs.getTimestamp("Timestamp"));
+                fc.setStatus(rs.getString("Status"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

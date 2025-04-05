@@ -19,30 +19,19 @@ import module.GPS_Tracking.vehicles.VehicleActionImpl;
 
 import java.io.IOException;
 
-@WebServlet("/resumeDriving")
-public class ResumeDrivingServlet extends HttpServlet {
+@WebServlet("/pauseDriving")
+public class PauseDrivingServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Vehicle currentVehicle = (Vehicle) request.getSession().getAttribute("currentVehicle");
-        Integer operatorId = (Integer) request.getSession().getAttribute("userID");
 
-        if (currentVehicle != null && operatorId != null) {
-            int routeId = currentVehicle.getRouteID();  // ✅ 从 Vehicle 里拿 routeID
-
+        if (currentVehicle != null) {
             VehicleAction vehicleAction = new VehicleActionImpl(currentVehicle);
-            double updatedDistance = vehicleAction.vehicleMovedDistance(routeId, operatorId);
+            vehicleAction.setRunning(false); // 暂停状态
 
-            request.getSession().setAttribute("carDistance", updatedDistance);
-            request.getSession().setAttribute("isPaused", false);
-
-            if (vehicleAction.isArrived(updatedDistance, routeId)) {
-                request.getSession().removeAttribute("isDriving");
-                request.getSession().removeAttribute("currentVehicle");
-                request.getSession().removeAttribute("carDistance");
-                request.getSession().removeAttribute("isPaused");
-            }
+            request.getSession().setAttribute("isPaused", true);
         }
 
-        response.sendRedirect("operatorDashboard");
+        response.sendRedirect("operator_status.jsp");
     }
 }

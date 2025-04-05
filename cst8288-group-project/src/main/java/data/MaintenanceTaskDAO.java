@@ -95,4 +95,36 @@ public class MaintenanceTaskDAO {
         }
         return tasks;
     }
+    
+    // ✅ Count of HIGH priority maintenance tasks
+    public int getHighPriorityTaskCount() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Maintenance_Tasks WHERE Priority = 'High'";
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    // ✅ Most recent maintenance task
+    public MaintenanceTask getMostRecentTask() throws SQLException {
+        String sql = "SELECT * FROM Maintenance_Tasks ORDER BY MaintenanceDate DESC LIMIT 1";
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                MaintenanceTask task = new MaintenanceTask();
+                task.setTaskId(rs.getInt("TaskID"));
+                task.setVehicleId(rs.getString("VehicleID"));
+                task.setTaskType(rs.getString("TaskType"));
+                task.setStatus(rs.getString("Status"));
+                task.setPriority(rs.getString("Priority"));
+                task.setScheduledDate(rs.getTimestamp("MaintenanceDate").toLocalDateTime());
+                task.setCreatedBy(rs.getString("CreatedBy"));
+                return task;
+            }
+        }
+        return null;
+    }
 } 

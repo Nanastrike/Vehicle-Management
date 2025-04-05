@@ -1,9 +1,12 @@
 package presentation;
 
 import data.VehicleDAO;
+import data.MaintenanceTaskDAO;
 import model.VehicleManagement.*;
 import data.DatabaseConnection;
 import data.DashboardDAO;
+import data.gps_tracking.VehicleActionDTO;
+import data.gps_tracking.VehicleActionDaoImpl;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -11,9 +14,11 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import model.MaintenanceTask.MaintenanceTask;
 
 /**
  * VehicleManagementServlet handles all vehicle-related actions such as listing,
@@ -43,6 +48,8 @@ public class VehicleManagementServlet extends HttpServlet {
 
     private Connection conn;
     private VehicleDAO vehicleDAO;
+    private MaintenanceTaskDAO maintenanceTaskDAO;
+    private VehicleActionDaoImpl vehicleActionDaoImpl;
 
     /**
      * Initializes the servlet and sets up database connection and DAO instance.
@@ -52,6 +59,8 @@ public class VehicleManagementServlet extends HttpServlet {
         try {
             conn = DatabaseConnection.getInstance().getConnection();
             vehicleDAO = new VehicleDAO(conn);
+            maintenanceTaskDAO = new MaintenanceTaskDAO(conn);
+            vehicleActionDaoImpl = new VehicleActionDaoImpl(conn);
         } catch (Exception e) {
             throw new ServletException("Error initializing VehicleManagementServlet", e);
         }
@@ -65,26 +74,47 @@ public class VehicleManagementServlet extends HttpServlet {
      * @throws ServletException if a servlet error occurs
      * @throws IOException      if an I/O error occurs
      */
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
         String action = request.getParameter("action");
 
         if (action == null || action.equals("list")) {
             listVehicles(request, response);
         } else if (action.equals("dashboard")) {
-            DashboardDAO dashboardDAO = new DashboardDAO(vehicleDAO);
-            Map<String, Integer> vehicleTypeCounts = dashboardDAO.getVehicleTypeCounts();
-            Vehicle lastVehicle = dashboardDAO.getLastAddedVehicle();
+            DashboardDAO dashboardDAO = new DashboardDAO(vehicleDAO, maintenanceTaskDAO, vehicleActionDaoImpl);
+            try {
+                Map<String, Integer> vehicleTypeCounts = dashboardDAO.getVehicleTypeCounts();
+                Vehicle lastVehicle = dashboardDAO.getLastAddedVehicle();
+                Integer highPriorityCount = dashboardDAO.getHighPriorityTaskCount();
+                MaintenanceTask mostRecentTask = dashboardDAO.getMostRecentTask();
+                VehicleActionDaoImpl gpsDao = new VehicleActionDaoImpl(conn);
+                int runningCount = gpsDao.getRunningVehiclesCount();
+                List<VehicleActionDTO> recentVehicles = gpsDao.getRecentVehicleActions(3);
 
-            request.setAttribute("vehicleTypeCounts", vehicleTypeCounts);
-            request.setAttribute("lastVehicle", lastVehicle);
+                request.setAttribute("runningVehicleCount", runningCount);
+                request.setAttribute("recentVehicles", recentVehicles);
 
-            request.getRequestDispatcher("DashboardPage.jsp").forward(request, response);
+                request.setAttribute("vehicleTypeCounts", vehicleTypeCounts);
+                request.setAttribute("lastVehicle", lastVehicle);
+                request.setAttribute("highPriorityCount", highPriorityCount);
+                request.setAttribute("mostRecentTask", mostRecentTask);
+
+                request.getRequestDispatcher("DashboardPage.jsp").forward(request, response);
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error loading dashboard data.");
+            }
+
+        } else if (action.equals("update")) {
+            showEditForm(request, response);
         } else {
-            response.sendRedirect("DashboardPage.jsp"); // Fallback
+            response.sendRedirect("DashboardPage.jsp");
         }
     }
+
+
 
     /**
      * Handles POST requests for inserting or updating vehicles.
