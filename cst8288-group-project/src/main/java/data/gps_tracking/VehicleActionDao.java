@@ -10,62 +10,98 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Data Access Object (DAO) interface for managing vehicle tracking logs.
+ * Provides CRUD operations and utility queries for handling vehicle movement
+ * data, including distance, timestamps, and operator-related logs.
  *
- * @author silve
+ * @author : Qinyu Luo
+ * @version: 1.0
+ * @course: CST8288
+ * @assignment: Group Project
+ * @time: 2025/04/05
+ * @Description: Defines database interaction methods for vehicle GPS tracking
+ * records, based primarily on vehicle ID.
  */
-//增删改查：车辆距离/时间表相关的数据库内容，基于车辆id
 public interface VehicleActionDao {
-  
+
     /**
-     * output all the vehicle records
-     * @return 
+     * Retrieves the latest movement record for all vehicles (e.g., last known
+     * state).
+     *
+     * @return a list of the most recent VehicleActionDTO entries per vehicle
      */
     List<VehicleActionDTO> getAllVehicleLogs();
-    
+
     /**
-     * 
-     * @param vehicleID
-     * @return 
+     * Retrieves all movement logs for a specific vehicle.
+     *
+     * @param vehicleID the vehicle's unique ID
+     * @return a list of VehicleActionDTO records associated with the vehicle
      */
     List<VehicleActionDTO> getAllLogsByVehicleID(int vehicleID);
-    
+
     /**
-     * 
-     * @param vehicleID
-     * @return 
+     * Retrieves the most recent movement log of a vehicle.
+     *
+     * @param vehicleID the vehicle's ID
+     * @return the latest VehicleActionDTO record, or null if not found
      */
     VehicleActionDTO getVehicleLogs(int vehicleID);
-    
+
     /**
-     * 
-     * @param vehicle
-     * @throws SQLException 
+     * Inserts a new vehicle distance tracking log into the database.
+     *
+     * @param vehicle the log object containing tracking data
+     * @throws SQLException if the database operation fails
      */
     void insertDistanceLog(VehicleActionDTO vehicle) throws SQLException;
 
     /**
-     * delete the chosen vehicle records
-     * @param vehicleID
+     * Deletes all movement logs for a given vehicle.
+     *
+     * @param vehicleID the vehicle's ID
      */
     void deleteVehicleLogs(int vehicleID);
-    
+
     /**
-     * change the info of chosen vehicle record
-     * @param vehicle
+     * Updates an existing vehicle tracking record in the database.
+     *
+     * @param vehicle the updated vehicle action object
      */
     void updateVehicleLogs(VehicleActionDTO vehicle);
-    
+
     /**
-     * 查询数据库中是否已经有该车辆的 LeavingTime，如果有就用数据库里的，
-     * 不再生成新的；如果没有，就生成一次并存进去。
-     * @param vehicleID
-     * @return 
+     * Checks if the vehicle already has a leavingTime in the database. If it
+     * exists, use it; if not, generate and store it once.
+     *
+     * @param vehicleID the vehicle's ID
+     * @return the leaving time recorded in the database (if any)
      */
     LocalDateTime getLeavingTimeFromDB(int vehicleID);
-    
+
+    /**
+     * Returns the number of vehicles that are currently marked as "running".
+     *
+     * @return count of vehicles currently in operation
+     * @throws SQLException if the query fails
+     */
     int getRunningVehiclesCount() throws SQLException;
-    
+
+    /**
+     * Retrieves a limited number of the most recent vehicle tracking logs.
+     *
+     * @param limit the maximum number of records to return
+     * @return a list of recent VehicleActionDTO entries
+     * @throws SQLException if the query fails
+     */
     List<VehicleActionDTO> getRecentVehicleActions(int limit) throws SQLException;
-    
+
+    /**
+     * Calculates the efficiency (e.g., distance per trip or session) for each
+     * operator.
+     *
+     * @return a map of operator names to efficiency values
+     * @throws SQLException if the calculation query fails
+     */
     Map<String, Double> calculateOperatorEfficiency() throws SQLException;
 }
