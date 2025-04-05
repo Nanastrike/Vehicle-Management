@@ -467,15 +467,16 @@
                                 <td>${vehicle.lastMaintenanceDate}</td>
                                 <td>
                                     <form action="MaintenanceServlet" method="post" style="display: inline;">
+                                        <input type="hidden" name="vehicleNumber" value="${vehicle.vehicleNumber}">
                                         <h6>Mechanical Components</h6>
-                                        <input type="checkbox" name="a">Brakes</input><br>
-                                        <input type="checkbox" name="b">Wheels/Tires</input><br><br>
+                                        <input type="checkbox" name="components" value="brakes">Brakes</input><br>
+                                        <input type="checkbox" name="components" value="wheels">Wheels/Tires</input><br><br>
                                         <h6>Electrical Components</h6>
-                                        <input type="checkbox" name="c">Catenary</input><br>
-                                        <input type="checkbox" name="d">Pantograph</input><br><br>
+                                        <input type="checkbox" name="components" value="catenary">Catenary</input><br>
+                                        <input type="checkbox" name="components" value="pantograph">Pantograph</input><br><br>
                                         <h6>Engine Components</h6>
-                                        <input type="checkbox" name="e">Oil Change</input><br>
-                                        <input type="checkbox" name="e">Coolant Change</input><br>
+                                        <input type="checkbox" name="components" value="oil">Oil Change</input><br>
+                                        <input type="checkbox" name="components" value="coolant">Coolant Change</input><br>
                                         <button type="submit" class="btn">Done</button><br>
                                     </form>
                                 </td>
@@ -496,28 +497,71 @@
                             <th>Vehicle Number</th>
                             <th>Brake</th>
                             <th>Wheels</th>
-                            <th>Batery</th>
-                            <th>something</th>
-                            <th>asd</th>
+                            <th>Catenary</th>
+                            <th>Pantograph</th>
+                            <th>Oil</th>
+                            <th>Coolant</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach var="task" items="${scheduledTasks}">
+                        <c:forEach var="status" items="${componentStatuses}">
                             <tr>
-                                <td>${task.vehicleNumber}</td>
-                                <td>${task.taskType}</td>
-                                <td>${task.scheduledDate}</td>
-                                <td>${task.priority}</td>
-                                <td>${task.status}</td>
+                                <td>${status.vehicleId}</td>
                                 <td>
-                                    <form action="MaintenanceServlet" method="post" style="display: inline;">
-                                        <input type="hidden" name="action" value="deleteTask">
-                                        <input type="hidden" name="taskId" value="${task.taskId}">
-                                        <button type="submit" class="btn">Delete</button>
-                                    </form>
+                                    <c:choose>
+                                        <c:when test="${status.componentName eq 'brakes'}">
+                                            <span class="status-${status.status.toLowerCase()}">${status.status}</span>
+                                        </c:when>
+                                        <c:otherwise>-</c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${status.componentName eq 'wheels'}">
+                                            <span class="status-${status.status.toLowerCase()}">${status.status}</span>
+                                        </c:when>
+                                        <c:otherwise>-</c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${status.componentName eq 'catenary'}">
+                                            <span class="status-${status.status.toLowerCase()}">${status.status}</span>
+                                        </c:when>
+                                        <c:otherwise>-</c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${status.componentName eq 'pantograph'}">
+                                            <span class="status-${status.status.toLowerCase()}">${status.status}</span>
+                                        </c:when>
+                                        <c:otherwise>-</c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${status.componentName eq 'oil'}">
+                                            <span class="status-${status.status.toLowerCase()}">${status.status}</span>
+                                        </c:when>
+                                        <c:otherwise>-</c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${status.componentName eq 'coolant'}">
+                                            <span class="status-${status.status.toLowerCase()}">${status.status}</span>
+                                        </c:when>
+                                        <c:otherwise>-</c:otherwise>
+                                    </c:choose>
                                 </td>
                             </tr>
                         </c:forEach>
+                        <c:if test="${empty componentStatuses}">
+                            <tr>
+                                <td colspan="7" style="text-align: center;">No component status data available</td>
+                            </tr>
+                        </c:if>
                     </tbody>
                 </table>
             </div>

@@ -15,6 +15,9 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
+import model.MaintenanceTask.ComponentStatus;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet(name = "MaintenanceServlet", urlPatterns = {"/MaintenanceServlet"})
 public class MaintenanceServlet extends HttpServlet {
@@ -58,6 +61,13 @@ public class MaintenanceServlet extends HttpServlet {
                 request.setAttribute("currentVehicle", currentVehicle);
             }
             
+            // Get saved component statuses from session
+            HttpSession session = request.getSession();
+            List<ComponentStatus> componentStatuses = (List<ComponentStatus>) session.getAttribute("componentStatuses");
+            if (componentStatuses != null) {
+                request.setAttribute("componentStatuses", componentStatuses);
+            }
+            
             if (vehicleList != null) {
                 for (Vehicle v : vehicleList) {
                     System.out.println("Vehicle: ID=" + v.getVehicleID() + 
@@ -95,6 +105,22 @@ public class MaintenanceServlet extends HttpServlet {
         }
     }
     
+    private List<ComponentStatus> mergeComponentStatuses(List<ComponentStatus> existingStatuses, List<ComponentStatus> newStatuses) {
+        List<ComponentStatus> mergedStatuses = new ArrayList<>();
+        
+        // Add existing statuses
+        if (existingStatuses != null) {
+            mergedStatuses.addAll(existingStatuses);
+        }
+        
+        // Add new statuses
+        if (newStatuses != null) {
+            mergedStatuses.addAll(newStatuses);
+        }
+        
+        return mergedStatuses;
+    }
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
@@ -123,6 +149,59 @@ public class MaintenanceServlet extends HttpServlet {
                 int taskId = Integer.parseInt(request.getParameter("taskId"));
                 taskManager.deleteMaintenanceTask(taskId);
                 response.sendRedirect("MaintenanceServlet");
+            } else {
+                // Handle component status update
+                String vehicleNumber = request.getParameter("vehicleNumber");
+                String[] components = request.getParameterValues("components");
+                
+                if (vehicleNumber != null && components != null) {
+                    // Get existing component statuses from session
+                    HttpSession session = request.getSession();
+                    List<ComponentStatus> existingStatuses = (List<ComponentStatus>) session.getAttribute("componentStatuses");
+                    
+                    // Create new component statuses
+                    List<ComponentStatus> newStatuses = new ArrayList<>();
+                    for (String component : components) {
+                        ComponentStatus status = new ComponentStatus(vehicleNumber, component, 0, 0);
+                        status.setLastUpdated(LocalDateTime.now());
+                        newStatuses.add(status);
+                    }
+                    
+                    // Merge existing and new statuses
+                    List<ComponentStatus> mergedStatuses = mergeComponentStatuses(existingStatuses, newStatuses);
+                    
+                    // Store merged statuses in session
+                    session.setAttribute("componentStatuses", mergedStatuses);
+                    // Also store in request for immediate display
+                    request.setAttribute("componentStatuses", mergedStatuses);
+                }
+                
+                // Get vehicle list
+                List<Vehicle> vehicleList = vehicleDAO.getAllVehicles();
+                
+                // Check vehicles needing maintenance
+                List<Vehicle> vehiclesNeedingMaintenance = new ArrayList<>();
+                LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
+                
+                for (Vehicle vehicle : vehicleList) {
+                    if (vehicle.getLastMaintenanceDate() != null) {
+                        LocalDateTime lastMaintenance = vehicle.getLastMaintenanceDate().toLocalDate().atStartOfDay();
+                        if (lastMaintenance.isBefore(threeMonthsAgo)) {
+                            vehiclesNeedingMaintenance.add(vehicle);
+                        }
+                    }
+                }
+                
+                // Get maintenance tasks
+                List<MaintenanceTask> tasks = taskManager.getAllMaintenanceTasks();
+                
+                // Set all necessary attributes
+                request.setAttribute("vehicleList", vehicleList);
+                request.setAttribute("vehiclesNeedingMaintenance", vehiclesNeedingMaintenance);
+                request.setAttribute("scheduledTasks", tasks);
+                
+                // Forward back to maintenance.jsp
+                request.getRequestDispatcher("/maintenance.jsp").forward(request, response);
             }
         } catch (Exception e) {
             System.err.println("Error in MaintenanceServlet doPost: " + e.getMessage());
