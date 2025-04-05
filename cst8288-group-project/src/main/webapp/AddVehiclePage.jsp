@@ -171,7 +171,7 @@
             <label for="maxPassengers">Max Passengers:</label>
             <input type="number" name="maxPassengers" id="maxPassengers" required>
 
-            <label for="routeID">Route ID (Optional):</label>
+            <label for="routeID">Route ID:</label>
             <input type="number" name="routeID" id="routeID" min="0" value="0">
 
             <label for="lastMaintenanceDate">Last Maintenance Date:</label>

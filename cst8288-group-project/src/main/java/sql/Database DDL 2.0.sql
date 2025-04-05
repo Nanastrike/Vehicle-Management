@@ -1,10 +1,9 @@
 -- Database: PTFMS (Public Transit Fleet Management System)
 SET FOREIGN_KEY_CHECKS = 0;
-CREATE DATABASE IF NOT EXISTS PTFMS;
 USE PTFMS;
 
 -- Drop tables if they already exist to avoid conflicts
-DROP TABLE IF EXISTS Operator_Status;
+DROP TABLE IF EXISTS Operator;
 DROP TABLE IF EXISTS Maintenance_Alerts;
 DROP TABLE IF EXISTS Fuel_Consumption;
 DROP TABLE IF EXISTS GPS_Tracking;
