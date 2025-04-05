@@ -447,65 +447,81 @@
                     </tbody>
                 </table>
             </div>
-
+            
             <div class="section">
-                <h2>Component Monitoring</h2>
-                <div class="section">
-                    <form action="MaintenanceServlet" method="GET">
-                        <div class="form-group">
-                            <label for="vehicleNumber">Vehicle Number:</label>
-                            <select id="vehicleNumber" name="vehicleNumber" onchange="this.form.submit()" class="form-select" required>
-                                <option value="">Select Vehicle</option>
-                                <c:forEach items="${vehicleList}" var="vehicle">
-                                    <option value="${vehicle.vehicleNumber}" ${param.vehicleNumber eq vehicle.vehicleNumber ? 'selected' : ''}>
-                                        ${vehicle.vehicleNumber}
-                                    </option>
-                                </c:forEach>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Last Maintenance Date:</label>
-                            <span>
-                                <c:choose>
-                                    <c:when test="${currentVehicle != null && currentVehicle.lastMaintenanceDate != null}">
-                                        ${currentVehicle.lastMaintenanceDate}
-                                    </c:when>
-                                    <c:otherwise>
-                                        No maintenance record
-                                    </c:otherwise>
-                                </c:choose>
-                            </span>
-                        </div>
+                <h2>Maintenance Check</h2>
+                <table class="maintenance-table">
+                    <thead>
+                        <tr>
+                            <th>Vehicle Number</th>
+                            <th>Vehicle Type</th>
+                            <th>Last Maintenance Data</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="vehicle" items="${vehicleList}">
+                            <tr>
+                                <td>${vehicle.vehicleNumber}</td>
+                                <td>${vehicle.vehicleType.typeName}</td>
+                                <td>${vehicle.lastMaintenanceDate}</td>
+                                <td>
+                                    <form action="MaintenanceServlet" method="post" style="display: inline;">
+                                        <h6>Mechanical Components</h6>
+                                        <input type="checkbox" name="a">Brakes</input><br>
+                                        <input type="checkbox" name="b">Wheels/Tires</input><br><br>
+                                        <h6>Electrical Components</h6>
+                                        <input type="checkbox" name="c">Catenary</input><br>
+                                        <input type="checkbox" name="d">Pantograph</input><br><br>
+                                        <h6>Engine Components</h6>
+                                        <input type="checkbox" name="e">Oil Change</input><br>
+                                        <input type="checkbox" name="e">Coolant Change</input><br>
+                                        <button type="submit" class="btn">Done</button><br>
+                                    </form>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+            </div>
 
-                        <div class="form-group">
-                            <label>Components to Check:</label>
-                            <div class="checkbox-group">
-                                <h4>Mechanical Components:</h4>
-                                <input type="checkbox" id="brakes" name="components" value="brakes">
-                                <label for="brakes">Brakes</label>
-                                <input type="checkbox" id="wheels" name="components" value="wheels">
-                                <label for="wheels">Wheels/Tires</label>
-                                
-                                <h4>Electrical Components:</h4>
-                                <input type="checkbox" id="catenary" name="components" value="catenary">
-                                <label for="catenary">Catenary</label>
-                                <input type="checkbox" id="pantograph" name="components" value="pantograph">
-                                <label for="pantograph">Pantograph</label>
-                                
-                                <h4>Engine Components:</h4>
-                                <input type="checkbox" id="oil" name="components" value="oil">
-                                <label for="oil">Oil Change</label>
-                                <input type="checkbox" id="coolant" name="components" value="coolant">
-                                <label for="coolant">Coolant Change</label>
-                            </div>
-                        </div>
-                        
-                        <input type="hidden" name="action" value="checkComponents">
-                        <button type="submit" class="btn">Submit Maintenance Check</button>
-                    </form>
-                </div>
 
+            
+            
+            <div class="section">
+                <h2>Components</h2>
+                <table class="maintenance-table">
+                    <thead>
+                        <tr>
+                            <th>Vehicle Number</th>
+                            <th>Brake</th>
+                            <th>Wheels</th>
+                            <th>Batery</th>
+                            <th>something</th>
+                            <th>asd</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="task" items="${scheduledTasks}">
+                            <tr>
+                                <td>${task.vehicleNumber}</td>
+                                <td>${task.taskType}</td>
+                                <td>${task.scheduledDate}</td>
+                                <td>${task.priority}</td>
+                                <td>${task.status}</td>
+                                <td>
+                                    <form action="MaintenanceServlet" method="post" style="display: inline;">
+                                        <input type="hidden" name="action" value="deleteTask">
+                                        <input type="hidden" name="taskId" value="${task.taskId}">
+                                        <button type="submit" class="btn">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+            </div>
+            
                 <h2>Component Status</h2>
                 <div class="status-section">
                     <table class="status-table">

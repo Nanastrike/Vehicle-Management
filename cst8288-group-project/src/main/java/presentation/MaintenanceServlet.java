@@ -46,7 +46,6 @@ public class MaintenanceServlet extends HttpServlet {
             List<Vehicle> vehicleList = vehicleDAO.getAllVehicles();
             System.out.println("Retrieved vehicle list size: " + (vehicleList != null ? vehicleList.size() : "null"));
             
-            // 如果是組件檢查請求，處理選中的車輛
             String selectedVehicle = request.getParameter("vehicleNumber");
             if ("checkComponents".equals(action) && selectedVehicle != null && !selectedVehicle.isEmpty()) {
                 Vehicle currentVehicle = null;
